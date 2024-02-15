@@ -18,7 +18,7 @@ object Home : Pages {
 
 object JSONMessage : Pages {
     override val icon = Icons.Filled.AccountBox
-    override val route = "message/{json}"
+    override val route = "jsonmessage/{json}"
 }
 
 object Message : Pages {

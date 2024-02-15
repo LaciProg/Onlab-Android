@@ -28,14 +28,20 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.google.gson.Gson
 import hu.bme.aut.android.composenavlibrary.MainActivity.Companion.formDataViewModel
 import hu.bme.aut.android.composenavlibrary.ui.Home
+import hu.bme.aut.android.composenavlibrary.ui.JSONMessage
 import hu.bme.aut.android.composenavlibrary.ui.Message
 import hu.bme.aut.android.composenavlibrary.ui.components.TabBar
 import hu.bme.aut.android.composenavlibrary.ui.pages
 import hu.bme.aut.android.composenavlibrary.ui.theme.ComposeNavLibraryTheme
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filter
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonNames
 
 class MainActivity : ComponentActivity() {
 
@@ -92,7 +98,9 @@ fun NavHostModel(
 
                     //navController.navigateSingleTopTo("message/${formDataTypes["MyForm1"]?.name}/${formDataTypes["MyForm1"]?.age}/${formDataTypes["MyForm1"]?.form}")
                 },
-
+                onClickJSONSend = {
+                    navController.navigateSingleTopTo("jsonmessage/$it")
+                }
 
 
             )
@@ -106,15 +114,28 @@ fun NavHostModel(
                 form = backStackEntry.arguments?.getString("form") ?: ""
             )
         }
+
+        composable(route = JSONMessage.route) { backStackEntry ->
+            JSONMessageScreen(
+                form = backStackEntry.arguments?.getString("json") ?: ""
+            )
+        }
     }
 
 }
 
-class FormData(){
+
+class FormData {
     var name by mutableStateOf("")
     var age by mutableStateOf("")
     var form by mutableStateOf("")
 }
+
+
+data class FormDataDataClass(
+    val name : String,
+    val age : String,
+    )
 
 class FormDataViewModel : ViewModel() {
     /*var name by mutableStateOf("")
@@ -140,6 +161,7 @@ fun MainForm(
     data: FormData?,
     //navController: NavHostController = rememberNavController(),
     onClickSend : () -> Unit = {},
+    onClickJSONSend:  (json : String) -> Unit = { }
 ){
     /*var name by remember { mutableStateOf("") }
     var age by remember { mutableStateOf("") }*/
@@ -173,6 +195,36 @@ fun MainForm(
         Button(onClick = onClickSend) {
             Text(text = "Send")
         }
+
+
+        val formData by remember { mutableStateOf(FormData()) }
+
+        Text(
+            text = "Hello, please give me your name and age!",
+            modifier = Modifier.padding(16.dp)
+        )
+        TextField(
+            value = formData.name,
+            onValueChange = {formData.name = it},
+            label = { Text("Name") },
+            modifier = Modifier.padding(16.dp)
+        )
+        TextField(
+            value = formData.age,
+            onValueChange = {formData.age = it},
+            label = { Text("Age") },
+            modifier = Modifier.padding(16.dp),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+        )
+
+        Text(
+            text = Gson().toJson(FormDataDataClass(formData.name, formData.age)),
+            modifier = Modifier.padding(16.dp)
+        )
+
+        Button(onClick = { onClickJSONSend(Gson().toJson(FormDataDataClass(formData.name, formData.age))) }) {
+            Text(text = "Send")
+        }
     }
 }
 
@@ -191,14 +243,16 @@ fun MessageScreen(
     }
 }
 
-/*
 @Composable
-@Preview(showBackground = true)
-fun MainFormPreview(){
-    ComposeNavLibraryTheme {
-        MainForm()
+fun JSONMessageScreen(
+    form: String
+){
+    val formData = Gson().fromJson(form, FormDataDataClass::class.java)
+    Column {
+        //                   Companion object                                           Parameters
+        Text(text = "Hello ${formData.name}, this is a ${formData.age} old message screen!")
     }
-}*/
+}
 
 fun NavHostController.navigateSingleTopTo(route: String) =
     this.navigate(route) {
