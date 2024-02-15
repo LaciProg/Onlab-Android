@@ -1,28 +1,20 @@
 package hu.bme.aut.android.composenavlibrary
 
 import android.os.Bundle
-import android.text.InputType
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,15 +28,26 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import hu.bme.aut.android.composenavlibrary.MainActivity.Companion.formDataViewModel
 import hu.bme.aut.android.composenavlibrary.ui.Home
 import hu.bme.aut.android.composenavlibrary.ui.Message
 import hu.bme.aut.android.composenavlibrary.ui.components.TabBar
 import hu.bme.aut.android.composenavlibrary.ui.pages
 import hu.bme.aut.android.composenavlibrary.ui.theme.ComposeNavLibraryTheme
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filter
 
 class MainActivity : ComponentActivity() {
+
+    companion object{
+        val formDataViewModel = FormDataViewModel()
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        //val formDataViewModel = FormDataViewModel()
+        formDataViewModel.buildFormDataTypes()
+
         setContent {
             ComposeNavLibraryTheme {
                 val navController = rememberNavController()
@@ -53,30 +56,9 @@ class MainActivity : ComponentActivity() {
                 val currentDestination = currentBackStack?.destination
                 // Change the variable to this and use Overview as a backup screen if this returns null
                 val currentScreen = pages.find { it.route == currentDestination?.route } ?: Home
-                val formDataViewModel = FormDataViewModel()
-                formDataViewModel.buildFormDataTypes()
-                NavHostModel(navController = navController, formDataViewModel.formData  /*formDataTypes = formDataViewModel.formDataTypes*/)
 
+                NavHostModel(navController = navController, formDataTypes = formDataViewModel.formDataTypes)
 
-
-                // A surface container using the 'background' color from the theme
-                /*Scaffold(
-                    topBar = {
-                        TabBar(
-                            allScreens = pages,
-                            onTabSelected = {newScreen ->
-                                navController.navigateSingleTopTo(newScreen.route)
-                            },
-                            currentScreen = currentScreen
-                        )
-                    }
-                ){ innerPaddings ->
-                    Surface(
-                        modifier = Modifier.padding(innerPaddings),
-                    ) {
-                        Greeting("Android")
-                    }
-                }*/
             }
         }
     }
@@ -85,7 +67,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun NavHostModel(
     navController: NavHostController,
-    formData: FormData,
+    formDataTypes: HashMap<String, FormData>,
     modifier: Modifier = Modifier
 ) {
 
@@ -99,24 +81,29 @@ fun NavHostModel(
         composable(
             route = Home.route,
             arguments = listOf(
-                navArgument("name") { type = NavType.StringType },
-                navArgument("age") { type = NavType.StringType }
+                navArgument("form") { type = NavType.StringType }
             )
         ) {
             MainForm(
-                navController = navController,
-                data = formData,
+                //navController = navController,
+                data = formDataTypes["MyForm1"],
                 onClickSend = {
-                    navController.navigateSingleTopTo("message/${formData.name}/${formData.age}")
+                    navController.navigateSingleTopTo("message/${formDataTypes["MyForm1"]?.form}")
+
+                    //navController.navigateSingleTopTo("message/${formDataTypes["MyForm1"]?.name}/${formDataTypes["MyForm1"]?.age}/${formDataTypes["MyForm1"]?.form}")
                 },
+
+
 
             )
         }
         composable(route = Message.route) { backStackEntry ->
             MessageScreen(
-                navController = navController,
-                name = backStackEntry.arguments?.getString("name") ?: "",
-                age = backStackEntry.arguments?.getString("age") ?: ""
+                //navController = navController,
+                //name = backStackEntry.arguments?.getString("name") ?: "",
+                //age = backStackEntry.arguments?.getString("age") ?: "",
+                forms = formDataTypes,
+                form = backStackEntry.arguments?.getString("form") ?: ""
             )
         }
     }
@@ -126,18 +113,18 @@ fun NavHostModel(
 class FormData(){
     var name by mutableStateOf("")
     var age by mutableStateOf("")
+    var form by mutableStateOf("")
 }
 
-class FormDataViewModel() : ViewModel() {
+class FormDataViewModel : ViewModel() {
     /*var name by mutableStateOf("")
     var age by mutableStateOf("")*/
-
-    val formData = FormData()
 
     val formDataTypes = HashMap<String, FormData>()
 
     fun buildFormDataTypes() {
-        formDataTypes["form1"] = FormData()
+        formDataTypes["MyForm1"] = FormData()
+
     }
 
 
@@ -150,13 +137,15 @@ class FormDataViewModel() : ViewModel() {
 @Composable
 fun MainForm(
     modifier: Modifier = Modifier,
-    data: FormData,
-    navController: NavHostController = rememberNavController(),
+    data: FormData?,
+    //navController: NavHostController = rememberNavController(),
     onClickSend : () -> Unit = {},
 ){
     /*var name by remember { mutableStateOf("") }
     var age by remember { mutableStateOf("") }*/
 
+    if(data == null) return
+    data.form = "MyForm1"
     Column(modifier = modifier) {
         Text(
             text = "Hello, please give me your name and age!",
@@ -190,12 +179,15 @@ fun MainForm(
 
 @Composable
 fun MessageScreen(
-    navController: NavHostController,
-    name: String ,
-    age: String
+    //navController: NavHostController,
+    //name: String ,
+    //age: String,
+    forms: HashMap<String, FormData>,
+    form: String
 ){
     Column {
-        Text(text = "Hello $name, this is a $age old message screen!")
+        //                   Companion object                                           Parameters
+        Text(text = "Hello ${formDataViewModel.formDataTypes[form]?.name}, this is a ${forms[form]?.age} old message screen!")
     }
 }
 

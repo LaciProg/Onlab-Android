@@ -16,14 +16,14 @@ object Home : Pages {
     override val route = "home"
 }
 
-object Accounts : Pages {
+object JSONMessage : Pages {
     override val icon = Icons.Filled.AccountBox
-    override val route = "accounts"
+    override val route = "message/{json}"
 }
 
 object Message : Pages {
     override val icon = Icons.Filled.AddCircle
-    override val route = "message/{name}/{age}"
+    override val route = "message/{form}"
 }
 
-val pages = listOf(Home, Accounts, Message)
+val pages = listOf(Home, JSONMessage, Message)
