@@ -87,7 +87,8 @@ fun NavHostModel(
         composable(
             route = Home.route,
             arguments = listOf(
-                navArgument("form") { type = NavType.StringType }
+                navArgument("form") { type = NavType.StringType },
+                navArgument("json") { type = NavType.StringType }
             )
         ) {
             MainForm(
@@ -145,9 +146,7 @@ class FormDataViewModel : ViewModel() {
 
     fun buildFormDataTypes() {
         formDataTypes["MyForm1"] = FormData()
-
     }
-
 
     /*fun name(name: String){ this.name = name }
     fun age(age: String){ this.age = age }
@@ -249,7 +248,6 @@ fun JSONMessageScreen(
 ){
     val formData = Gson().fromJson(form, FormDataDataClass::class.java)
     Column {
-        //                   Companion object                                           Parameters
         Text(text = "Hello ${formData.name}, this is a ${formData.age} old message screen!")
     }
 }
