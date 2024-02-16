@@ -8,7 +8,7 @@ Egyszerű compose alapú form elkészítése, a megadott adatok továbbítása m
 
 ## Fontosabb lépések
 ### 1.  NavController beállítása
-app\src\main\java\hu\bme\aut\android\composenavlibrary\MainActivity.kt
+[app\src\main\java\hu\bme\aut\android\composenavlibrary\MainActivity.kt](https://github.com/LaciProg/Onlab-Android/blob/NavComp/app/src/main/java/hu/bme/aut/android/composenavlibrary/MainActivity.kt)
 ~~~kt
 //Get the NavControllet entity
 val navController = rememberNavController()
@@ -19,7 +19,7 @@ val currentDestination = currentBackStack?.destination
 val currentScreen = pages.find { it.route == currentDestination?.route } ?: Home
 ~~~ 
 ### 2. EndPointok megtervezése
-app\src\main\java\hu\bme\aut\android\composenavlibrary\ui\Pages.kt
+[app\src\main\java\hu\bme\aut\android\composenavlibrary\ui\Pages.kt](https://github.com/LaciProg/Onlab-Android/blob/NavComp/app/src/main/java/hu/bme/aut/android/composenavlibrary/ui/Pages.kt)
 ~~~kt
 //For collection and similar behaviours
 interface Pages {
