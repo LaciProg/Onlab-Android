@@ -10,7 +10,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -21,8 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hu.bme.aut.android.examapp.data.MultipleChoiceData
-import hu.bme.aut.android.examapp.data.TrueFalseData
-import kotlin.random.Random
 
 @Composable
 fun MultipleChoiceQuestion(question: MultipleChoiceData = MultipleChoiceData("Default question", previewAnswerList, 0)) {
