@@ -56,3 +56,17 @@ fun GreetingPreview() {
         Greeting("Android")
     }
 }
+
+@Preview(showBackground = true)
+@Composable
+fun TrueFalseQuestionPreview() {
+    ExamAppTheme {
+        Column {
+
+            TrueFalseQuestion()
+            EditTrueFalseQuestion()
+            MultipleChoiceQuestion()
+            EditMultipleChoiceQuestion()
+        }
+    }
+}

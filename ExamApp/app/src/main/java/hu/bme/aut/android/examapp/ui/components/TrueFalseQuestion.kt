@@ -1,7 +1,5 @@
 package hu.bme.aut.android.examapp.ui.components
 
-import android.text.Editable
-import android.widget.EditText
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
