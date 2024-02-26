@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -104,7 +105,7 @@ private fun Editable(
     onCorrectAnswerChange: (Int) -> Unit = {},
 ) {
     Column(modifier = Modifier.fillMaxWidth()){
-        TextField(
+        OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             value = question,
             onValueChange = { onQuestionChanged(it) }
@@ -126,7 +127,7 @@ private fun Editable(
                     Text(text = (index+'A'.code).toChar().toString())
                 }
                 Log.d("MultipleChoiceQuestion", "questionNumber: $index")
-                TextField(
+                OutlinedTextField(
                     modifier = Modifier.weight(8f),
                     value = answer,
                     onValueChange = { onAnswerChange(it, index) }

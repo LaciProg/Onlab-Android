@@ -28,12 +28,12 @@ import hu.bme.aut.android.examapp.data.room.dto.TypeDto
     version = 1,
     exportSchema = false)
 abstract class ExamDatabase : RoomDatabase() {
-    abstract fun ExamDao(): ExamDao
-    abstract fun TrueFalseQuestionDao(): TrueFalseQuestionDao
-    abstract fun MultipleChoiceQuestionDao(): MultipleChoiceQuestionDao
-    abstract fun TopicDao(): TopicDao
-    abstract fun TypeDao(): TypeDao
-    abstract fun PointDao(): PointDao
+    abstract fun examDao(): ExamDao
+    abstract fun trueFalseQuestionDao(): TrueFalseQuestionDao
+    abstract fun multipleChoiceQuestionDao(): MultipleChoiceQuestionDao
+    abstract fun topicDao(): TopicDao
+    abstract fun typeDao(): TypeDao
+    abstract fun pointDao(): PointDao
 
     companion object {
         @Volatile
