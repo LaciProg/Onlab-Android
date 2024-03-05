@@ -1,3 +1,21 @@
 <resources>
     <string name="app_name">ExamApp</string>
+
+    <string name="back_button">Back</string>
+    <string name="delete">Delete</string>
+    <string name="save_action">Save</string>
+
+    <string name="delete_question">Are you sure you want to delete?</string>
+    <string name="no_topic_description">Oops!\nNo topic in the list.\nTap + to add.</string>
+    <string name="edit_topic">Edit Topic</string>
+    <string name="topic">Topic</string>
+    <string name="topic_entry_title">Add Topic</string>
+    <string name="topic_description_req">Topic Description*</string>
+    <string name="topic_name_req">Topic*</string>
+
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+
+    <string name="required_fields">*required fields</string>
+
 </resources>

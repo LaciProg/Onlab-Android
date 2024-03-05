@@ -7,18 +7,11 @@ import androidx.room.PrimaryKey
 
 @Entity(
     tableName = "topic",
-    foreignKeys = [
-        ForeignKey(
-            entity = TopicDto::class,
-            parentColumns = arrayOf("id"),
-            childColumns = arrayOf("parentId"),
-            onDelete = ForeignKey.SET_NULL
-        )],
-    indices = [androidx.room.Index(value = ["parentId"])]
+    indices = [androidx.room.Index(value = ["topic"], unique = true), androidx.room.Index(value = ["parentTopic"])]
 )
 data class TopicDto(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name =  "id") var id: Int,
-    @ColumnInfo(name =  "topic")var topic: String,
+    @ColumnInfo(name =  "topic") var topic: String,
     @ColumnInfo(name =  "description")var description: String,
-    @ColumnInfo(name =  "parentId")var parentId: Int
+    @ColumnInfo(name =  "parentTopic")var parentTopic: String
 )

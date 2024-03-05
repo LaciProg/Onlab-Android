@@ -26,8 +26,8 @@ interface TopicDao {
     @Query("SELECT * FROM topic WHERE id = :id")
     fun getTopicById(id: Int): Flow<TopicDto>
 
-    @Query("SELECT * FROM topic WHERE parentId = :parentId")
-    fun getTopicsByParentId(parentId: Int): Flow<List<TopicDto>>
+    @Query("SELECT * FROM topic WHERE parentTopic = :parentTopic")
+    fun getTopicsByParentId(parentTopic: String): Flow<List<TopicDto>>
 
     @Query("SELECT * FROM topic WHERE topic = :topic")
     fun getTopicByTopic(topic: String): Flow<TopicDto>

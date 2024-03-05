@@ -15,21 +15,36 @@ object ScreenThird : ExamDestination{
     override val route: String = "Third"
 }
 object ScreenFourth : ExamDestination{
-    override val route: String = "Fourth"
+    override val route: String = "Exit"
 }
 object ScreenFive : ExamDestination{
     override val route: String = "Fifth"
 }
 
-/*
-sealed class ExamDestination(val route: String) {
-    data object ScreenFirst : ExamDestination("ScreenFirst")
-    data object ScreenSecond : ExamDestination("ScreenSecond")
-    data object ScreenThird : ExamDestination("ScreenThird")
-    data object ScreenFourth : ExamDestination("ScreenFourth")
-    data object ScreenFive : ExamDestination("ScreenFive")
+object NewTopic : ExamDestination{
+    override val route: String = "NewTopic"
+}
 
-    val examTabRowScreens = listOf(ScreenFirst, ScreenSecond, ScreenThird, ScreenFourth, ScreenFive)
-}*/
+object TopicDetails : ExamDestination{
+    override val route: String = "TopicDetails"
+    const val topicNameArg = "itemId"
+    val routeWithArgs = "$route/{$topicNameArg}"
+}
 
 val examTabRowScreens = listOf(ScreenFirst, ScreenSecond, ScreenThird, ScreenFourth, ScreenFive)
+
+/*
+open class ExamDestination(val route: String = "ScreenFirst") {
+    object ScreenFirst : ExamDestination("ScreenFirst")
+    object ScreenSecond : ExamDestination("ScreenSecond")
+    object ScreenThird : ExamDestination("ScreenThird")
+    object ScreenFourth : ExamDestination("ScreenFourth")
+    object ScreenFive : ExamDestination("ScreenFive")
+    object NewTopic : ExamDestination("NewTopic")
+
+    companion object {
+        val examTabRowScreens = listOf(ScreenFirst, ScreenSecond, ScreenThird, ScreenFourth, ScreenFive)
+    }
+    //val examTabRowScreens = listOf(ScreenFirst, ScreenSecond, ScreenThird, ScreenFourth, ScreenFive)
+}*/
+

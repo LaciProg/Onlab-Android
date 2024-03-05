@@ -1,5 +1,8 @@
 package hu.bme.aut.android.examapp.data
 
 data class TrueFalseData(
-    var question: String,
-    var answer: Boolean)
+    val question: String,
+    val answer: Boolean,
+    val topic: String,
+    val point: String
+)

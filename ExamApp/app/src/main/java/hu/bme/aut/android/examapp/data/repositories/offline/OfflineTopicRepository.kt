@@ -12,6 +12,6 @@ class OfflineTopicRepository(private val topicDao: TopicDao) : TopicRepository {
     override fun getAllTopics() = topicDao.getAllTopics()
     override fun getTopicById(id: Int) = topicDao.getTopicById(id)
     override fun getAllTopicName() = topicDao.getAllTopicName()
-    override fun getTopicsByParentId(parentId: Int) = topicDao.getTopicsByParentId(parentId)
+    override fun getTopicsByParentId(parentTopic: String) = topicDao.getTopicsByParentId(parentTopic)
     override fun getTopicByTopic(topic: String): Flow<TopicDto> = topicDao.getTopicByTopic(topic)
 }

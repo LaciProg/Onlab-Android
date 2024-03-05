@@ -1,11 +1,14 @@
 package hu.bme.aut.android.examapp.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -37,38 +40,34 @@ fun TrueFalseQuestion(question: String = "Default question") {
 }
 
 @Composable
-fun EditTrueFalseQuestion(questionData: TrueFalseData = TrueFalseData("Default", false), onQuestionChanged: (TrueFalseData) -> Unit = {}) {
+fun EditTrueFalseQuestion(questionData: TrueFalseData = TrueFalseData("Default", false, "Compose", "Plus/Minus/2"), onQuestionChanged: (TrueFalseData) -> Unit = {}) {
     var question by remember { mutableStateOf(questionData.question) }
     var answer by remember { mutableStateOf(questionData.answer) }
-    Column {
-
-        TrueFalseQuestionRow(question = question, isEditable = true, onQuestionChanged = { question = it }, onAnswerChange =  { answer = it })
-        /*Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ){
-            TextField(
-                modifier = Modifier.weight(4f),
-                value = question,
-                onValueChange = { question = it }
+    var topic by remember { mutableStateOf("") }
+    var point by remember { mutableStateOf("") }
+    Scaffold(
+        topBar = {
+            PointTopicBar(
+                onChooseTopic = {
+                    Log.d("MultiQuestionTopic", it)
+                    topic = it
+                },
+                onChoosePoint = {
+                    Log.d("MultiQuestionPoint", it)
+                    point = it
+                }
             )
-            Spacer(Modifier.width(16.dp))
-            TextButton(
-                modifier = Modifier.weight(1f),
-                onClick = { answer = true }
-            ) {
-                Text("True")
+        }
+    ) { innerPadding ->
+        Column(modifier = Modifier.padding(innerPadding)) {
+            TrueFalseQuestionRow(
+                question = question,
+                isEditable = true,
+                onQuestionChanged = { question = it },
+                onAnswerChange = { answer = it })
+            Button(onClick = { onQuestionChanged(TrueFalseData(question, answer, topic, point)) }) {
+                Text("Save")
             }
-            Spacer(Modifier.width(16.dp))
-            TextButton(
-                modifier = Modifier.weight(1f),
-                onClick = { answer = false}
-            ) {
-                Text("False")
-            }
-        }*/
-        Button(onClick = { onQuestionChanged(TrueFalseData(question, answer)) }) {
-            Text("Save")
         }
     }
 }

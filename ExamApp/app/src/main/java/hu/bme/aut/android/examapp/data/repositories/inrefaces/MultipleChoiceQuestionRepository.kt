@@ -10,7 +10,7 @@ interface MultipleChoiceQuestionRepository {
     suspend fun deleteMultipleChoiceQuestion(multipleChoiceQuestion: MultipleChoiceQuestionDto)
     fun getAllMultipleChoiceQuestions(): Flow<List<MultipleChoiceQuestionDto>>
     fun getMultipleChoiceQuestionById(id: Int): Flow<MultipleChoiceQuestionDto>
-    fun getMultipleChoiceQuestionsByTopic(topicId: Int): Flow<Map<TopicDto,List<MultipleChoiceQuestionDto>>>
+    fun getMultipleChoiceQuestionsByTopic(topic: String): Flow<Map<TopicDto,List<MultipleChoiceQuestionDto>>>
     fun getMultipleChoiceQuestionsByType(typeId: Int): Flow<List<MultipleChoiceQuestionDto>>
     fun getAllMultipleChoiceQuestionQuestion(): Flow<List<String>>
 

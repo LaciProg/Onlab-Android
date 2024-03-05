@@ -29,8 +29,8 @@ interface MultipleChoiceQuestionDao {
 
     @Query("SELECT * FROM multipleChoiceQuestion" +
             " JOIN topic ON multipleChoiceQuestion.topicId = topic.id" +
-            " WHERE topic.id = :topicId OR topic.parentId = :topicId")
-    fun getMultipleChoiceQuestionsByTopic(topicId: Int): Flow<Map<TopicDto ,List<MultipleChoiceQuestionDto>>>
+            " WHERE topic.topic = :topic OR topic.parentTopic = :topic")
+    fun getMultipleChoiceQuestionsByTopic(topic: String): Flow<Map<TopicDto ,List<MultipleChoiceQuestionDto>>>
 
     @Query("SELECT * FROM multipleChoiceQuestion" +
             " JOIN type ON multipleChoiceQuestion.topicId = type.id" +

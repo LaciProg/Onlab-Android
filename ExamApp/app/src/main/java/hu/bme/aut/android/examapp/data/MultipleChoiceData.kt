@@ -3,5 +3,7 @@ package hu.bme.aut.android.examapp.data
 data class MultipleChoiceData(
     val question: String,
     val answers: List<String>,
-    val correctAnswer: Int
+    val correctAnswer: Int,
+    val topic: String,
+    val point: String
 )

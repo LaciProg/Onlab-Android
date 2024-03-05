@@ -17,15 +17,27 @@
 package hu.bme.aut.android.examapp.ui
 
 
+import android.util.Log
+import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import hu.bme.aut.android.examapp.DefaultPreview
+import androidx.navigation.navArgument
+import hu.bme.aut.android.examapp.DefaultMulti
+import hu.bme.aut.android.examapp.DefaultTrueFalse
 import hu.bme.aut.android.examapp.Greeting
-import hu.bme.aut.android.examapp.ui.components.TrueFalseQuestion
+import hu.bme.aut.android.examapp.ui.components.DropDownList
+import hu.bme.aut.android.examapp.ui.topic.NewTopic
+import hu.bme.aut.android.examapp.ui.topic.TopicView
+import hu.bme.aut.android.examapp.ui.topic.TopicDetails
+import hu.bme.aut.android.examapp.ui.viewmodel.TopicEntryViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun ExamNavHost(
@@ -37,28 +49,40 @@ fun ExamNavHost(
         startDestination = /*ExamDestination.*/ScreenFirst.route,
         modifier = modifier
     ) {
-        composable(route = /*ExamDestination.*/ScreenFirst.route) {
-            Greeting(name = "Laci"
-                /*onClickSeeAllAccounts = {
-                    navController.navigateSingleTopTo(ExamDestination.ScreenSecond.route)
-                },
-                onClickSeeAllBills = {
-                    navController.navigateSingleTopTo(Bills.route)
-                },
-                onAccountClick = { accountType ->
-                    navController.navigateToSingleAccount(accountType)
-                }*/
+        composable(
+            route = /*ExamDestination.*/ScreenFirst.route,
+
+        ) {
+
+            TopicView(
+                addNewTopic = { navController.navigate(/*ExamDestination.*/NewTopic.route) },
+                navigateToTopicDetails = { topicName ->
+                    navController.navigate(/*ExamDestination.*/"${TopicDetails.route}/$topicName")
+                }
             )
         }
         composable(route = /*ExamDestination.*/ScreenSecond.route) {
-            DefaultPreview(
+            DefaultTrueFalse(
                 /*onAccountClick = { accountType ->
                     navController.navigateToSingleAccount(accountType)
                 }*/
             )
         }
         composable(route = /*ExamDestination.*/ScreenThird.route) {
-            TrueFalseQuestion()
+            DefaultMulti()
+        }
+        composable(route = /*ExamDestination.*/NewTopic.route) {
+            NewTopic(
+                navigateBack = { navController.popBackStack() },
+                onNavigateUp = { navController.navigateUp() },
+            )
+        }
+        composable(
+            route = /*ExamDestination.*//*"${TopicDetails.route}/{topicName}"*/TopicDetails.routeWithArgs) {
+            TopicDetails(
+                navigateBack = { navController.popBackStack() }
+            )
+
         }
     }
 }

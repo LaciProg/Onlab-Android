@@ -29,8 +29,8 @@ interface TrueFalseQuestionDao {
 
     @Query("SELECT * FROM trueFalseQuestion" +
             " JOIN topic ON trueFalseQuestion.topicId = topic.id" +
-            " WHERE topic.id = :topicId OR topic.parentId = :topicId")
-    fun getTrueFalseQuestionsByTopic(topicId: Int): Flow<Map<TopicDto ,List<TrueFalseQuestionDto>>>
+            " WHERE topic.topic = :topic OR topic.parentTopic = :topic")
+    fun getTrueFalseQuestionsByTopic(topic: String): Flow<Map<TopicDto ,List<TrueFalseQuestionDto>>>
 
     @Query("SELECT * FROM trueFalseQuestion" +
             " JOIN type ON trueFalseQuestion.topicId = type.id" +

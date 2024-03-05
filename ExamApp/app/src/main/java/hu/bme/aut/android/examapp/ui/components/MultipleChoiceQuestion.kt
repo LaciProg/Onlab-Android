@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -23,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import hu.bme.aut.android.examapp.data.MultipleChoiceData
 
 @Composable
-fun MultipleChoiceQuestion(question: MultipleChoiceData = MultipleChoiceData("Default question", previewAnswerList, 0)) {
+fun MultipleChoiceQuestion(question: MultipleChoiceData = MultipleChoiceData("Default question", previewAnswerList, 0, "Compose", "Plus/4")) {
     //val answersRandomized = answers.shuffled()
     MultipleChoiceQuestionRow(question = question.question, answers = question.answers.toMutableList(), isEditable = false)
 
@@ -47,28 +48,48 @@ fun MultipleChoiceQuestion(question: MultipleChoiceData = MultipleChoiceData("De
 
 @Composable
 fun EditMultipleChoiceQuestion(
-    question: MultipleChoiceData = MultipleChoiceData("Default question", previewAnswerList, 0),
+    question: MultipleChoiceData = MultipleChoiceData("Default question", previewAnswerList, 0, "Compose", "Plus/4"),
     onQuestionChanged: (MultipleChoiceData) -> Unit = {},
 ) {
     var questionName by remember { mutableStateOf(question.question) }
     val answers = remember { question.answers.toMutableList() }
     var correctAnswer by remember { mutableIntStateOf(question.correctAnswer) }
-    Column {
-        MultipleChoiceQuestionRow(question = questionName,
-            answers = answers,
-            isEditable = true,
-            onQuestionChanged = { questionName = it },
-            onAnswerChange = { answer: String, index: Int ->
-                answers[index] = answer
-            },
-            onCorrectAnswerChange = { correct:Int ->
-                correctAnswer = correct
-                Log.d("EditMultipleChoiceQuestion", "correctAnswer: $correctAnswer")}
-        )
-        Button(onClick = { onQuestionChanged(MultipleChoiceData(questionName, answers, correctAnswer)) }) {
-            Text("Save")
+    var topic by remember { mutableStateOf("") }
+    var point by remember { mutableStateOf("") }
+    Scaffold(
+        topBar = {
+            PointTopicBar(
+                onChooseTopic = {
+                    Log.d("MultiQuestionTopic", it)
+                    topic = it
+                                },
+                onChoosePoint = {
+                    Log.d("MultiQuestionPoint", it)
+                    point = it
+                }
+            )
+        }
+    ) { innerPadding ->
+        Column(modifier = Modifier.padding(innerPadding)) {
+            MultipleChoiceQuestionRow(question = questionName,
+                answers = answers,
+                isEditable = true,
+                onQuestionChanged = { questionName = it },
+                onAnswerChange = { answer: String, index: Int ->
+                    answers[index] = answer
+                },
+                onCorrectAnswerChange = { correct: Int ->
+                    correctAnswer = correct
+                    //Log.d("EditMultipleChoiceQuestion", "correctAnswer: $correctAnswer")
+                }
+            )
+            Button(onClick = { onQuestionChanged(MultipleChoiceData(questionName, answers, correctAnswer, topic, point)) }) {
+                Text("Save")
+            }
+
         }
     }
+
 }
 
 @Composable
@@ -126,7 +147,7 @@ private fun Editable(
                 ) {
                     Text(text = (index+'A'.code).toChar().toString())
                 }
-                Log.d("MultipleChoiceQuestion", "questionNumber: $index")
+                //Log.d("MultipleChoiceQuestion", "questionNumber: $index")
                 OutlinedTextField(
                     modifier = Modifier.weight(8f),
                     value = answer,

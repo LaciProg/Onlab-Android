@@ -17,7 +17,7 @@ class OfflineTrueFalseQuestionRepository(private val trueFalseQuestionDao: TrueF
             trueFalseQuestionDao.deleteTrueFalseQuestion(trueFalseQuestion)
        override fun getAllTrueFalseQuestions(): Flow<List<TrueFalseQuestionDto>> = trueFalseQuestionDao.getAllTrueFalseQuestions()
        override fun getTrueFalseQuestionById(id: Int): Flow<TrueFalseQuestionDto> = trueFalseQuestionDao.getTrueFalseQuestionById(id)
-       override fun getTrueFalseQuestionsByTopic(topicId: Int): Flow<Map<TopicDto, List<TrueFalseQuestionDto>>> = trueFalseQuestionDao.getTrueFalseQuestionsByTopic(topicId)
+       override fun getTrueFalseQuestionsByTopic(topic: String): Flow<Map<TopicDto, List<TrueFalseQuestionDto>>> = trueFalseQuestionDao.getTrueFalseQuestionsByTopic(topic)
        override fun getTrueFalseQuestionsByType(typeId: Int): Flow<List<TrueFalseQuestionDto>> = trueFalseQuestionDao.getTrueFalseQuestionsByType(typeId)
        override fun getAllTrueFalseQuestionQuestion() = trueFalseQuestionDao.getAllTrueFalseQuestionQuestion()
 

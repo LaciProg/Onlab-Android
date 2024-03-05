@@ -1,0 +1,168 @@
+package hu.bme.aut.android.examapp.ui.topic
+
+import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.lifecycle.viewmodel.compose.viewModel
+import hu.bme.aut.android.examapp.R
+import hu.bme.aut.android.examapp.ui.AppViewModelProvider
+import hu.bme.aut.android.examapp.ui.components.DropDownList
+import hu.bme.aut.android.examapp.ui.viewmodel.TopicDetails
+import hu.bme.aut.android.examapp.ui.viewmodel.TopicEntryViewModel
+import hu.bme.aut.android.examapp.ui.viewmodel.TopicListViewModel
+import hu.bme.aut.android.examapp.ui.viewmodel.TopicUiState
+import kotlinx.coroutines.launch
+import java.util.Currency
+import java.util.Locale
+
+@Composable
+fun NewTopic(
+    navigateBack: () -> Unit,
+    onNavigateUp: () -> Unit,
+    canNavigateBack: Boolean = true,
+    viewModel: TopicEntryViewModel = viewModel(factory = AppViewModelProvider.Factory)
+) {
+    val coroutineScope = rememberCoroutineScope()
+    Scaffold(
+        topBar = {
+                Text(text = "New topic")
+        }
+    ) { innerPadding ->
+        TopicEntryBody(
+            topicUiState = viewModel.topicUiState,
+            onTopicValueChange = viewModel::updateUiState,
+            onSaveClick = {
+                coroutineScope.launch {
+                    viewModel.saveTopic()
+                    navigateBack()
+                }
+            },
+            modifier = Modifier
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
+                .fillMaxWidth()
+        )
+    }
+}
+
+@Composable
+fun TopicEntryBody(
+    topicUiState: TopicUiState,
+    onTopicValueChange: (TopicDetails) -> Unit,
+    onSaveClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
+        modifier = modifier.padding(dimensionResource(id = R.dimen.padding_medium))
+    ) {
+        TopicInputForm(
+            topicDetails = topicUiState.topicDetails,
+            onValueChange = onTopicValueChange,
+            modifier = Modifier.fillMaxWidth()
+        )
+        Button(
+            onClick = onSaveClick,
+            enabled = topicUiState.isEntryValid,
+            shape = MaterialTheme.shapes.small,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(stringResource(R.string.save_action))
+        }
+    }
+}
+
+@Composable
+fun TopicInputForm(
+    topicDetails: TopicDetails,
+    modifier: Modifier = Modifier,
+    onValueChange: (TopicDetails) -> Unit = {},
+    enabled: Boolean = true,
+    listViewModel: TopicListViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    topicViewModel: TopicEntryViewModel = viewModel(factory = AppViewModelProvider.Factory)
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
+    ) {
+        OutlinedTextField(
+            value = topicDetails.topic,
+            onValueChange = { onValueChange(topicDetails.copy(topic = it)) },
+            label = { Text(stringResource(R.string.topic_name_req)) },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+            ),
+            modifier = Modifier.fillMaxWidth(),
+            enabled = enabled,
+            singleLine = true
+        )
+        OutlinedTextField(
+            value = topicDetails.description,
+            onValueChange = { onValueChange(topicDetails.copy(description = it)) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            label = { Text(stringResource(R.string.topic_description_req)) },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+            ),
+            leadingIcon = { Text(Currency.getInstance(Locale.getDefault()).symbol) },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = enabled,
+            singleLine = true
+        )
+        DropDownList(
+            name = stringResource(R.string.topic),
+            items = listViewModel.topicListUiState.collectAsState().value.itemList,
+            onChoose = { onValueChange(topicDetails.copy(parent = it)) },
+            default = topicDetails,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        /*
+        OutlinedTextField(
+            value = itemDetails.quantity,
+            onValueChange = { onValueChange(itemDetails.copy(quantity = it)) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            label = { Text(stringResource(R.string.quantity_req)) },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+            ),
+            modifier = Modifier.fillMaxWidth(),
+            enabled = enabled,
+            singleLine = true
+        )*/
+        if (enabled) {
+            Text(
+                text = stringResource(R.string.required_fields),
+                modifier = Modifier.padding(start = dimensionResource(id = R.dimen.padding_medium))
+            )
+        }
+    }
+}
