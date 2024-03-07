@@ -4,16 +4,26 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import hu.bme.aut.android.examapp.ui.AppViewModelProvider
 import hu.bme.aut.android.examapp.ui.ExamDestination
 //import hu.bme.aut.android.examapp.ui.ExamDestination.Companion.examTabRowScreens
 import hu.bme.aut.android.examapp.ui.ExamNavHost
@@ -29,16 +39,21 @@ import hu.bme.aut.android.examapp.ui.components.TrueFalseQuestion
 import hu.bme.aut.android.examapp.ui.navigateSingleTopTo
 import hu.bme.aut.android.examapp.ui.examTabRowScreens
 import hu.bme.aut.android.examapp.ui.theme.ExamAppTheme
+import hu.bme.aut.android.examapp.ui.viewmodel.type.TypeViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d("MainActivity", /*ExamDestination.*/ScreenThird.route)
         setContent {
-            MainScreen()
+            RegisterQuestionTypes()
+            NavigationComponent()
         }
     }
 }
+
+@Composable
+fun RegisterQuestionTypes(viewModel: TypeViewModel = viewModel(factory = AppViewModelProvider.Factory)){}
 
 @Composable
 fun DefaultTrueFalse() {
@@ -63,12 +78,12 @@ fun DefaultMulti() {
 }
 
 @Composable
-fun MainScreen() {
+fun NavigationComponent() {
     ExamAppTheme {
         val navController = rememberNavController()
         val currentBackStack by navController.currentBackStackEntryAsState()
         val currentDestination = currentBackStack?.destination
-        Log.d("MainScreen", "currentDestination: $currentDestination")
+        Log.d("NavigationComponent", "currentDestination: $currentDestination")
         val currentScreen = //ExamDestination.ScreenFirst
             examTabRowScreens.find { it.route == currentDestination?.route } ?: /*ExamDestination.*/ScreenFirst
 
@@ -93,6 +108,38 @@ fun MainScreen() {
 }
 
 @Composable
+fun MainScreen(
+    navigateToTopicList: () -> Unit,
+    navigateToPointList: () -> Unit
+){
+    Column(
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth(),
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            modifier = Modifier.wrapContentSize(),
+            text = "Welcome to the Exam App!"
+        )
+        OutlinedButton(
+            onClick = { navigateToTopicList() },
+            shape = MaterialTheme.shapes.small,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(stringResource(R.string.topic))
+        }
+        OutlinedButton(
+            onClick = { navigateToPointList() },
+            shape = MaterialTheme.shapes.small,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(stringResource(R.string.point))
+        }
+    }
+}
+
+@Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
     Text(
         text = "Hello $name!",
@@ -102,8 +149,8 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 
 @Composable
 @Preview(showBackground = true)
-fun MainScreenPreview() {
-    MainScreen()
+fun MNavigationComponentPreview() {
+    NavigationComponent()
 }
 
 @Preview(showBackground = true)

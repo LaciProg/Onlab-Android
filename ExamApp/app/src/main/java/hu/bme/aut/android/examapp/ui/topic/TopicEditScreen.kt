@@ -1,33 +1,38 @@
 package hu.bme.aut.android.examapp.ui.topic
 
-import androidx.compose.material3.ExperimentalMaterial3Api
+import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import hu.bme.aut.android.examapp.ui.AppViewModelProvider
-import hu.bme.aut.android.examapp.ui.viewmodel.TopicDetails
-import hu.bme.aut.android.examapp.ui.viewmodel.TopicEditViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.TopicEntryViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.TopicUiState
-import kotlinx.coroutines.Job
+import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicEditViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun TopicDetails(
+fun TopicEditScreen(
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TopicEditViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val coroutineScope = rememberCoroutineScope()
-
+    val context = LocalContext.current
     TopicEntryBody(
         topicUiState = viewModel.topicUiState,
         onTopicValueChange = viewModel::updateUiState,
         onSaveClick = {
             coroutineScope.launch {
-                viewModel.updateTopic()
-                navigateBack()
+                if(viewModel.updateTopic()){
+                    navigateBack()
+                }
+                else{
+                    Toast.makeText(
+                        context,
+                        "Topic with this name already exists",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
             }
         },
         modifier = modifier

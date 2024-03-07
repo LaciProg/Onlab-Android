@@ -21,17 +21,52 @@ object ScreenFive : ExamDestination{
     override val route: String = "Fifth"
 }
 
-object NewTopic : ExamDestination{
-    override val route: String = "NewTopic"
+object MainScreenDestination : ExamDestination {
+    override val route = "MainScreen"
 }
 
-object TopicDetails : ExamDestination{
+object TopicListDestination : ExamDestination {
+    override val route = "TopicList"
+}
+
+object TopicDetailsDestination : ExamDestination{
     override val route: String = "TopicDetails"
-    const val topicNameArg = "itemId"
+    const val topicNameArg = "topicName"
     val routeWithArgs = "$route/{$topicNameArg}"
 }
 
-val examTabRowScreens = listOf(ScreenFirst, ScreenSecond, ScreenThird, ScreenFourth, ScreenFive)
+object TopicEditDestination : ExamDestination {
+    override val route = "TopicEdit"
+    const val topicNameArg = "topicName"
+    val routeWithArgs = "$route/{$topicNameArg}"
+}
+
+object NewTopicDestination : ExamDestination{
+    override val route: String = "NewTopic"
+}
+
+object PointListDestination : ExamDestination {
+    override val route = "PointList"
+}
+
+object PointDetailsDestination : ExamDestination{
+    override val route: String = "PointDetails"
+    const val pointNameArg = "pointName"
+    val routeWithArgs = "$route/{$pointNameArg}"
+}
+
+object PointEditDestination : ExamDestination {
+    override val route = "PointEdit"
+    const val pointNameArg = "pointName"
+    val routeWithArgs = "$route/{$pointNameArg}"
+}
+
+object NewPointDestination : ExamDestination{
+    override val route: String = "NewPoint"
+}
+
+
+val examTabRowScreens = listOf(MainScreenDestination, ScreenSecond, ScreenThird, ScreenFourth, ScreenFive)
 
 /*
 open class ExamDestination(val route: String = "ScreenFirst") {

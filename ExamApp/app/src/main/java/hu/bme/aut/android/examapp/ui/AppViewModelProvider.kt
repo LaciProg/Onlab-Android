@@ -5,19 +5,35 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import hu.bme.aut.android.examapp.ExamApplication
-import hu.bme.aut.android.examapp.ui.viewmodel.TopicEditViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.TopicEntryViewModel
+import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicEditViewModel
+import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicEntryViewModel
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory
-import hu.bme.aut.android.examapp.ui.viewmodel.TopicListViewModel
-
+import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
+import hu.bme.aut.android.examapp.data.repositories.inrefaces.PointRepository
+import hu.bme.aut.android.examapp.data.repositories.inrefaces.TypeRepository
+import hu.bme.aut.android.examapp.ui.viewmodel.point.PointDetailsViewModel
+import hu.bme.aut.android.examapp.ui.viewmodel.point.PointEditViewModel
+import hu.bme.aut.android.examapp.ui.viewmodel.point.PointEntryViewModel
+import hu.bme.aut.android.examapp.ui.viewmodel.point.PointListViewModel
+import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicDetailsViewModel
+import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicListViewModel
+import hu.bme.aut.android.examapp.ui.viewmodel.type.TypeViewModel
 
 object AppViewModelProvider {
     val Factory = viewModelFactory {
+
+        /**
+         * Initializes the TypeViewModels with the [TypeRepository] from the [ExamApplication]'s container.
+         */
         initializer {
-            TopicEditViewModel(
-                this.createSavedStateHandle(),
-                examApplication().container.topicRepository
-            )
+            TypeViewModel(examApplication().container.typeRepository)
+        }
+
+        /**
+         * Initializes the TopicViewModels with the [TopicRepository] from the [ExamApplication]'s container.
+         */
+        initializer {
+            TopicListViewModel(examApplication().container.topicRepository)
         }
 
         initializer {
@@ -25,7 +41,43 @@ object AppViewModelProvider {
         }
 
         initializer {
-            TopicListViewModel(examApplication().container.topicRepository)
+            TopicDetailsViewModel(
+                this.createSavedStateHandle(),
+                examApplication().container.topicRepository
+            )
+        }
+
+        initializer {
+            TopicEditViewModel(
+                this.createSavedStateHandle(),
+                examApplication().container.topicRepository
+            )
+        }
+
+
+        /**
+         * Initializes the PointViewModels with the [PointRepository] from the [ExamApplication]'s container.
+         */
+        initializer {
+            PointListViewModel(examApplication().container.pointRepository)
+        }
+
+        initializer {
+            PointEntryViewModel(examApplication().container.pointRepository)
+        }
+
+        initializer {
+            PointDetailsViewModel(
+                this.createSavedStateHandle(),
+                examApplication().container.pointRepository
+            )
+        }
+
+        initializer {
+            PointEditViewModel(
+                this.createSavedStateHandle(),
+                examApplication().container.pointRepository
+            )
         }
     }
 }

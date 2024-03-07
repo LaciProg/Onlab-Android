@@ -7,8 +7,8 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "point")
 data class PointDto(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name =  "id") var id: Int,
-    @ColumnInfo(name =  "point")var point: Int,
-    @ColumnInfo(name =  "type")var topic: String,
-    @ColumnInfo(name =  "goodAnswer")var goodAnswer: Int,
-    @ColumnInfo(name =  "badAnswer")var badAnswer: Int,
+    @ColumnInfo(name =  "point") var point: Double,
+    @ColumnInfo(name =  "type") var type: String,
+    @ColumnInfo(name =  "goodAnswer") var goodAnswer: Double,
+    @ColumnInfo(name =  "badAnswer") var badAnswer: Double,
 )

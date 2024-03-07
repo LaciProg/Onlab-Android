@@ -28,4 +28,10 @@ interface PointDao {
 
     @Query("SELECT type FROM point ORDER BY type ASC")
     fun getAllPointType(): Flow<List<String>>
+
+    @Query("SELECT type FROM point ORDER BY type ASC")
+    fun getAllPointName(): Flow<List<String>>
+
+    @Query("SELECT * FROM point WHERE type = :type")
+    fun getPointByType(type: String): Flow<PointDto>
 }

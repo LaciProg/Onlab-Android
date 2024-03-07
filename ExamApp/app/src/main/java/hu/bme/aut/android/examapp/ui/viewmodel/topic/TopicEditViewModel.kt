@@ -1,4 +1,4 @@
-package hu.bme.aut.android.examapp.ui.viewmodel
+package hu.bme.aut.android.examapp.ui.viewmodel.topic
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -7,7 +7,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
-import hu.bme.aut.android.examapp.data.repositories.offline.OfflineTopicRepository
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -23,7 +22,7 @@ class TopicEditViewModel(
     var topicUiState by mutableStateOf(TopicUiState())
         private set
 
-    private val topicName: String = checkNotNull(savedStateHandle[hu.bme.aut.android.examapp.ui.TopicDetails.topicNameArg])
+    private val topicName: String = checkNotNull(savedStateHandle[hu.bme.aut.android.examapp.ui.TopicDetailsDestination.topicNameArg])
 
     init {
         viewModelScope.launch {
@@ -37,9 +36,14 @@ class TopicEditViewModel(
     /**
      * Update the topic in the [TopicRepository]'s data source
      */
-    suspend fun updateTopic() {
-        if (validateInput(topicUiState.topicDetails)) {
+    suspend fun updateTopic() : Boolean{
+        return if (validateInput(topicUiState.topicDetails) && validateUniqueTopic(topicUiState.topicDetails)) {
             topicRepository.updateTopic(topicUiState.topicDetails.toTopic())
+            true
+        }
+        else {
+            topicUiState = topicUiState.copy(isEntryValid = false)
+            false
         }
     }
 
@@ -54,16 +58,14 @@ class TopicEditViewModel(
 
     private fun validateInput(uiState: TopicDetails = topicUiState.topicDetails): Boolean {
         return with(uiState) {
-            topic.isNotBlank() && description.isNotBlank()
+            topic.isNotBlank() && description.isNotBlank() && !topic.contains("/") && !description.contains("/")
         }
+    }
+
+    private suspend fun validateUniqueTopic(uiState: TopicDetails = topicUiState.topicDetails): Boolean {
+        return !topicRepository.getAllTopicName().filterNotNull().first().contains(uiState.topic) || uiState.topic == topicName
     }
 }
 
 
 
-/**
- * UI state for TopicDetailsScreen
- */
-data class TopicDetailsUiState(
-    val topicDetails: TopicDetails = TopicDetails()
-)

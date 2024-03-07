@@ -1,4 +1,4 @@
-package hu.bme.aut.android.examapp.ui.viewmodel
+package hu.bme.aut.android.examapp.ui.viewmodel.topic
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -28,6 +28,6 @@ class TopicListViewModel(topicRepository: TopicRepository) : ViewModel() {
 }
 
 /**
- * Ui State for HomeScreen
+ * UI state for TopicListScreen
  */
-data class TopicListUiState(val itemList: List<String> = listOf())
+data class TopicListUiState(val topicList: List<String> = listOf())

@@ -6,6 +6,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -16,7 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import hu.bme.aut.android.examapp.ui.viewmodel.TopicDetails
+import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicDetails
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,13 +25,13 @@ fun DropDownList(
     modifier: Modifier = Modifier,
     name: String = "Gyümölcsök",
     items: List<String> = listOf("Alma", "Körte", "Banán"),
-    default: TopicDetails = TopicDetails(),
+    default: String = String(),
     onChoose: (String) -> Unit = {},
 ) {
-    Log.d("DropDownList", "Default.parent: ${default.parent}")
+    Log.d("DropDownList", "Default.parent: $default")
     var isExpanded by remember{ mutableStateOf(false)}
     var item by remember { mutableStateOf("") }
-    item = default.parent
+    item = default
     ExposedDropdownMenuBox(
         expanded = isExpanded,
         modifier = modifier,
@@ -38,7 +39,7 @@ fun DropDownList(
             isExpanded = newValue
         }
     ) {
-        TextField(
+        OutlinedTextField(
             value = item,
             onValueChange = {},
             readOnly = true,

@@ -1,15 +1,13 @@
-package hu.bme.aut.android.examapp.ui.viewmodel
+package hu.bme.aut.android.examapp.ui.viewmodel.topic
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
 import hu.bme.aut.android.examapp.data.room.dto.TopicDto
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlin.coroutines.coroutineContext
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 
 class TopicEntryViewModel(private val topicRepository: TopicRepository) : ViewModel(){
 
@@ -21,16 +19,24 @@ class TopicEntryViewModel(private val topicRepository: TopicRepository) : ViewMo
             TopicUiState(topicDetails = topicDetails, isEntryValid = validateInput(topicDetails))
     }
 
-    suspend fun saveTopic() {
-        if (validateInput()) {
+    suspend fun saveTopic() : Boolean {
+        return if (validateInput() && validateUniqueTopic()) {
             topicRepository.insertTopic(topicUiState.topicDetails.toTopic())
+            true
+        } else {
+            topicUiState = topicUiState.copy(isEntryValid = false)
+            false
         }
     }
 
     private fun validateInput(uiState: TopicDetails = topicUiState.topicDetails): Boolean {
         return with(uiState) {
-            topic.isNotBlank() && description.isNotBlank()
+            topic.isNotBlank() && description.isNotBlank() && !topic.contains("/") && !description.contains("/")
         }
+    }
+
+    private suspend fun validateUniqueTopic(uiState: TopicDetails = topicUiState.topicDetails): Boolean {
+        return !topicRepository.getAllTopicName().filterNotNull().first().contains(uiState.topic)
     }
 
 }

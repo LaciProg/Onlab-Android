@@ -17,12 +17,8 @@
 package hu.bme.aut.android.examapp.ui
 
 
-import android.util.Log
-import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
@@ -31,13 +27,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import hu.bme.aut.android.examapp.DefaultMulti
 import hu.bme.aut.android.examapp.DefaultTrueFalse
-import hu.bme.aut.android.examapp.Greeting
-import hu.bme.aut.android.examapp.ui.components.DropDownList
+import hu.bme.aut.android.examapp.MainScreen
+import hu.bme.aut.android.examapp.ui.point.NewPoint
+import hu.bme.aut.android.examapp.ui.point.PointDetailsScreen
+import hu.bme.aut.android.examapp.ui.point.PointEditScreen
+import hu.bme.aut.android.examapp.ui.point.PointListScreen
 import hu.bme.aut.android.examapp.ui.topic.NewTopic
-import hu.bme.aut.android.examapp.ui.topic.TopicView
-import hu.bme.aut.android.examapp.ui.topic.TopicDetails
-import hu.bme.aut.android.examapp.ui.viewmodel.TopicEntryViewModel
-import kotlinx.coroutines.launch
+import hu.bme.aut.android.examapp.ui.topic.TopicDetailsScreen
+import hu.bme.aut.android.examapp.ui.topic.TopicListScreen
+import hu.bme.aut.android.examapp.ui.topic.TopicEditScreen
 
 @Composable
 fun ExamNavHost(
@@ -46,21 +44,94 @@ fun ExamNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = /*ExamDestination.*/ScreenFirst.route,
+        startDestination = /*ExamDestination.*/MainScreenDestination.route,
         modifier = modifier
     ) {
         composable(
-            route = /*ExamDestination.*/ScreenFirst.route,
+            route = MainScreenDestination.route
+        ){
+            MainScreen(
+                navigateToTopicList = { navController.navigateSingleTopTo(TopicListDestination.route) },
+                navigateToPointList = { navController.navigateSingleTopTo(PointListDestination.route) }
+            )
+        }
 
+        composable(
+            route = /*ExamDestination.*/TopicListDestination.route,
         ) {
-
-            TopicView(
-                addNewTopic = { navController.navigate(/*ExamDestination.*/NewTopic.route) },
+            TopicListScreen(
+                addNewTopic = { navController.navigate(/*ExamDestination.*/NewTopicDestination.route) },
                 navigateToTopicDetails = { topicName ->
-                    navController.navigate(/*ExamDestination.*/"${TopicDetails.route}/$topicName")
+                    navController.navigate(/*ExamDestination.*/"${TopicDetailsDestination.route}/$topicName")
                 }
             )
         }
+
+        composable(
+            route = /*ExamDestination.*//*"${TopicDetails.route}/{topicName}"*/TopicDetailsDestination.routeWithArgs) {
+            TopicDetailsScreen(
+                navigateToEditTopic = { navController.navigate("${TopicEditDestination.route}/$it") },
+                navigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = TopicEditDestination.routeWithArgs,
+            arguments = listOf(navArgument(TopicEditDestination.topicNameArg) {
+                type = NavType.StringType
+            })
+        ) {
+            TopicEditScreen(
+                navigateBack = { navController.popBackStack() },
+                //onNavigateUp = { navController.navigateUp() }
+            )
+        }
+
+        composable(route = /*ExamDestination.*/NewTopicDestination.route) {
+            NewTopic(
+                navigateBack = { navController.popBackStack() },
+                onNavigateUp = { navController.navigateUp() },
+            )
+        }
+
+        composable(
+            route = /*ExamDestination.*/PointListDestination.route,
+        ) {
+            PointListScreen(
+                addNewPoint = { navController.navigate(/*ExamDestination.*/NewPointDestination.route) },
+                navigateToPointDetails = { pointName ->
+                    navController.navigate(/*ExamDestination.*/"${PointDetailsDestination.route}/$pointName")
+                }
+            )
+        }
+
+        composable(
+            route = /*ExamDestination.*//*"${TopicDetails.route}/{topicName}"*/PointDetailsDestination.routeWithArgs) {
+            PointDetailsScreen(
+                navigateToEditPoint = { navController.navigate("${PointEditDestination.route}/$it") },
+                navigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = PointEditDestination.routeWithArgs,
+            arguments = listOf(navArgument(PointEditDestination.pointNameArg) {
+                type = NavType.StringType
+            })
+        ) {
+            PointEditScreen(
+                navigateBack = { navController.popBackStack() },
+                //onNavigateUp = { navController.navigateUp() }
+            )
+        }
+
+        composable(route = /*ExamDestination.*/NewPointDestination.route) {
+            NewPoint(
+                navigateBack = { navController.popBackStack() },
+                onNavigateUp = { navController.navigateUp() },
+            )
+        }
+
         composable(route = /*ExamDestination.*/ScreenSecond.route) {
             DefaultTrueFalse(
                 /*onAccountClick = { accountType ->
@@ -71,19 +142,7 @@ fun ExamNavHost(
         composable(route = /*ExamDestination.*/ScreenThird.route) {
             DefaultMulti()
         }
-        composable(route = /*ExamDestination.*/NewTopic.route) {
-            NewTopic(
-                navigateBack = { navController.popBackStack() },
-                onNavigateUp = { navController.navigateUp() },
-            )
-        }
-        composable(
-            route = /*ExamDestination.*//*"${TopicDetails.route}/{topicName}"*/TopicDetails.routeWithArgs) {
-            TopicDetails(
-                navigateBack = { navController.popBackStack() }
-            )
 
-        }
     }
 }
 

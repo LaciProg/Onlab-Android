@@ -1,6 +1,5 @@
-package hu.bme.aut.android.examapp.ui.topic
+package hu.bme.aut.android.examapp.ui.point
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -15,30 +14,24 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import hu.bme.aut.android.examapp.ui.AppViewModelProvider
-import hu.bme.aut.android.examapp.ui.ExamDestination
-import hu.bme.aut.android.examapp.ui.ExamTabRow
-import hu.bme.aut.android.examapp.ui.NewTopic
-import hu.bme.aut.android.examapp.ui.TopicDetails
-import hu.bme.aut.android.examapp.ui.viewmodel.TopicListViewModel
-import kotlinx.coroutines.flow.count
+import hu.bme.aut.android.examapp.ui.viewmodel.point.PointListViewModel
 
 @Composable
-fun TopicView(
-    addNewTopic: () -> Unit = {},
-    navigateToTopicDetails: (String) -> Unit,
+fun PointListScreen(
+    modifier: Modifier = Modifier,
+    addNewPoint: () -> Unit = {},
+    navigateToPointDetails: (String) -> Unit,
     //navigateToItemEntry: () -> Unit,
     //navigateToItemUpdate: (Int) -> Unit,
-    modifier: Modifier = Modifier,
-    viewModel: TopicListViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: PointListViewModel = viewModel(factory = AppViewModelProvider.Factory)
   ){
-    val topicUiState by viewModel.topicListUiState.collectAsState()
+    val pointUiState by viewModel.pointListUiState.collectAsState()
     Scaffold(
-        topBar = { Text("Topic list") },
+        topBar = { Text("Point list") },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { addNewTopic() }
+                onClick = { addNewPoint() }
             ) {
                 Icon(Icons.Filled.Add, contentDescription = "Add")
             }
@@ -46,8 +39,8 @@ fun TopicView(
     ) { padding ->
 
         LazyColumn(contentPadding = padding) {
-            items(topicUiState.itemList){
-                TextButton(onClick = { navigateToTopicDetails(it) }) {
+            items(pointUiState.pointList){
+                TextButton(onClick = { navigateToPointDetails(it) }) {
                     Text(it)
                 }
             }

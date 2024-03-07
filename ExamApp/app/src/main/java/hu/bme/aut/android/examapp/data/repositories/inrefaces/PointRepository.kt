@@ -10,4 +10,6 @@ interface PointRepository {
     fun getAllPoints(): Flow<List<PointDto>>
     fun getPointById(id: Int): Flow<PointDto>
     fun getAllPointType(): Flow<List<String>>
+    fun getAllPointName(): Flow<List<String>>
+    fun getPointByType(type: String): Flow<PointDto>
 }
