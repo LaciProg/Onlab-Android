@@ -21,14 +21,17 @@ class PointEditViewModel(
     var pointUiState by mutableStateOf(PointUiState())
         private set
 
-    private val pointName: String = checkNotNull(savedStateHandle[hu.bme.aut.android.examapp.ui.PointDetailsDestination.pointNameArg])
+    private val pointId: String = checkNotNull(savedStateHandle[hu.bme.aut.android.examapp.ui.PointDetailsDestination.pointIdArg.toString()])
+
+    private lateinit var originalPoint: String
 
     init {
         viewModelScope.launch {
-            pointUiState = pointRepository.getPointByType(pointName)
+            pointUiState = pointRepository.getPointById(pointId.toInt())
                 .filterNotNull()
                 .first()
                 .toPointUiState(true)
+            originalPoint = pointUiState.pointDetails.type
         }
     }
 
@@ -56,7 +59,7 @@ class PointEditViewModel(
     }
 
     private suspend fun validateUniqueTopic(uiState: PointDetails = pointUiState.pointDetails): Boolean {
-        return !pointRepository.getAllPointType().filterNotNull().first().contains(uiState.type) || uiState.type == pointName
+        return !pointRepository.getAllPointType().filterNotNull().first().contains(uiState.type) || originalPoint == uiState.type
     }
 }
 

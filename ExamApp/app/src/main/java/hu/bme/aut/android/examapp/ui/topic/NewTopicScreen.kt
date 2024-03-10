@@ -103,9 +103,12 @@ fun TopicInputForm(
     topicDetails: TopicDetails,
     modifier: Modifier = Modifier,
     onValueChange: (TopicDetails) -> Unit = {},
+    default: String = "",
     enabled: Boolean = true,
-    listViewModel: TopicListViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    listViewModel: TopicListViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    entryViewModel: TopicEntryViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+    val coroutineScope = rememberCoroutineScope()
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
@@ -139,9 +142,17 @@ fun TopicInputForm(
         )
         DropDownList(
             name = stringResource(R.string.topic),
-            items = listViewModel.topicListUiState.collectAsState().value.topicList.filterNot{ it == topicDetails.topic },
-            onChoose = { onValueChange(topicDetails.copy(parent = it)) },
-            default = topicDetails.parent,
+            items = listViewModel.topicListUiState.collectAsState().value.topicList.map { it.topic } .filterNot{ it == topicDetails.topic },
+            onChoose = {parent ->
+                coroutineScope.launch{
+                    onValueChange(topicDetails.copy(parent = entryViewModel.getTopicIdByTopic(parent)))
+                }
+            },
+            default = topicDetails.parentTopicName
+                /*coroutineScope.launch{
+                    entryViewModel.getTopicById(topicDetails.parent)
+                }.*/// "banán"
+            ,
             modifier = Modifier.fillMaxWidth(),
         )
         if (enabled) {

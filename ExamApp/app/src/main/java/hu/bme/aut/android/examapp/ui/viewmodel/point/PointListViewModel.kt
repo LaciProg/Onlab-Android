@@ -15,7 +15,14 @@ class PointListViewModel(pointRepository: PointRepository) : ViewModel() {
      * [PointListUiState]
      */
     val pointListUiState: StateFlow<PointListUiState> =
-        pointRepository.getAllPointName().map { PointListUiState(it) }
+        pointRepository.getAllPoints().map { PointListUiState(
+            pointList = it.map { pointDto ->
+                PointRowUiState(
+                    point = pointDto.type,
+                    id = pointDto.id
+                )
+            }
+        ) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
@@ -30,4 +37,9 @@ class PointListViewModel(pointRepository: PointRepository) : ViewModel() {
 /**
  * UI state for PointListScreen
  */
-data class PointListUiState(val pointList: List<String> = listOf())
+data class PointListUiState(val pointList: List<PointRowUiState> = listOf(PointRowUiState()))
+
+data class PointRowUiState(
+    val point: String = "",
+    val id: Int = 0
+)

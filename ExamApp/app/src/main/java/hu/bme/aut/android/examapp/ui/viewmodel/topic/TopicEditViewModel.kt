@@ -1,5 +1,6 @@
 package hu.bme.aut.android.examapp.ui.viewmodel.topic
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -9,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class TopicEditViewModel(
@@ -16,21 +18,27 @@ class TopicEditViewModel(
     private val topicRepository: TopicRepository
 ) : ViewModel() {
 
+    private lateinit var originaltopic: String
     /**
      * Holds current topic ui state
      */
     var topicUiState by mutableStateOf(TopicUiState())
         private set
 
-    private val topicName: String = checkNotNull(savedStateHandle[hu.bme.aut.android.examapp.ui.TopicDetailsDestination.topicNameArg])
+    private val topicId: String = checkNotNull(savedStateHandle[hu.bme.aut.android.examapp.ui.TopicDetailsDestination.topicIdArg.toString()])
 
     init {
         viewModelScope.launch {
-            topicUiState = topicRepository.getTopicByTopic(topicName)
+            topicUiState = topicRepository.getTopicById(topicId.toInt())
                 .filterNotNull()
                 .first()
-                .toTopicUiState(true)
+                .toTopicUiState(true,
+                    parentName =  topicRepository.getTopicById(
+                        topicRepository.getTopicById(topicId.toInt()).map { it.parentTopic }.first())
+                        .map{it.topic}.first())
+            originaltopic = topicUiState.topicDetails.topic
         }
+
     }
 
     /**
@@ -63,7 +71,7 @@ class TopicEditViewModel(
     }
 
     private suspend fun validateUniqueTopic(uiState: TopicDetails = topicUiState.topicDetails): Boolean {
-        return !topicRepository.getAllTopicName().filterNotNull().first().contains(uiState.topic) || uiState.topic == topicName
+        return !topicRepository.getAllTopicName().filterNotNull().first().contains(uiState.topic) || originaltopic == uiState.topic
     }
 }
 

@@ -10,8 +10,8 @@ interface TrueFalseQuestionRepository {
     suspend fun deleteTrueFalseQuestion(trueFalseQuestion: TrueFalseQuestionDto)
     fun getAllTrueFalseQuestions(): Flow<List<TrueFalseQuestionDto>>
     fun getTrueFalseQuestionById(id: Int): Flow<TrueFalseQuestionDto>
-    fun getTrueFalseQuestionsByTopic(topic: String): Flow<Map<TopicDto,List<TrueFalseQuestionDto>>>
-    fun getTrueFalseQuestionsByType(typeId: Int): Flow<List<TrueFalseQuestionDto>>
+    fun getTrueFalseQuestionsByTopic(topicFk: Int): Flow<Map<TopicDto,List<TrueFalseQuestionDto>>>
+    fun getTrueFalseQuestionsByType(typeFk: Int): Flow<List<TrueFalseQuestionDto>>
     fun getAllTrueFalseQuestionQuestion(): Flow<List<String>>
 
 }

@@ -31,14 +31,14 @@ object TopicListDestination : ExamDestination {
 
 object TopicDetailsDestination : ExamDestination{
     override val route: String = "TopicDetails"
-    const val topicNameArg = "topicName"
-    val routeWithArgs = "$route/{$topicNameArg}"
+    const val topicIdArg = 0
+    val routeWithArgs = "$route/{$topicIdArg}"
 }
 
 object TopicEditDestination : ExamDestination {
     override val route = "TopicEdit"
-    const val topicNameArg = "topicName"
-    val routeWithArgs = "$route/{$topicNameArg}"
+    const val topicIdArg = 0
+    val routeWithArgs = "$route/{$topicIdArg}"
 }
 
 object NewTopicDestination : ExamDestination{
@@ -51,18 +51,38 @@ object PointListDestination : ExamDestination {
 
 object PointDetailsDestination : ExamDestination{
     override val route: String = "PointDetails"
-    const val pointNameArg = "pointName"
-    val routeWithArgs = "$route/{$pointNameArg}"
+    const val pointIdArg = 0
+    val routeWithArgs = "$route/{$pointIdArg}"
 }
 
 object PointEditDestination : ExamDestination {
     override val route = "PointEdit"
-    const val pointNameArg = "pointName"
-    val routeWithArgs = "$route/{$pointNameArg}"
+    const val pointIdArg = 0
+    val routeWithArgs = "$route/{$pointIdArg}"
 }
 
 object NewPointDestination : ExamDestination{
     override val route: String = "NewPoint"
+}
+
+object TrueFalseQuestionListDestination : ExamDestination {
+    override val route = "TrueFalseQuestionList"
+}
+
+object TrueFalseQuestionDetailsDestination : ExamDestination{
+    override val route: String = "TrueFalseQuestionDetailsDetails"
+    const val trueFalseQuestionIdArg = 0
+    val routeWithArgs = "$route/$trueFalseQuestionIdArg"
+}
+
+object TrueFalseQuestionEditDestination : ExamDestination {
+    override val route = "TrueFalseQuestionEdit"
+    const val trueFalseQuestionIdArg = 0
+    val routeWithArgs = "$route/$trueFalseQuestionIdArg"
+}
+
+object NewTrueFalseQuestionDestination : ExamDestination{
+    override val route: String = "NewTrueFalseQuestion"
 }
 
 

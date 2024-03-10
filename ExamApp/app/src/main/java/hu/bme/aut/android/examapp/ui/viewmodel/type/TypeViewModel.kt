@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 
 class TypeViewModel(
     private val typeRepository: TypeRepository,
-    private val types: List<String> = listOf("trueFalseQuestion", "multipleChoiceQuestion"),
+    private val types: List<String> = listOf(Type.trueFalseQuestion.name, Type.multipleChoiceQuestion.name),
 ) : ViewModel() {
 
 
@@ -22,8 +22,13 @@ class TypeViewModel(
         viewModelScope.launch {
            val storedTypes = typeRepository.getAllTypeType().filterNotNull().first()
            for(type in types) {
-                if(!storedTypes.contains(type)) typeRepository.insertType(TypeDto( id = 0, type = type))
+                if(!storedTypes.contains(type)) typeRepository.insertType(TypeDto(id = 0, type = type))
            }
         }
     }
+}
+
+enum class Type {
+    trueFalseQuestion,
+    multipleChoiceQuestion
 }

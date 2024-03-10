@@ -28,14 +28,14 @@ interface MultipleChoiceQuestionDao {
     fun getMultipleChoiceQuestionById(id: Int): Flow<MultipleChoiceQuestionDto>
 
     @Query("SELECT * FROM multipleChoiceQuestion" +
-            " JOIN topic ON multipleChoiceQuestion.topicId = topic.id" +
-            " WHERE topic.topic = :topic OR topic.parentTopic = :topic")
-    fun getMultipleChoiceQuestionsByTopic(topic: String): Flow<Map<TopicDto ,List<MultipleChoiceQuestionDto>>>
+            " JOIN topic ON multipleChoiceQuestion.topicFk = topic.topic" +
+            " WHERE topic.id = :topicFk OR topic.parentTopicFk = :topicFk")
+    fun getMultipleChoiceQuestionsByTopic(topicFk: Int): Flow<Map<TopicDto ,List<MultipleChoiceQuestionDto>>>
 
     @Query("SELECT * FROM multipleChoiceQuestion" +
-            " JOIN type ON multipleChoiceQuestion.topicId = type.id" +
-            " WHERE type.id = :typeId")
-    fun getMultipleChoiceQuestionsByType(typeId: Int): Flow<List<MultipleChoiceQuestionDto>>
+            " JOIN type ON multipleChoiceQuestion.typeFk = type.id" +
+            " WHERE type.id = :typeFk")
+    fun getMultipleChoiceQuestionsByType(typeFk: Int): Flow<List<MultipleChoiceQuestionDto>>
 
     @Query("SELECT question FROM multipleChoiceQuestion ORDER BY question ASC")
     fun getAllMultipleChoiceQuestionQuestion(): Flow<List<String>>

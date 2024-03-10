@@ -7,11 +7,11 @@ import androidx.room.PrimaryKey
 
 @Entity(
     tableName = "topic",
-    indices = [androidx.room.Index(value = ["topic"], unique = true), androidx.room.Index(value = ["parentTopic"])]
+    indices = [androidx.room.Index(value = ["topic"], unique = true), androidx.room.Index(value = ["parentTopicFk"])]
 )
 data class TopicDto(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name =  "id") var id: Int,
     @ColumnInfo(name =  "topic") var topic: String,
     @ColumnInfo(name =  "description")var description: String,
-    @ColumnInfo(name =  "parentTopic")var parentTopic: String
+    @ColumnInfo(name =  "parentTopicFk")var parentTopic: Int
 )

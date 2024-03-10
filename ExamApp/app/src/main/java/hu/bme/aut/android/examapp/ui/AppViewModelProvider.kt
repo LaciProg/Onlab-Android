@@ -11,12 +11,16 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.PointRepository
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TypeRepository
+import hu.bme.aut.android.examapp.data.repositories.inrefaces.TrueFalseQuestionRepository
 import hu.bme.aut.android.examapp.ui.viewmodel.point.PointDetailsViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.point.PointEditViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.point.PointEntryViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.point.PointListViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicDetailsViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicListViewModel
+import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionDetailsViewModel
+import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionEntryViewModel
+import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionListViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.type.TypeViewModel
 
 object AppViewModelProvider {
@@ -77,6 +81,29 @@ object AppViewModelProvider {
             PointEditViewModel(
                 this.createSavedStateHandle(),
                 examApplication().container.pointRepository
+            )
+        }
+
+        /**
+         * Initializes the TrueFalseQuestionViewModels with the [TrueFalseQuestionRepository] from the [ExamApplication]'s container.
+         */
+        initializer {
+            TrueFalseQuestionListViewModel(
+                trueFalseQuestionRepository =  examApplication().container.trueFalseQuestionRepository,
+                topicRepository =  examApplication().container.topicRepository
+            )
+        }
+
+        initializer {
+            TrueFalseQuestionDetailsViewModel(
+                this.createSavedStateHandle(),
+                examApplication().container.trueFalseQuestionRepository
+            )
+        }
+
+        initializer {
+            TrueFalseQuestionEntryViewModel(
+                examApplication().container.trueFalseQuestionRepository
             )
         }
     }

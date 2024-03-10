@@ -21,7 +21,7 @@ import hu.bme.aut.android.examapp.ui.viewmodel.point.PointListViewModel
 fun PointListScreen(
     modifier: Modifier = Modifier,
     addNewPoint: () -> Unit = {},
-    navigateToPointDetails: (String) -> Unit,
+    navigateToPointDetails: (Int) -> Unit,
     //navigateToItemEntry: () -> Unit,
     //navigateToItemUpdate: (Int) -> Unit,
     viewModel: PointListViewModel = viewModel(factory = AppViewModelProvider.Factory)
@@ -40,8 +40,8 @@ fun PointListScreen(
 
         LazyColumn(contentPadding = padding) {
             items(pointUiState.pointList){
-                TextButton(onClick = { navigateToPointDetails(it) }) {
-                    Text(it)
+                TextButton(onClick = { navigateToPointDetails(it.id) }) {
+                    Text(it.point)
                 }
             }
         }

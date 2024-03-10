@@ -53,6 +53,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.viewmodel.compose.viewModel
 import hu.bme.aut.android.examapp.data.room.dto.TopicDto
 import hu.bme.aut.android.examapp.ui.AppViewModelProvider
+import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicDetails
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicDetailsUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicDetailsViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.toTopic
@@ -61,7 +62,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopicDetailsScreen(
-    navigateToEditTopic: (String) -> Unit,
+    navigateToEditTopic: (Int) -> Unit,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TopicDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory)
@@ -73,7 +74,7 @@ fun TopicDetailsScreen(
             Text(text = uiState.value.topicDetails.topic)
         }, floatingActionButton = {
             FloatingActionButton(
-                onClick = { navigateToEditTopic(uiState.value.topicDetails.topic) },
+                onClick = { navigateToEditTopic(uiState.value.topicDetails.id) },
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
 
@@ -116,7 +117,7 @@ private fun TopicDetailsBody(
     ) {
         var deleteConfirmationRequired by rememberSaveable { mutableStateOf(false) }
         TopicDetails(
-            topic = topicDetailsUiState.topicDetails.toTopic(), modifier = Modifier.fillMaxWidth()
+            topic = topicDetailsUiState.topicDetails/*.toTopic()*/, modifier = Modifier.fillMaxWidth()
         )
         OutlinedButton(
             onClick = { deleteConfirmationRequired = true },
@@ -141,7 +142,9 @@ private fun TopicDetailsBody(
 
 @Composable
 fun TopicDetails(
-    topic: TopicDto, modifier: Modifier = Modifier
+    topic: TopicDetails,
+    modifier: Modifier = Modifier,
+    viewModel: TopicDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     Card(
         modifier = modifier, colors = CardDefaults.cardColors(
@@ -177,7 +180,7 @@ fun TopicDetails(
             )
             TopicDetailsRow(
                 labelResID = R.string.parent_topic,
-                topicDetail = if(topic.parentTopic=="") stringResource(R.string.no_parent) else topic.parentTopic,
+                topicDetail = if(topic.parent == -1) stringResource(R.string.no_parent) else topic.parentTopicName /* viewModel.getTopicById(topic.parentTopic)*/,
                 modifier = Modifier.padding(
                     horizontal = dimensionResource(
                         id = R.dimen

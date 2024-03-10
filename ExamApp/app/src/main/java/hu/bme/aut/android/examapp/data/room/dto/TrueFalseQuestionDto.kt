@@ -11,29 +11,29 @@ import androidx.room.PrimaryKey
         ForeignKey(
             entity = TopicDto::class,
             parentColumns = arrayOf("id"),
-            childColumns = arrayOf("topicId"),
+            childColumns = arrayOf("topicFk"),
             onDelete = ForeignKey.SET_DEFAULT
     ),
         ForeignKey(
             entity = PointDto::class,
             parentColumns = arrayOf("id"),
-            childColumns = arrayOf("pointId"),
+            childColumns = arrayOf("pointFk"),
             onDelete = ForeignKey.SET_DEFAULT
     ),
         ForeignKey(
             entity = TypeDto::class,
-            parentColumns = arrayOf("id"),
-            childColumns = arrayOf("typeId"),
+            parentColumns = arrayOf("type"),
+            childColumns = arrayOf("typeFk"),
             onDelete = ForeignKey.CASCADE
         )
     ],
-    indices = [androidx.room.Index(value = ["topicId", "pointId", "typeId"])]
+    indices = [androidx.room.Index(value = ["topicFk", "pointFk", "typeFk"])]
 )
 data class TrueFalseQuestionDto(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name =  "id") var id: Int,
     @ColumnInfo(name =  "question")var question: String,
     @ColumnInfo(name =  "correctAnswer")var correctAnswer: Boolean,
-    @ColumnInfo(name = "pointId") var pointId: Int,
-    @ColumnInfo(name = "topicId") var topicId: Int,
-    @ColumnInfo(name = "typeId") var typeId: Int
+    @ColumnInfo(name = "pointFk") var point: Int,
+    @ColumnInfo(name = "topicFk") var topic: Int,
+    @ColumnInfo(name = "typeFk") var type: String
 )

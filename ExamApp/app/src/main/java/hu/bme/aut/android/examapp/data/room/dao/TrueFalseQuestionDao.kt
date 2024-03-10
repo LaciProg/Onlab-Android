@@ -28,14 +28,14 @@ interface TrueFalseQuestionDao {
     fun getTrueFalseQuestionById(id: Int): Flow<TrueFalseQuestionDto>
 
     @Query("SELECT * FROM trueFalseQuestion" +
-            " JOIN topic ON trueFalseQuestion.topicId = topic.id" +
-            " WHERE topic.topic = :topic OR topic.parentTopic = :topic")
-    fun getTrueFalseQuestionsByTopic(topic: String): Flow<Map<TopicDto ,List<TrueFalseQuestionDto>>>
+            " JOIN topic ON trueFalseQuestion.topicFk = topic.topic" +
+            " WHERE topic.id = :topicFk OR topic.parentTopicFk = :topicFk")
+    fun getTrueFalseQuestionsByTopic(topicFk: Int): Flow<Map<TopicDto ,List<TrueFalseQuestionDto>>>
 
     @Query("SELECT * FROM trueFalseQuestion" +
-            " JOIN type ON trueFalseQuestion.topicId = type.id" +
-            " WHERE type.id = :typeId")
-    fun getTrueFalseQuestionsByType(typeId: Int): Flow<List<TrueFalseQuestionDto>>
+            " JOIN type ON trueFalseQuestion.typeFk = type.id" +
+            " WHERE type.id = :typeFk")
+    fun getTrueFalseQuestionsByType(typeFk: Int): Flow<List<TrueFalseQuestionDto>>
 
     @Query("SELECT question FROM trueFalseQuestion ORDER BY question ASC")
     fun getAllTrueFalseQuestionQuestion(): Flow<List<String>>

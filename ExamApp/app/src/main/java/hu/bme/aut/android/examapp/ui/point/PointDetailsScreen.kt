@@ -61,7 +61,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PointDetailsScreen(
-    navigateToEditPoint: (String) -> Unit,
+    navigateToEditPoint: (Int) -> Unit,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PointDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory)
@@ -73,7 +73,7 @@ fun PointDetailsScreen(
             Text(text = uiState.value.pointDetails.type)
         }, floatingActionButton = {
             FloatingActionButton(
-                onClick = { navigateToEditPoint(uiState.value.pointDetails.type) },
+                onClick = { navigateToEditPoint(uiState.value.pointDetails.id) },
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
 

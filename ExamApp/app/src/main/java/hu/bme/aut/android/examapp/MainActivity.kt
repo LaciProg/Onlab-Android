@@ -110,7 +110,8 @@ fun NavigationComponent() {
 @Composable
 fun MainScreen(
     navigateToTopicList: () -> Unit,
-    navigateToPointList: () -> Unit
+    navigateToPointList: () -> Unit,
+    navigateToTrueFalseQuestionList: () -> Unit,
 ){
     Column(
         modifier = Modifier
@@ -135,6 +136,13 @@ fun MainScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(R.string.point))
+        }
+        OutlinedButton(
+            onClick = { navigateToTrueFalseQuestionList() },
+            shape = MaterialTheme.shapes.small,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(stringResource(R.string.true_false_question))
         }
     }
 }

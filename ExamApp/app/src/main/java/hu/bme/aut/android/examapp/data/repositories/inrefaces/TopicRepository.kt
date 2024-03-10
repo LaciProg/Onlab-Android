@@ -10,6 +10,6 @@ interface TopicRepository {
     fun getAllTopics(): Flow<List<TopicDto>>
     fun getTopicById(id: Int): Flow<TopicDto>
     fun getAllTopicName(): Flow<List<String>>
-    fun getTopicsByParentId(parentTopic: String): Flow<List<TopicDto>>
+    fun getTopicsByParentId(parentTopicFk: Int): Flow<List<TopicDto>>
     fun getTopicByTopic(topic: String): Flow<TopicDto>
 }

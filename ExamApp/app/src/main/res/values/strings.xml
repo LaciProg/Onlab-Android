@@ -30,5 +30,12 @@
     <string name="point_type">Point type</string>
     <string name="good_answer">Good answer</string>
     <string name="bad_answer">Bad answer</string>
+    <string name="question">Question</string>
+    <string name="answer">Answer</string>
+    <string name="true_false_question">True-False question</string>
+    <string name="question_name_req">Question*</string>
+    <string name="true_action">True</string>
+    <string name="false_action">False</string>
+    <string name="correct_answer_req">Mark the correct answer*</string>
 
 </resources>

@@ -21,7 +21,7 @@ import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicListViewModel
 fun TopicListScreen(
     modifier: Modifier = Modifier,
     addNewTopic: () -> Unit = {},
-    navigateToTopicDetails: (String) -> Unit,
+    navigateToTopicDetails: (Int) -> Unit,
     //navigateToItemEntry: () -> Unit,
     //navigateToItemUpdate: (Int) -> Unit,
     viewModel: TopicListViewModel = viewModel(factory = AppViewModelProvider.Factory)
@@ -40,8 +40,8 @@ fun TopicListScreen(
 
         LazyColumn(contentPadding = padding) {
             items(topicUiState.topicList){
-                TextButton(onClick = { navigateToTopicDetails(it) }) {
-                    Text(it)
+                TextButton(onClick = { navigateToTopicDetails(it.id) }) {
+                    Text(it.topic)
                 }
             }
         }

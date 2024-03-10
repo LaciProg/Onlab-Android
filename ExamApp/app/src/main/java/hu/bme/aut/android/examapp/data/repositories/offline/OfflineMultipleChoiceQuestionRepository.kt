@@ -14,7 +14,7 @@ class OfflineMultipleChoiceQuestionRepository(private val multipleChoiceQuestion
         multipleChoiceQuestionDao.deleteMultipleChoiceQuestion(multipleChoiceQuestion)
         override fun getAllMultipleChoiceQuestions() = multipleChoiceQuestionDao.getAllMultipleChoiceQuestions()
         override fun getMultipleChoiceQuestionById(id: Int) = multipleChoiceQuestionDao.getMultipleChoiceQuestionById(id)
-        override fun getMultipleChoiceQuestionsByTopic(topic: String) = multipleChoiceQuestionDao.getMultipleChoiceQuestionsByTopic(topic)
-        override fun getMultipleChoiceQuestionsByType(typeId: Int) = multipleChoiceQuestionDao.getMultipleChoiceQuestionsByType(typeId)
+        override fun getMultipleChoiceQuestionsByTopic(topicFk: Int) = multipleChoiceQuestionDao.getMultipleChoiceQuestionsByTopic(topicFk)
+        override fun getMultipleChoiceQuestionsByType(typeFk: Int) = multipleChoiceQuestionDao.getMultipleChoiceQuestionsByType(typeFk)
         override fun getAllMultipleChoiceQuestionQuestion() = multipleChoiceQuestionDao.getAllMultipleChoiceQuestionQuestion()
 }

@@ -36,6 +36,8 @@ import hu.bme.aut.android.examapp.ui.topic.NewTopic
 import hu.bme.aut.android.examapp.ui.topic.TopicDetailsScreen
 import hu.bme.aut.android.examapp.ui.topic.TopicListScreen
 import hu.bme.aut.android.examapp.ui.topic.TopicEditScreen
+import hu.bme.aut.android.examapp.ui.truefalsequestion.NewTrueFalseQuestionScreen
+import hu.bme.aut.android.examapp.ui.truefalsequestion.TrueFalseQuestionListScreen
 
 @Composable
 fun ExamNavHost(
@@ -52,7 +54,8 @@ fun ExamNavHost(
         ){
             MainScreen(
                 navigateToTopicList = { navController.navigateSingleTopTo(TopicListDestination.route) },
-                navigateToPointList = { navController.navigateSingleTopTo(PointListDestination.route) }
+                navigateToPointList = { navController.navigateSingleTopTo(PointListDestination.route) },
+                navigateToTrueFalseQuestionList = { navController.navigateSingleTopTo(TrueFalseQuestionListDestination.route) }
             )
         }
 
@@ -61,8 +64,8 @@ fun ExamNavHost(
         ) {
             TopicListScreen(
                 addNewTopic = { navController.navigate(/*ExamDestination.*/NewTopicDestination.route) },
-                navigateToTopicDetails = { topicName ->
-                    navController.navigate(/*ExamDestination.*/"${TopicDetailsDestination.route}/$topicName")
+                navigateToTopicDetails = { topicId ->
+                    navController.navigate(/*ExamDestination.*/"${TopicDetailsDestination.route}/$topicId")
                 }
             )
         }
@@ -77,7 +80,7 @@ fun ExamNavHost(
 
         composable(
             route = TopicEditDestination.routeWithArgs,
-            arguments = listOf(navArgument(TopicEditDestination.topicNameArg) {
+            arguments = listOf(navArgument(TopicEditDestination.topicIdArg.toString()) {
                 type = NavType.StringType
             })
         ) {
@@ -99,8 +102,8 @@ fun ExamNavHost(
         ) {
             PointListScreen(
                 addNewPoint = { navController.navigate(/*ExamDestination.*/NewPointDestination.route) },
-                navigateToPointDetails = { pointName ->
-                    navController.navigate(/*ExamDestination.*/"${PointDetailsDestination.route}/$pointName")
+                navigateToPointDetails = { pointId ->
+                    navController.navigate(/*ExamDestination.*/"${PointDetailsDestination.route}/$pointId")
                 }
             )
         }
@@ -115,7 +118,7 @@ fun ExamNavHost(
 
         composable(
             route = PointEditDestination.routeWithArgs,
-            arguments = listOf(navArgument(PointEditDestination.pointNameArg) {
+            arguments = listOf(navArgument(PointEditDestination.pointIdArg.toString()) {
                 type = NavType.StringType
             })
         ) {
@@ -131,6 +134,24 @@ fun ExamNavHost(
                 onNavigateUp = { navController.navigateUp() },
             )
         }
+
+
+        composable(route = TrueFalseQuestionListDestination.route) {
+            TrueFalseQuestionListScreen(
+                addNewTrueFalseQuestion = { navController.navigate(/*ExamDestination.*/NewTrueFalseQuestionDestination.route) },
+                navigateToTrueFalseQuestionDetails = { navController.navigate("${TrueFalseQuestionDetailsDestination.route}/$it") }
+            )
+        }
+
+        composable(route = /*ExamDestination.*/NewTrueFalseQuestionDestination.route) {
+            NewTrueFalseQuestionScreen(
+                navigateBack = { navController.popBackStack() },
+                onNavigateUp = { navController.navigateUp() },
+            )
+        }
+
+
+
 
         composable(route = /*ExamDestination.*/ScreenSecond.route) {
             DefaultTrueFalse(

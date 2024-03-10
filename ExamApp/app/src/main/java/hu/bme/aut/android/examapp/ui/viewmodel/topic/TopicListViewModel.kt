@@ -15,7 +15,14 @@ class TopicListViewModel(topicRepository: TopicRepository) : ViewModel() {
      * [TopicListUiState]
      */
     val topicListUiState: StateFlow<TopicListUiState> =
-        topicRepository.getAllTopicName().map { TopicListUiState(it) }
+        topicRepository.getAllTopics().map { TopicListUiState(
+            topicList = it.map { topicDto ->
+                TopicRowUiState(
+                    topic = topicDto.topic,
+                    id = topicDto.id
+                )
+            }
+        ) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
@@ -30,4 +37,9 @@ class TopicListViewModel(topicRepository: TopicRepository) : ViewModel() {
 /**
  * UI state for TopicListScreen
  */
-data class TopicListUiState(val topicList: List<String> = listOf())
+data class TopicListUiState(val topicList: List<TopicRowUiState> = listOf(TopicRowUiState()))
+
+data class TopicRowUiState(
+    val topic: String = "",
+    val id: Int = 0
+)

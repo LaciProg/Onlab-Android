@@ -16,10 +16,10 @@ class PointDetailsViewModel(
     private val pointRepository: PointRepository,
 ) : ViewModel() {
 
-    private val pointName: String = checkNotNull(savedStateHandle[PointDetailsDestination.pointNameArg])
+    private val pointId: String = checkNotNull(savedStateHandle[PointDetailsDestination.pointIdArg.toString()])
 
     val uiState: StateFlow<PointDetailsUiState> =
-        pointRepository.getPointByType(pointName)
+        pointRepository.getPointById(pointId.toInt())
             .filterNotNull()
             .map {
                 PointDetailsUiState(pointDetails =  it.toPointDetails())

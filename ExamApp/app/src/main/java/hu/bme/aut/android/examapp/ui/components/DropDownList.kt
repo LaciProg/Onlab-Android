@@ -1,6 +1,7 @@
 package hu.bme.aut.android.examapp.ui.components
 
 import android.util.Log
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -25,16 +26,16 @@ fun DropDownList(
     modifier: Modifier = Modifier,
     name: String = "Gyümölcsök",
     items: List<String> = listOf("Alma", "Körte", "Banán"),
-    default: String = String(),
+    default: String = "",
     onChoose: (String) -> Unit = {},
 ) {
-    Log.d("DropDownList", "Default.parent: $default")
+    Log.d("DropDownList", "items: $items")
     var isExpanded by remember{ mutableStateOf(false)}
     var item by remember { mutableStateOf("") }
     item = default
     ExposedDropdownMenuBox(
         expanded = isExpanded,
-        modifier = modifier,
+        modifier = modifier.fillMaxWidth(),
         onExpandedChange = { newValue ->
             isExpanded = newValue
         }
@@ -55,25 +56,29 @@ fun DropDownList(
                 unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
                 disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
             ),
-            modifier = Modifier.menuAnchor()
+            modifier = modifier.menuAnchor().fillMaxWidth()
         )
 
         ExposedDropdownMenu(
             expanded = isExpanded,
             onDismissRequest = {
                 isExpanded = false
-            }
+            },
+            modifier = modifier.fillMaxWidth()
         ) {
             for(i in items) {
                 DropdownMenuItem(
                     text = {
+
                         Text(text = i)
                     },
                     onClick = {
                         item = i
+                        Log.d("DropDownList", "i: $i")
                         isExpanded = false
                         onChoose(i)
-                    }
+                    },
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
             DropdownMenuItem(
@@ -82,7 +87,8 @@ fun DropDownList(
                     item = ""
                     isExpanded = false
                     onChoose("")
-                }
+                },
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }
