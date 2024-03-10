@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.PointRepository
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TrueFalseQuestionRepository
-import hu.bme.aut.android.examapp.ui.TopicDetailsDestination
 import hu.bme.aut.android.examapp.ui.TrueFalseQuestionDetailsDestination
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

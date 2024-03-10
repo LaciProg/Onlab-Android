@@ -7,8 +7,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.PointRepository
-import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
-import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicDetails
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch

@@ -51,12 +51,10 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.viewmodel.compose.viewModel
-import hu.bme.aut.android.examapp.data.room.dto.TopicDto
 import hu.bme.aut.android.examapp.ui.AppViewModelProvider
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicDetails
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicDetailsUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicDetailsViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.topic.toTopic
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)

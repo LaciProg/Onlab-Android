@@ -22,8 +22,6 @@ fun PointListScreen(
     modifier: Modifier = Modifier,
     addNewPoint: () -> Unit = {},
     navigateToPointDetails: (Int) -> Unit,
-    //navigateToItemEntry: () -> Unit,
-    //navigateToItemUpdate: (Int) -> Unit,
     viewModel: PointListViewModel = viewModel(factory = AppViewModelProvider.Factory)
   ){
     val pointUiState by viewModel.pointListUiState.collectAsState()

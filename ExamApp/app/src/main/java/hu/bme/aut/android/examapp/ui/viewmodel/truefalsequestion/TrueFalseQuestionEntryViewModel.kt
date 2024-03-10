@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TrueFalseQuestionRepository
-import hu.bme.aut.android.examapp.data.room.dto.PointDto
 import hu.bme.aut.android.examapp.data.room.dto.TrueFalseQuestionDto
 import hu.bme.aut.android.examapp.ui.viewmodel.type.Type
 import kotlinx.coroutines.flow.filterNotNull
