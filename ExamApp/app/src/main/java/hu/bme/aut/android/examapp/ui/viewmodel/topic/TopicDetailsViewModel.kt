@@ -29,7 +29,7 @@ class TopicDetailsViewModel(
             .map { topicDto ->
                 TopicDetailsUiState(topicDetails =  topicDto.toTopicDetails(
                     parentName = if(topicDto.parentTopic !=-1) topicRepository.getTopicById(topicDto.parentTopic).map{it.topic}.first()
-                    else ""
+                                else ""
                 ))
             }.stateIn(
                 scope = viewModelScope,

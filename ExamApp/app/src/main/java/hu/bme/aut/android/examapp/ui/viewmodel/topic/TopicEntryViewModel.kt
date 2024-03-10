@@ -4,15 +4,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
 import hu.bme.aut.android.examapp.data.room.dto.TopicDto
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 
 class TopicEntryViewModel(private val topicRepository: TopicRepository) : ViewModel(){
 
@@ -33,16 +28,6 @@ class TopicEntryViewModel(private val topicRepository: TopicRepository) : ViewMo
             false
         }
     }
-
-    /*val parentTopicUiState: StateFlow<String> =
-        topicRepository.getTopicsByParentId().map {
-            it
-        }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TopicListViewModel.TIMEOUT_MILLIS),
-                initialValue = TopicListUiState()
-            )*/
 
     suspend fun getTopicById(id: Int): String {
         return topicRepository.getTopicById(id).filterNotNull().first().topic

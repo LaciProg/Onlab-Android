@@ -18,7 +18,11 @@ class TrueFalseQuestionEntryViewModel(private val trueFalseQuestionRepository: T
 
     fun updateUiState(trueFalseQuestionDetails: TrueFalseQuestionDetails) {
         trueFalseQuestionUiState =
-            TrueFalseQuestionUiState(trueFalseQuestionDetails = trueFalseQuestionDetails, isEntryValid = validateInput(trueFalseQuestionDetails))
+            TrueFalseQuestionUiState(
+                trueFalseQuestionDetails = trueFalseQuestionDetails,
+                isEntryValid = validateInput(trueFalseQuestionDetails,
+                )
+            )
     }
 
     suspend fun saveTrueFalseQuestion() : Boolean {
@@ -34,7 +38,7 @@ class TrueFalseQuestionEntryViewModel(private val trueFalseQuestionRepository: T
 
     private fun validateInput(uiState: TrueFalseQuestionDetails = trueFalseQuestionUiState.trueFalseQuestionDetails): Boolean {
         return with(uiState) {
-            question.isNotBlank() && isAnswerChosen && /*pointName.isNotBlank() && topicName.isNotBlank() &&*/ !question.contains("/")
+            question.isNotBlank() && isAnswerChosen && point!= -1 && topic != -1 && !question.contains("/")
         }
     }
 
@@ -53,9 +57,11 @@ data class TrueFalseQuestionDetails(
     val id: Int = 0,
     val question: String = "",
     val correctAnswer: Boolean = false,
-    val point: Int = 0,
-    val topic: Int = 0,
+    val point: Int = -1,
+    val topic: Int = -1,
     val isAnswerChosen: Boolean = false,
+    val pointName: String = "",
+    val topicName: String = ""
 )
 
 fun TrueFalseQuestionDetails.toTrueFalseQuestion(): TrueFalseQuestionDto = TrueFalseQuestionDto(
@@ -64,18 +70,20 @@ fun TrueFalseQuestionDetails.toTrueFalseQuestion(): TrueFalseQuestionDto = TrueF
     correctAnswer = correctAnswer,
     point = point,
     topic = topic,
-    type = Type.trueFalseQuestion.name
+    type = Type.trueFalseQuestion.name,
 )
 
-fun TrueFalseQuestionDto.toTrueFalseQuestionUiState(isEntryValid: Boolean = false): TrueFalseQuestionUiState = TrueFalseQuestionUiState(
-    trueFalseQuestionDetails = this.toTrueFalseQuestionDetails(),
+fun TrueFalseQuestionDto.toTrueFalseQuestionUiState(isEntryValid: Boolean = false, pointName: String, topicName: String): TrueFalseQuestionUiState = TrueFalseQuestionUiState(
+    trueFalseQuestionDetails = this.toTrueFalseQuestionDetails(pointName = pointName, topicName =  topicName),
     isEntryValid = isEntryValid
 )
 
-fun TrueFalseQuestionDto.toTrueFalseQuestionDetails(): TrueFalseQuestionDetails = TrueFalseQuestionDetails(
+fun TrueFalseQuestionDto.toTrueFalseQuestionDetails(pointName: String, topicName: String): TrueFalseQuestionDetails = TrueFalseQuestionDetails(
     id = id,
     question = question,
     correctAnswer = correctAnswer,
     point = point,
     topic = topic,
+    pointName = pointName,
+    topicName = topicName
 )

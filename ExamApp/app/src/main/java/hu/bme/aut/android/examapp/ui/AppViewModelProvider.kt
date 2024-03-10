@@ -97,7 +97,10 @@ object AppViewModelProvider {
         initializer {
             TrueFalseQuestionDetailsViewModel(
                 this.createSavedStateHandle(),
-                examApplication().container.trueFalseQuestionRepository
+                examApplication().container.trueFalseQuestionRepository,
+                examApplication().container.topicRepository,
+                examApplication().container.pointRepository
+
             )
         }
 

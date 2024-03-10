@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -22,13 +21,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.viewmodel.compose.viewModel
 import hu.bme.aut.android.examapp.R
 import hu.bme.aut.android.examapp.ui.AppViewModelProvider
 import hu.bme.aut.android.examapp.ui.components.DropDownList
 import hu.bme.aut.android.examapp.ui.viewmodel.point.PointListViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicDetails
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicListViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionDetails
 import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionEntryViewModel
@@ -115,20 +112,18 @@ fun TrueFalseQuestionInputForm(
         verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
     ) {
         DropDownList(
-            name = stringResource(R.string.topic_name_req),//TODO
-            items = topicListViewModel.topicListUiState.collectAsState().value.topicList.map{it.topic}/*.filterNot{ it == trueFalseQuestionDetails.topicName }*/,
-            onChoose = { onValueChange(trueFalseQuestionDetails.copy(topic = 0 /*it*/)) },
-            //default = trueFalseQuestionDetails.topicName,
+            name = stringResource(R.string.topic_name_req),
+            items = topicListViewModel.topicListUiState.collectAsState().value.topicList.map{it.topic}.filterNot{ it == trueFalseQuestionDetails.topicName },
+            onChoose = { topicName -> onValueChange(trueFalseQuestionDetails.copy(topicName = topicName, topic = if(topicName.isNotBlank()) topicListViewModel.topicListUiState.value.topicList.filter { it.topic == topicName }.map{it.id}.first() else -1)) },
+            default = trueFalseQuestionDetails.topicName,
             modifier = Modifier.fillMaxWidth(),
-            default = ""
         )
         DropDownList(
             name = stringResource(R.string.point_req),
-            items = pointListViewModel.pointListUiState.collectAsState().value.pointList.map{it.point}/*.filterNot{ it == trueFalseQuestionDetails.pointName }*/,
-            onChoose = { onValueChange(trueFalseQuestionDetails.copy(point =0 /*it*/)) },
-            //default = trueFalseQuestionDetails.topicName,
+            items = pointListViewModel.pointListUiState.collectAsState().value.pointList.map{it.point}.filterNot{ it == trueFalseQuestionDetails.pointName },
+            onChoose = { pointName -> onValueChange(trueFalseQuestionDetails.copy(pointName = pointName, point = if(pointName.isNotBlank()) pointListViewModel.pointListUiState.value.pointList.filter { it.point ==  pointName}.map{it.id}.first() else -1)) },
+            default = trueFalseQuestionDetails.pointName,
             modifier = Modifier.fillMaxWidth(),
-            default = ""
         )
         OutlinedTextField(
             value = trueFalseQuestionDetails.question,
