@@ -117,16 +117,18 @@ fun TrueFalseQuestionInputForm(
         DropDownList(
             name = stringResource(R.string.topic_name_req),//TODO
             items = topicListViewModel.topicListUiState.collectAsState().value.topicList.map{it.topic}/*.filterNot{ it == trueFalseQuestionDetails.topicName }*/,
-            onChoose = { onValueChange(trueFalseQuestionDetails.copy(topicName = 0 /*it*/)) },
+            onChoose = { onValueChange(trueFalseQuestionDetails.copy(topic = 0 /*it*/)) },
             //default = trueFalseQuestionDetails.topicName,
             modifier = Modifier.fillMaxWidth(),
+            default = ""
         )
         DropDownList(
             name = stringResource(R.string.point_req),
             items = pointListViewModel.pointListUiState.collectAsState().value.pointList.map{it.point}/*.filterNot{ it == trueFalseQuestionDetails.pointName }*/,
-            onChoose = { onValueChange(trueFalseQuestionDetails.copy(pointName =0 /*it*/)) },
+            onChoose = { onValueChange(trueFalseQuestionDetails.copy(point =0 /*it*/)) },
             //default = trueFalseQuestionDetails.topicName,
             modifier = Modifier.fillMaxWidth(),
+            default = ""
         )
         OutlinedTextField(
             value = trueFalseQuestionDetails.question,

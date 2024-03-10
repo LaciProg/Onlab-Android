@@ -26,9 +26,10 @@ class TopicDetailsViewModel(
     val uiState: StateFlow<TopicDetailsUiState> =
         topicRepository.getTopicById(topicId.toInt())
             .filterNotNull()
-            .map {
-                TopicDetailsUiState(topicDetails =  it.toTopicDetails(
-                    parentName = topicRepository.getTopicById(it.parentTopic).map{it.topic}.first()
+            .map { topicDto ->
+                TopicDetailsUiState(topicDetails =  topicDto.toTopicDetails(
+                    parentName = if(topicDto.parentTopic !=-1) topicRepository.getTopicById(topicDto.parentTopic).map{it.topic}.first()
+                    else ""
                 ))
             }.stateIn(
                 scope = viewModelScope,

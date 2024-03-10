@@ -31,8 +31,9 @@ fun DropDownList(
 ) {
     Log.d("DropDownList", "items: $items")
     var isExpanded by remember{ mutableStateOf(false)}
-    var item by remember { mutableStateOf("") }
-    item = default
+    var item by remember {
+      mutableStateOf(default)
+    }
     ExposedDropdownMenuBox(
         expanded = isExpanded,
         modifier = modifier.fillMaxWidth(),
@@ -41,7 +42,7 @@ fun DropDownList(
         }
     ) {
         OutlinedTextField(
-            value = item,
+            value = item.ifEmpty { default },
             onValueChange = {},
             readOnly = true,
             trailingIcon = {
@@ -56,7 +57,9 @@ fun DropDownList(
                 unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
                 disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
             ),
-            modifier = modifier.menuAnchor().fillMaxWidth()
+            modifier = modifier
+                .menuAnchor()
+                .fillMaxWidth()
         )
 
         ExposedDropdownMenu(
@@ -97,6 +100,6 @@ fun DropDownList(
 @Composable
 @Preview(showBackground = true)
 fun DropDownListPreview() {
-    DropDownList()
+    DropDownList(default = "")
 }
 

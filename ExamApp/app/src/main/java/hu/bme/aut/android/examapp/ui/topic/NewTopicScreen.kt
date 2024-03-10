@@ -1,5 +1,6 @@
 package hu.bme.aut.android.examapp.ui.topic
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -145,6 +146,7 @@ fun TopicInputForm(
             items = listViewModel.topicListUiState.collectAsState().value.topicList.map { it.topic } .filterNot{ it == topicDetails.topic },
             onChoose = {parent ->
                 coroutineScope.launch{
+                    Log.d("NewTopicScreen", "parent: $parent")
                     onValueChange(topicDetails.copy(parent = entryViewModel.getTopicIdByTopic(parent)))
                 }
             },

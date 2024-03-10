@@ -53,8 +53,8 @@ data class TrueFalseQuestionDetails(
     val id: Int = 0,
     val question: String = "",
     val correctAnswer: Boolean = false,
-    val pointName: Int = 0,
-    val topicName: Int = 0,
+    val point: Int = 0,
+    val topic: Int = 0,
     val isAnswerChosen: Boolean = false,
 )
 
@@ -62,8 +62,8 @@ fun TrueFalseQuestionDetails.toTrueFalseQuestion(): TrueFalseQuestionDto = TrueF
     id = id,
     question = question,
     correctAnswer = correctAnswer,
-    point = pointName,
-    topic = topicName,
+    point = point,
+    topic = topic,
     type = Type.trueFalseQuestion.name
 )
 
@@ -76,6 +76,6 @@ fun TrueFalseQuestionDto.toTrueFalseQuestionDetails(): TrueFalseQuestionDetails 
     id = id,
     question = question,
     correctAnswer = correctAnswer,
-    pointName = point,
-    topicName = topic,
+    point = point,
+    topic = topic,
 )

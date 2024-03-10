@@ -20,14 +20,16 @@ fun PointTopicBar(
             name = "Topic",
             /*TODO database access*/
             items = listOf("Math", "Physics", "Chemistry", "Biology", "History", "Literature", "Geography", "Art", "Music", "Physical Education", "Computer Science", "Foreign Language"),
-            onChoose = {onChooseTopic(it)}
+            onChoose = {onChooseTopic(it)},
+            default = ""
         )
         Spacer(modifier = Modifier.height(16.dp))
         DropDownList(
             name = "Point",
             /*TODO database access*/
             items = listOf("Plus/Minus/2", "Plus/4"),
-            onChoose = {onChoosePoint(it)}
+            onChoose = {onChoosePoint(it)},
+            default = ""
         )
     }
 }
