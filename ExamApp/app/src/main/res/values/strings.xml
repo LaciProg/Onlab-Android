@@ -37,5 +37,7 @@
     <string name="true_action">True</string>
     <string name="false_action">False</string>
     <string name="correct_answer_req">Mark the correct answer*</string>
+    <string name="edit_question">Edit question</string>
+    <string name="correct_answer">Correct answer</string>
 
 </resources>

@@ -25,7 +25,7 @@ class TrueFalseQuestionEntryViewModel(private val trueFalseQuestionRepository: T
     }
 
     suspend fun saveTrueFalseQuestion() : Boolean {
-        return if (validateInput() && validateUniqueTopic()) {
+        return if (validateInput() && validateUniqueTrueFalseQuestion()) {
             trueFalseQuestionRepository.insertTrueFalseQuestion(trueFalseQuestionUiState.trueFalseQuestionDetails.toTrueFalseQuestion())
             true
         }
@@ -41,7 +41,7 @@ class TrueFalseQuestionEntryViewModel(private val trueFalseQuestionRepository: T
         }
     }
 
-    private suspend fun validateUniqueTopic(uiState: TrueFalseQuestionDetails = trueFalseQuestionUiState.trueFalseQuestionDetails): Boolean {
+    private suspend fun validateUniqueTrueFalseQuestion(uiState: TrueFalseQuestionDetails = trueFalseQuestionUiState.trueFalseQuestionDetails): Boolean {
         return !trueFalseQuestionRepository.getAllTrueFalseQuestionQuestion().filterNotNull().first().contains(uiState.question)
     }
 
@@ -72,17 +72,18 @@ fun TrueFalseQuestionDetails.toTrueFalseQuestion(): TrueFalseQuestionDto = TrueF
     type = Type.trueFalseQuestion.name,
 )
 
-fun TrueFalseQuestionDto.toTrueFalseQuestionUiState(isEntryValid: Boolean = false, pointName: String, topicName: String): TrueFalseQuestionUiState = TrueFalseQuestionUiState(
-    trueFalseQuestionDetails = this.toTrueFalseQuestionDetails(pointName = pointName, topicName =  topicName),
+fun TrueFalseQuestionDto.toTrueFalseQuestionUiState(isEntryValid: Boolean = false, pointName: String, topicName: String, isAnswerChosen: Boolean = false): TrueFalseQuestionUiState = TrueFalseQuestionUiState(
+    trueFalseQuestionDetails = this.toTrueFalseQuestionDetails(pointName = pointName, topicName =  topicName, isAnswerChosen),
     isEntryValid = isEntryValid
 )
 
-fun TrueFalseQuestionDto.toTrueFalseQuestionDetails(pointName: String, topicName: String): TrueFalseQuestionDetails = TrueFalseQuestionDetails(
+fun TrueFalseQuestionDto.toTrueFalseQuestionDetails(pointName: String, topicName: String, isAnswerChosen: Boolean = false): TrueFalseQuestionDetails = TrueFalseQuestionDetails(
     id = id,
     question = question,
     correctAnswer = correctAnswer,
     point = point,
     topic = topic,
     pointName = pointName,
-    topicName = topicName
+    topicName = topicName,
+    isAnswerChosen = isAnswerChosen
 )

@@ -70,19 +70,39 @@ object TrueFalseQuestionListDestination : ExamDestination {
 }
 
 object TrueFalseQuestionDetailsDestination : ExamDestination{
-    override val route: String = "TrueFalseQuestionDetailsDetails"
+    override val route: String = "TrueFalseQuestionDetails"
     const val trueFalseQuestionIdArg = 0
-    val routeWithArgs = "$route/$trueFalseQuestionIdArg"
+    val routeWithArgs = "$route/{$trueFalseQuestionIdArg}"
 }
 
 object TrueFalseQuestionEditDestination : ExamDestination {
     override val route = "TrueFalseQuestionEdit"
     const val trueFalseQuestionIdArg = 0
-    val routeWithArgs = "$route/$trueFalseQuestionIdArg"
+    val routeWithArgs = "$route/{$trueFalseQuestionIdArg}"
 }
 
 object NewTrueFalseQuestionDestination : ExamDestination{
     override val route: String = "NewTrueFalseQuestion"
+}
+
+object MultipleChoiceQuestionListDestination : ExamDestination {
+    override val route = "MultipleChoiceQuestionList"
+}
+
+object MultipleChoiceQuestionDetailsDestination : ExamDestination{
+    override val route: String = "MultipleChoiceQuestionDetails"
+    const val multipleChoiceQuestionIdArg = 0
+    val routeWithArgs = "$route/{$multipleChoiceQuestionIdArg}"
+}
+
+object MultipleChoiceQuestionEditDestination : ExamDestination {
+    override val route = "MultipleChoiceQuestionEdit"
+    const val multipleChoiceQuestionIdArg = 0
+    val routeWithArgs = "$route/{$multipleChoiceQuestionIdArg}"
+}
+
+object NewMultipleChoiceQuestionDestination : ExamDestination{
+    override val route: String = "MultipleChoiceFalseQuestion"
 }
 
 

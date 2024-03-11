@@ -37,6 +37,8 @@ import hu.bme.aut.android.examapp.ui.topic.TopicDetailsScreen
 import hu.bme.aut.android.examapp.ui.topic.TopicListScreen
 import hu.bme.aut.android.examapp.ui.topic.TopicEditScreen
 import hu.bme.aut.android.examapp.ui.truefalsequestion.NewTrueFalseQuestionScreen
+import hu.bme.aut.android.examapp.ui.truefalsequestion.TrueFalseQuestionDetailsScreen
+import hu.bme.aut.android.examapp.ui.truefalsequestion.TrueFalseQuestionEditScreen
 import hu.bme.aut.android.examapp.ui.truefalsequestion.TrueFalseQuestionListScreen
 
 @Composable
@@ -71,7 +73,8 @@ fun ExamNavHost(
         }
 
         composable(
-            route = /*ExamDestination.*//*"${TopicDetails.route}/{topicName}"*/TopicDetailsDestination.routeWithArgs) {
+            route = TopicDetailsDestination.routeWithArgs
+        ) {
             TopicDetailsScreen(
                 navigateToEditTopic = { navController.navigate("${TopicEditDestination.route}/$it") },
                 navigateBack = { navController.popBackStack() }
@@ -90,7 +93,9 @@ fun ExamNavHost(
             )
         }
 
-        composable(route = /*ExamDestination.*/NewTopicDestination.route) {
+        composable(
+            route = /*ExamDestination.*/NewTopicDestination.route
+        ) {
             NewTopic(
                 navigateBack = { navController.popBackStack() },
                 onNavigateUp = { navController.navigateUp() },
@@ -109,7 +114,8 @@ fun ExamNavHost(
         }
 
         composable(
-            route = /*ExamDestination.*//*"${TopicDetails.route}/{topicName}"*/PointDetailsDestination.routeWithArgs) {
+            route = PointDetailsDestination.routeWithArgs
+        ) {
             PointDetailsScreen(
                 navigateToEditPoint = { navController.navigate("${PointEditDestination.route}/$it") },
                 navigateBack = { navController.popBackStack() }
@@ -128,7 +134,9 @@ fun ExamNavHost(
             )
         }
 
-        composable(route = /*ExamDestination.*/NewPointDestination.route) {
+        composable(
+            route = /*ExamDestination.*/NewPointDestination.route
+        ) {
             NewPoint(
                 navigateBack = { navController.popBackStack() },
                 onNavigateUp = { navController.navigateUp() },
@@ -136,14 +144,38 @@ fun ExamNavHost(
         }
 
 
-        composable(route = TrueFalseQuestionListDestination.route) {
+        composable(
+            route = TrueFalseQuestionListDestination.route
+        ) {
             TrueFalseQuestionListScreen(
                 addNewTrueFalseQuestion = { navController.navigate(/*ExamDestination.*/NewTrueFalseQuestionDestination.route) },
                 navigateToTrueFalseQuestionDetails = { navController.navigate("${TrueFalseQuestionDetailsDestination.route}/$it") }
             )
         }
 
-        composable(route = /*ExamDestination.*/NewTrueFalseQuestionDestination.route) {
+
+        composable(
+            route = TrueFalseQuestionDetailsDestination.routeWithArgs
+        ){
+            TrueFalseQuestionDetailsScreen(
+                navigateToEditTrueFalseQuestion = {navController.navigate("${TrueFalseQuestionEditDestination.route}/$it") },
+                navigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = TrueFalseQuestionEditDestination.routeWithArgs,
+        ) {
+            TrueFalseQuestionEditScreen(
+                navigateBack = { navController.popBackStack() },
+                //onNavigateUp = { navController.navigateUp() }
+            )
+        }
+
+
+        composable(
+            route = /*ExamDestination.*/NewTrueFalseQuestionDestination.route
+        ) {
             NewTrueFalseQuestionScreen(
                 navigateBack = { navController.popBackStack() },
                 onNavigateUp = { navController.navigateUp() },
@@ -151,6 +183,46 @@ fun ExamNavHost(
         }
 
 
+        composable(
+            route = MultipleChoiceQuestionListDestination.route
+        ) {
+            TrueFalseQuestionListScreen(
+                addNewTrueFalseQuestion = { navController.navigate(/*ExamDestination.*/NewTrueFalseQuestionDestination.route) },
+                navigateToTrueFalseQuestionDetails = { navController.navigate("${ MultipleChoiceQuestionDetailsDestination.route}/$it") }
+            )
+        }
+
+
+        composable(
+            route = MultipleChoiceQuestionDetailsDestination.routeWithArgs
+        ){
+            TrueFalseQuestionDetailsScreen(
+                navigateToEditTrueFalseQuestion = {navController.navigate("${ MultipleChoiceQuestionEditDestination.route}/$it") },
+                navigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route =  MultipleChoiceQuestionEditDestination.routeWithArgs,
+            /*arguments = listOf(navArgument(PointEditDestination.pointIdArg.toString()) {
+                type = NavType.StringType
+            })*/
+        ) {
+            TrueFalseQuestionEditScreen(
+                navigateBack = { navController.popBackStack() },
+                //onNavigateUp = { navController.navigateUp() }
+            )
+        }
+
+
+        composable(
+            route = /*ExamDestination.*/NewMultipleChoiceQuestionDestination.route
+        ) {
+            NewTrueFalseQuestionScreen(
+                navigateBack = { navController.popBackStack() },
+                onNavigateUp = { navController.navigateUp() },
+            )
+        }
 
 
         composable(route = /*ExamDestination.*/ScreenSecond.route) {

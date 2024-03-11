@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package hu.bme.aut.android.examapp.ui.topic
+package hu.bme.aut.android.examapp.ui.truefalsequestion
 
 import hu.bme.aut.android.examapp.R
 import androidx.annotation.StringRes
@@ -52,47 +52,47 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.viewmodel.compose.viewModel
 import hu.bme.aut.android.examapp.ui.AppViewModelProvider
-import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicDetails
-import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicDetailsUiState
-import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicDetailsViewModel
+import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionDetails
+import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionDetailsUiState
+import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionDetailsViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopicDetailsScreen(
-    navigateToEditTopic: (Int) -> Unit,
+fun TrueFalseQuestionDetailsScreen(
+    navigateToEditTrueFalseQuestion: (Int) -> Unit,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: TopicDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: TrueFalseQuestionDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val uiState = viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     Scaffold(
         topBar = {
-            Text(text = uiState.value.topicDetails.topic)
+            Text(text = uiState.value.trueFalseQuestionDetails.question)
         }, floatingActionButton = {
             FloatingActionButton(
-                onClick = { navigateToEditTopic(uiState.value.topicDetails.id) },
+                onClick = { navigateToEditTrueFalseQuestion(uiState.value.trueFalseQuestionDetails.id) },
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
 
             ) {
                 Icon(
                     imageVector = Icons.Default.Edit,
-                    contentDescription = stringResource(R.string.edit_topic),
+                    contentDescription = stringResource(R.string.edit_question),
                 )
             }
         }, modifier = modifier
     ) { innerPadding ->
-        TopicDetailsBody(
-            topicDetailsUiState = uiState.value,
+        TrueFalseQuestionDetailsBody(
+            trueFalseQuestionDetailsUiState = uiState.value,
             onDelete = {
                 // Note: If the user rotates the screen very fast, the operation may get cancelled
                 // and the item may not be deleted from the Database. This is because when config
                 // change occurs, the Activity will be recreated and the rememberCoroutineScope will
                 // be cancelled - since the scope is bound to composition.
                 coroutineScope.launch {
-                    viewModel.deleteTopic()
+                    viewModel.deleteTrueFalseQuestion()
                     navigateBack()
                 }
             },
@@ -104,8 +104,8 @@ fun TopicDetailsScreen(
 }
 
 @Composable
-private fun TopicDetailsBody(
-    topicDetailsUiState: TopicDetailsUiState,
+private fun TrueFalseQuestionDetailsBody(
+    trueFalseQuestionDetailsUiState: TrueFalseQuestionDetailsUiState,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -114,8 +114,8 @@ private fun TopicDetailsBody(
         verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
     ) {
         var deleteConfirmationRequired by rememberSaveable { mutableStateOf(false) }
-        TopicDetails(
-            topic = topicDetailsUiState.topicDetails/*.toTopic()*/, modifier = Modifier.fillMaxWidth()
+        TrueFalseQuestionDetails(
+            trueFalseQuestion = trueFalseQuestionDetailsUiState.trueFalseQuestionDetails/*.toTopic()*/, modifier = Modifier.fillMaxWidth()
         )
         OutlinedButton(
             onClick = { deleteConfirmationRequired = true },
@@ -139,8 +139,8 @@ private fun TopicDetailsBody(
 
 
 @Composable
-fun TopicDetails(
-    topic: TopicDetails,
+fun TrueFalseQuestionDetails(
+    trueFalseQuestion: TrueFalseQuestionDetails,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -155,9 +155,19 @@ fun TopicDetails(
                 .padding(dimensionResource(id = R.dimen.padding_medium)),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
         ) {
-            TopicDetailsRow(
+            TrueFalseQuestionDetailsRow(
+                labelResID = R.string.question,
+                trueFalseQuestionDetail = trueFalseQuestion.question,
+                modifier = Modifier.padding(
+                    horizontal = dimensionResource(
+                        id = R.dimen
+                            .padding_medium
+                    )
+                )
+            )
+            TrueFalseQuestionDetailsRow(
                 labelResID = R.string.topic,
-                topicDetail = topic.topic,
+                trueFalseQuestionDetail = trueFalseQuestion.topicName,
                 modifier = Modifier.padding(
                     horizontal = dimensionResource(
                         id = R.dimen
@@ -165,9 +175,9 @@ fun TopicDetails(
                     )
                 )
             )
-            TopicDetailsRow(
-                labelResID = R.string.description,
-                topicDetail = topic.description,
+            TrueFalseQuestionDetailsRow(
+                labelResID = R.string.point,
+                trueFalseQuestionDetail = trueFalseQuestion.pointName,
                 modifier = Modifier.padding(
                     horizontal = dimensionResource(
                         id = R.dimen
@@ -175,9 +185,9 @@ fun TopicDetails(
                     )
                 )
             )
-            TopicDetailsRow(
-                labelResID = R.string.parent_topic,
-                topicDetail = if(topic.parent == -1) stringResource(R.string.no_parent) else topic.parentTopicName /* viewModel.getTopicById(topic.parentTopic)*/,
+            TrueFalseQuestionDetailsRow(
+                labelResID = R.string.correct_answer,
+                trueFalseQuestionDetail = trueFalseQuestion.correctAnswer.toString(),
                 modifier = Modifier.padding(
                     horizontal = dimensionResource(
                         id = R.dimen
@@ -191,13 +201,13 @@ fun TopicDetails(
 }
 
 @Composable
-private fun TopicDetailsRow(
-    @StringRes labelResID: Int, topicDetail: String, modifier: Modifier = Modifier
+private fun TrueFalseQuestionDetailsRow(
+    @StringRes labelResID: Int, trueFalseQuestionDetail: String, modifier: Modifier = Modifier
 ) {
     Row(modifier = modifier) {
         Text(text = stringResource(labelResID))
         Spacer(modifier = Modifier.weight(1f))
-        Text(text = topicDetail, fontWeight = FontWeight.Bold)
+        Text(text = trueFalseQuestionDetail, fontWeight = FontWeight.Bold)
     }
 }
 

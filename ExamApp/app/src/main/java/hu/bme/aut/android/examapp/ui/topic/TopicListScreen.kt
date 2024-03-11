@@ -22,8 +22,6 @@ fun TopicListScreen(
     modifier: Modifier = Modifier,
     addNewTopic: () -> Unit = {},
     navigateToTopicDetails: (Int) -> Unit,
-    //navigateToItemEntry: () -> Unit,
-    //navigateToItemUpdate: (Int) -> Unit,
     viewModel: TopicListViewModel = viewModel(factory = AppViewModelProvider.Factory)
   ){
     val topicUiState by viewModel.topicListUiState.collectAsState()

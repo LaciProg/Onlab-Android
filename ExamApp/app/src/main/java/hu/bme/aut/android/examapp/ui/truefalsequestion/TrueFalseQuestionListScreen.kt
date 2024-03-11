@@ -28,7 +28,7 @@ import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuesti
 fun TrueFalseQuestionListScreen(
     modifier: Modifier = Modifier,
     addNewTrueFalseQuestion: () -> Unit = {},
-    navigateToTrueFalseQuestionDetails: (String) -> Unit,
+    navigateToTrueFalseQuestionDetails: (Int) -> Unit,
     viewModel: TrueFalseQuestionListViewModel = viewModel(factory = AppViewModelProvider.Factory)
   ){
     val trueFalseQuestionListUiState by viewModel.trueFalseQuestionListUiState.collectAsState()
@@ -59,7 +59,7 @@ fun TrueFalseQuestionListScreen(
             items(trueFalseQuestionListUiState.trueFalseQuestionList){
                 Row(
                     modifier = Modifier
-                        .clickable { navigateToTrueFalseQuestionDetails(it.question) }
+                        .clickable { navigateToTrueFalseQuestionDetails(it.id) }
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ){

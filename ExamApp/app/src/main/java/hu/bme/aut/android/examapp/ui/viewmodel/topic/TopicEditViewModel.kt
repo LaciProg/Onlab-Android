@@ -17,7 +17,7 @@ class TopicEditViewModel(
     private val topicRepository: TopicRepository
 ) : ViewModel() {
 
-    private lateinit var originaltopic: String
+    private lateinit var originalTopic: String
     /**
      * Holds current topic ui state
      */
@@ -35,7 +35,7 @@ class TopicEditViewModel(
                     parentName =  topicRepository.getTopicById(
                         topicRepository.getTopicById(topicId.toInt()).map { it.parentTopic }.first())
                         .map{it.topic}.first())
-            originaltopic = topicUiState.topicDetails.topic
+            originalTopic = topicUiState.topicDetails.topic
         }
 
     }
@@ -70,7 +70,7 @@ class TopicEditViewModel(
     }
 
     private suspend fun validateUniqueTopic(uiState: TopicDetails = topicUiState.topicDetails): Boolean {
-        return !topicRepository.getAllTopicName().filterNotNull().first().contains(uiState.topic) || originaltopic == uiState.topic
+        return !topicRepository.getAllTopicName().filterNotNull().first().contains(uiState.topic) || originalTopic == uiState.topic
     }
 }
 

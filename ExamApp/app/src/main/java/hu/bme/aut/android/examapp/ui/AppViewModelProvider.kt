@@ -19,6 +19,7 @@ import hu.bme.aut.android.examapp.ui.viewmodel.point.PointListViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicDetailsViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicListViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionDetailsViewModel
+import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionEditViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionEntryViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionListViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.type.TypeViewModel
@@ -100,7 +101,15 @@ object AppViewModelProvider {
                 examApplication().container.trueFalseQuestionRepository,
                 examApplication().container.topicRepository,
                 examApplication().container.pointRepository
+            )
+        }
 
+        initializer {
+            TrueFalseQuestionEditViewModel(
+                this.createSavedStateHandle(),
+                examApplication().container.trueFalseQuestionRepository,
+                examApplication().container.topicRepository,
+                examApplication().container.pointRepository
             )
         }
 
