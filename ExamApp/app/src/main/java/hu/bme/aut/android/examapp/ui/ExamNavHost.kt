@@ -28,6 +28,8 @@ import androidx.navigation.navArgument
 import hu.bme.aut.android.examapp.DefaultMulti
 import hu.bme.aut.android.examapp.DefaultTrueFalse
 import hu.bme.aut.android.examapp.MainScreen
+import hu.bme.aut.android.examapp.ui.multiplechoicequestion.MultipleChoiceQuestionDetailsScreen
+import hu.bme.aut.android.examapp.ui.multiplechoicequestion.MultipleChoiceQuestionEditScreen
 import hu.bme.aut.android.examapp.ui.multiplechoicequestion.MultipleChoiceQuestionListScreen
 import hu.bme.aut.android.examapp.ui.multiplechoicequestion.NewMultipleChoiceQuestionScreen
 import hu.bme.aut.android.examapp.ui.point.NewPoint
@@ -199,8 +201,8 @@ fun ExamNavHost(
         composable(
             route = MultipleChoiceQuestionDetailsDestination.routeWithArgs
         ){
-            TrueFalseQuestionDetailsScreen(
-                navigateToEditTrueFalseQuestion = {navController.navigate("${ MultipleChoiceQuestionEditDestination.route}/$it") },
+            MultipleChoiceQuestionDetailsScreen(
+                navigateToEditMultipleChoiceQuestion = {navController.navigate("${ MultipleChoiceQuestionEditDestination.route}/$it") },
                 navigateBack = { navController.popBackStack() }
             )
         }
@@ -211,7 +213,7 @@ fun ExamNavHost(
                 type = NavType.StringType
             })*/
         ) {
-            TrueFalseQuestionEditScreen(
+            MultipleChoiceQuestionEditScreen(
                 navigateBack = { navController.popBackStack() },
                 //onNavigateUp = { navController.navigateUp() }
             )
