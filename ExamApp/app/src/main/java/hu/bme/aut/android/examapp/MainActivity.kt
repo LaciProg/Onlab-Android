@@ -107,6 +107,7 @@ fun MainScreen(
     navigateToTopicList: () -> Unit,
     navigateToPointList: () -> Unit,
     navigateToTrueFalseQuestionList: () -> Unit,
+    navigateToMultipleChoiceQuestionList: () -> Unit
 ){
     Column(
         modifier = Modifier
@@ -138,6 +139,13 @@ fun MainScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(R.string.true_false_question))
+        }
+        OutlinedButton(
+            onClick = { navigateToMultipleChoiceQuestionList() },
+            shape = MaterialTheme.shapes.small,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(stringResource(R.string.multiple_choice_question))
         }
     }
 }

@@ -38,7 +38,7 @@ class TrueFalseQuestionEditViewModel(
                 .toTrueFalseQuestionUiState(
                     isEntryValid = true,
                     topicName = topicRepository.getTopicById(trueFalseQuestionRepository.getTrueFalseQuestionById(trueFalseQuestionId.toInt()).map { it.topic }.first()).map { it.topic }.first(),
-                    pointName = pointRepository.getPointById(trueFalseQuestionRepository.getTrueFalseQuestionById(trueFalseQuestionId.toInt()).map{it.point}.first()).map{it.type}.first(),
+                    pointName = pointRepository.getPointById(trueFalseQuestionRepository.getTrueFalseQuestionById(trueFalseQuestionId.toInt()).map{ it.point }.first()).map{ it.type }.first(),
                     isAnswerChosen = true
                 )
             originalQuestion = trueFalseQuestionUiState.trueFalseQuestionDetails.question

@@ -12,6 +12,8 @@ import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.PointRepository
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TypeRepository
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TrueFalseQuestionRepository
+import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionEntryViewModel
+import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionListViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.point.PointDetailsViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.point.PointEditViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.point.PointEntryViewModel
@@ -116,6 +118,20 @@ object AppViewModelProvider {
         initializer {
             TrueFalseQuestionEntryViewModel(
                 examApplication().container.trueFalseQuestionRepository
+            )
+        }
+
+
+        initializer {
+            MultipleChoiceQuestionListViewModel(
+                examApplication().container.multipleChoiceQuestionRepository,
+                examApplication().container.topicRepository
+                )
+        }
+
+        initializer {
+            MultipleChoiceQuestionEntryViewModel(
+                examApplication().container.multipleChoiceQuestionRepository
             )
         }
     }

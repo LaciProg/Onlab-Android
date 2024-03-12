@@ -150,11 +150,7 @@ fun TopicInputForm(
                     onValueChange(topicDetails.copy(parent = entryViewModel.getTopicIdByTopic(parent)))
                 }
             },
-            default = topicDetails.parentTopicName
-                /*coroutineScope.launch{
-                    entryViewModel.getTopicById(topicDetails.parent)
-                }.*/// "banán"
-            ,
+            default = topicDetails.parentTopicName,
             modifier = Modifier.fillMaxWidth(),
         )
         if (enabled) {

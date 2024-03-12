@@ -28,6 +28,8 @@ import androidx.navigation.navArgument
 import hu.bme.aut.android.examapp.DefaultMulti
 import hu.bme.aut.android.examapp.DefaultTrueFalse
 import hu.bme.aut.android.examapp.MainScreen
+import hu.bme.aut.android.examapp.ui.multiplechoicequestion.MultipleChoiceQuestionListScreen
+import hu.bme.aut.android.examapp.ui.multiplechoicequestion.NewMultipleChoiceQuestionScreen
 import hu.bme.aut.android.examapp.ui.point.NewPoint
 import hu.bme.aut.android.examapp.ui.point.PointDetailsScreen
 import hu.bme.aut.android.examapp.ui.point.PointEditScreen
@@ -57,7 +59,8 @@ fun ExamNavHost(
             MainScreen(
                 navigateToTopicList = { navController.navigateSingleTopTo(TopicListDestination.route) },
                 navigateToPointList = { navController.navigateSingleTopTo(PointListDestination.route) },
-                navigateToTrueFalseQuestionList = { navController.navigateSingleTopTo(TrueFalseQuestionListDestination.route) }
+                navigateToTrueFalseQuestionList = { navController.navigateSingleTopTo(TrueFalseQuestionListDestination.route) },
+                navigateToMultipleChoiceQuestionList = {navController.navigateSingleTopTo(MultipleChoiceQuestionListDestination.route)}
             )
         }
 
@@ -186,9 +189,9 @@ fun ExamNavHost(
         composable(
             route = MultipleChoiceQuestionListDestination.route
         ) {
-            TrueFalseQuestionListScreen(
-                addNewTrueFalseQuestion = { navController.navigate(/*ExamDestination.*/NewTrueFalseQuestionDestination.route) },
-                navigateToTrueFalseQuestionDetails = { navController.navigate("${ MultipleChoiceQuestionDetailsDestination.route}/$it") }
+            MultipleChoiceQuestionListScreen(
+                addNewMultipleChoiceQuestion = { navController.navigate(/*ExamDestination.*/NewMultipleChoiceQuestionDestination.route) },
+                navigateToMultipleChoiceQuestionDetails = { navController.navigate("${ MultipleChoiceQuestionDetailsDestination.route}/$it") }
             )
         }
 
@@ -218,7 +221,7 @@ fun ExamNavHost(
         composable(
             route = /*ExamDestination.*/NewMultipleChoiceQuestionDestination.route
         ) {
-            NewTrueFalseQuestionScreen(
+            NewMultipleChoiceQuestionScreen(
                 navigateBack = { navController.popBackStack() },
                 onNavigateUp = { navController.navigateUp() },
             )

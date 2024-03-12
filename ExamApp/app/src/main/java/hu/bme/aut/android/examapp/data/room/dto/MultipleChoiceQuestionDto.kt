@@ -33,7 +33,7 @@ data class MultipleChoiceQuestionDto(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name =  "id") var id: Int,
     @ColumnInfo(name =  "question")var question: String,
     @ColumnInfo(name =  "answers")var answers: String,
-    @ColumnInfo(name =  "correctAnswer")var correctAnswer: Int,
+    @ColumnInfo(name =  "correctAnswersList")var correctAnswersList: String,
     @ColumnInfo(name = "pointFk") var point: Int,
     @ColumnInfo(name = "topicFk") var topic: Int,
     @ColumnInfo(name = "typeFk") var type: String

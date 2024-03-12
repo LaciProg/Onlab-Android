@@ -39,5 +39,7 @@
     <string name="correct_answer_req">Mark the correct answer*</string>
     <string name="edit_question">Edit question</string>
     <string name="correct_answer">Correct answer</string>
+    <string name="question_answer_req">Answer*</string>
+    <string name="multiple_choice_question">Multiple choice question</string>
 
 </resources>
