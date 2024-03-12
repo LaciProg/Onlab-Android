@@ -25,7 +25,7 @@ import hu.bme.aut.android.examapp.data.room.dto.TypeDto
         TypeDto::class,
         PointDto::class
     ],
-    version = 8,
+    version = 9,
     exportSchema = false)
 abstract class ExamDatabase : RoomDatabase() {
     abstract fun examDao(): ExamDao
