@@ -13,5 +13,6 @@ interface TrueFalseQuestionRepository {
     fun getTrueFalseQuestionsByTopic(topicFk: Int): Flow<Map<TopicDto,List<TrueFalseQuestionDto>>>
     fun getTrueFalseQuestionsByType(typeFk: Int): Flow<List<TrueFalseQuestionDto>>
     fun getAllTrueFalseQuestionQuestion(): Flow<List<String>>
+    fun getTrueFalseQuestionByQuestion(question: String): Flow<TrueFalseQuestionDto>
 
 }

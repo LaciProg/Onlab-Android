@@ -1,21 +1,29 @@
 package hu.bme.aut.android.examapp
 
+import android.graphics.Insets.add
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -35,6 +43,10 @@ import hu.bme.aut.android.examapp.ui.navigateSingleTopTo
 import hu.bme.aut.android.examapp.ui.examTabRowScreens
 import hu.bme.aut.android.examapp.ui.theme.ExamAppTheme
 import hu.bme.aut.android.examapp.ui.viewmodel.type.TypeViewModel
+import org.burnoutcrew.reorderable.ReorderableItem
+import org.burnoutcrew.reorderable.detectReorderAfterLongPress
+import org.burnoutcrew.reorderable.rememberReorderableLazyListState
+import org.burnoutcrew.reorderable.reorderable
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -107,7 +119,8 @@ fun MainScreen(
     navigateToTopicList: () -> Unit,
     navigateToPointList: () -> Unit,
     navigateToTrueFalseQuestionList: () -> Unit,
-    navigateToMultipleChoiceQuestionList: () -> Unit
+    navigateToMultipleChoiceQuestionList: () -> Unit,
+    navigateToExamList: () -> Unit
 ){
     Column(
         modifier = Modifier
@@ -146,6 +159,43 @@ fun MainScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(R.string.multiple_choice_question))
+        }
+        OutlinedButton(
+            onClick = { navigateToExamList() },
+            shape = MaterialTheme.shapes.small,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(stringResource(R.string.exams))
+        }
+    }
+    //VerticalReorderList()
+}
+
+@Composable
+fun VerticalReorderList() {
+    val data = remember { mutableStateOf(List(100) { "Item $it" }) }
+    val state = rememberReorderableLazyListState(onMove = { from, to ->
+        data.value = data.value.toMutableList().apply {
+            add(to.index, removeAt(from.index))
+        }
+    })
+    LazyColumn(
+        state = state.listState,
+        modifier = Modifier
+            .reorderable(state)
+            .detectReorderAfterLongPress(state)
+    ) {
+        items(data.value, { it }) { item ->
+            ReorderableItem(state, key = item) { isDragging ->
+                val elevation = animateDpAsState(if (isDragging) 16.dp else 0.dp)
+                Column(
+                    modifier = Modifier
+                        .shadow(elevation.value)
+                    //.background(MaterialTheme.colors.surface)
+                ) {
+                    Text(item)
+                }
+            }
         }
     }
 }

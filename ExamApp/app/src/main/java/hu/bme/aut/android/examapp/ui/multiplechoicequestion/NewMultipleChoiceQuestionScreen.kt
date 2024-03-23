@@ -1,6 +1,5 @@
 package hu.bme.aut.android.examapp.ui.multiplechoicequestion
 
-import android.graphics.drawable.Icon
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -8,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -38,11 +36,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import hu.bme.aut.android.examapp.R
 import hu.bme.aut.android.examapp.ui.AppViewModelProvider
 import hu.bme.aut.android.examapp.ui.components.DropDownList
-import hu.bme.aut.android.examapp.ui.viewmodel.point.PointListViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicListViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionDetails
 import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionEntryViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionUiState
+import hu.bme.aut.android.examapp.ui.viewmodel.point.PointListViewModel
+import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicListViewModel
 import kotlinx.coroutines.launch
 
 @Composable
@@ -64,8 +62,16 @@ fun NewMultipleChoiceQuestionScreen(
             onMultipleChoiceQuestionValueChange = viewModel::updateUiState,
             onSaveClick = {
                 coroutineScope.launch {
-                    viewModel.saveMultipleChoiceQuestion()
-                    navigateBack()
+                    if(viewModel.saveMultipleChoiceQuestion()) {
+                        navigateBack()
+                    }
+                    else{
+                        Toast.makeText(
+                            context,
+                            "Question already exists",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 }
             },
             modifier = Modifier
@@ -152,13 +158,15 @@ fun MultipleChoiceQuestionInputForm(
             listSize.intValue = multipleChoiceQuestionDetails.answers.size
             var text by remember { mutableStateOf("")}
             for(index in 0 until listSize.intValue){
-                //text = ""
-                Log.d("asd", "text: $text ${multipleChoiceQuestionDetails.isAnswerChosen}") //TODO ha kitörlöd nem fut a recomposeition
+
+                //TODO ha kitörlöd nem fut a recomposeition
+                Log.d("asd", "text: $text ${multipleChoiceQuestionDetails.isAnswerChosen}")
+
                 Row{
                     TextButton(onClick = {
                         if(multipleChoiceQuestionDetails.correctAnswersList.contains(multipleChoiceQuestionDetails.answers[index]) && multipleChoiceQuestionDetails.answers[index].isNotEmpty() ){
                             multipleChoiceQuestionDetails.correctAnswersList.remove(multipleChoiceQuestionDetails.answers[index])
-                            Log.d("remove", "remove: ${multipleChoiceQuestionDetails.correctAnswersList}")
+                            //Log.d("remove", "remove: ${multipleChoiceQuestionDetails.correctAnswersList}")
                             if(multipleChoiceQuestionDetails.correctAnswersList.isEmpty()){
                                 onValueChange(multipleChoiceQuestionDetails.copy(isAnswerChosen = false))
                             }
@@ -173,7 +181,7 @@ fun MultipleChoiceQuestionInputForm(
                                if(multipleChoiceQuestionDetails.answers[index].isNotEmpty())multipleChoiceQuestionDetails.correctAnswersList.add(multipleChoiceQuestionDetails.answers[index])
                                onValueChange(multipleChoiceQuestionDetails.copy(isAnswerChosen = true))
                             }
-                            Log.d("correctAnswer", "correctAnswer: ${multipleChoiceQuestionDetails.correctAnswersList}")
+                            //Log.d("correctAnswer", "correctAnswer: ${multipleChoiceQuestionDetails.correctAnswersList}")
                         }
                         text = multipleChoiceQuestionDetails.correctAnswersList.toString()
                     }) {
@@ -200,7 +208,7 @@ fun MultipleChoiceQuestionInputForm(
                         onValueChange = {
                             text = it
                             if(multipleChoiceQuestionDetails.correctAnswersList.contains(multipleChoiceQuestionDetails.answers[index]) && multipleChoiceQuestionDetails.answers[index].isNotEmpty()){
-                                Log.d("correctAnswer", "a")
+                                //Log.d("correctAnswer", "a")
                                 multipleChoiceQuestionDetails.correctAnswersList[multipleChoiceQuestionDetails.correctAnswersList.indexOf(multipleChoiceQuestionDetails.answers[index])] = text
                             }
                             multipleChoiceQuestionDetails.answers[index] = it

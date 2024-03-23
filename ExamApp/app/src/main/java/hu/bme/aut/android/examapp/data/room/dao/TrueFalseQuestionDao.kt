@@ -39,4 +39,7 @@ interface TrueFalseQuestionDao {
 
     @Query("SELECT question FROM trueFalseQuestion ORDER BY question ASC")
     fun getAllTrueFalseQuestionQuestion(): Flow<List<String>>
+
+    @Query("SELECT * FROM trueFalseQuestion WHERE question = :question")
+    fun getTrueFalseQuestionByQuestion(question: String): Flow<TrueFalseQuestionDto>
 }

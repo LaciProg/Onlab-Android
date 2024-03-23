@@ -50,8 +50,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import hu.bme.aut.android.examapp.ui.AppViewModelProvider
+import hu.bme.aut.android.examapp.ui.theme.ExamAppTheme
 import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionDetails
 import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionDetailsUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionDetailsViewModel
@@ -104,7 +106,7 @@ fun MultipleChoiceQuestionDetailsScreen(
 }
 
 @Composable
-private fun MultipleChoiceQuestionDetailsBody(
+fun MultipleChoiceQuestionDetailsBody(
     multipleChoiceQuestionDetailsUiState: MultipleChoiceQuestionDetailsUiState,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
@@ -234,13 +236,23 @@ private fun DeleteConfirmationDialog(
         })
 }
 
-/*
+
 @Preview(showBackground = true)
 @Composable
 fun ItemDetailsScreenPreview() {
     ExamAppTheme {
-        TopicDetailsBody(ItemDetailsUiState(
-            outOfStock = true, itemDetails = ItemDetails(1, "Pen", "$100", "10")
+        MultipleChoiceQuestionDetailsBody(MultipleChoiceQuestionDetailsUiState(
+            multipleChoiceQuestionDetails = MultipleChoiceQuestionDetails(
+                id = 1,
+                question = "Question",
+                answers = mutableListOf("Answer 1", "Answer 2", "Answer 3", "Answer 4"),
+                correctAnswersList = mutableListOf("Answer 1", "Answer 2"),
+                point = 10,
+                topic = 1,
+                isAnswerChosen = true,
+                pointName = "Point",
+                topicName = "Topic"
+            )
         ),  onDelete = {})
     }
-}*/
+}

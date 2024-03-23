@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import hu.bme.aut.android.examapp.ui.viewmodel.type.Type
 
 @Entity(
     tableName = "trueFalseQuestion",
@@ -36,4 +37,7 @@ data class TrueFalseQuestionDto(
     @ColumnInfo(name = "pointFk") var point: Int,
     @ColumnInfo(name = "topicFk") var topic: Int,
     @ColumnInfo(name = "typeFk") var type: String
-)
+) : Question {
+    override val typeOrdinal: Int
+        get() = Type.trueFalseQuestion.ordinal
+}

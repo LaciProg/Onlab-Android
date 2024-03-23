@@ -13,5 +13,6 @@ interface MultipleChoiceQuestionRepository {
     fun getMultipleChoiceQuestionsByTopic(topicFk: Int): Flow<Map<TopicDto,List<MultipleChoiceQuestionDto>>>
     fun getMultipleChoiceQuestionsByType(typeFk: Int): Flow<List<MultipleChoiceQuestionDto>>
     fun getAllMultipleChoiceQuestionQuestion(): Flow<List<String>>
+    fun getMultipleChoiceQuestionByQuestion(question: String): Flow<MultipleChoiceQuestionDto>
 
 }

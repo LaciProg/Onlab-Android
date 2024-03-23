@@ -11,14 +11,15 @@ class OfflineTrueFalseQuestionRepository(private val trueFalseQuestionDao: TrueF
     TrueFalseQuestionRepository {
         override suspend fun insertTrueFalseQuestion(trueFalseQuestion: TrueFalseQuestionDto) =
             trueFalseQuestionDao.insertTrueFalseQuestion(trueFalseQuestion)
-       override suspend fun updateTrueFalseQuestion(trueFalseQuestion: TrueFalseQuestionDto) =
+        override suspend fun updateTrueFalseQuestion(trueFalseQuestion: TrueFalseQuestionDto) =
             trueFalseQuestionDao.updateTrueFalseQuestion(trueFalseQuestion)
-       override suspend fun deleteTrueFalseQuestion(trueFalseQuestion: TrueFalseQuestionDto) =
+        override suspend fun deleteTrueFalseQuestion(trueFalseQuestion: TrueFalseQuestionDto) =
             trueFalseQuestionDao.deleteTrueFalseQuestion(trueFalseQuestion)
-       override fun getAllTrueFalseQuestions(): Flow<List<TrueFalseQuestionDto>> = trueFalseQuestionDao.getAllTrueFalseQuestions()
-       override fun getTrueFalseQuestionById(id: Int): Flow<TrueFalseQuestionDto> = trueFalseQuestionDao.getTrueFalseQuestionById(id)
-       override fun getTrueFalseQuestionsByTopic(topicFk: Int): Flow<Map<TopicDto, List<TrueFalseQuestionDto>>> = trueFalseQuestionDao.getTrueFalseQuestionsByTopic(topicFk)
-       override fun getTrueFalseQuestionsByType(typeFk: Int): Flow<List<TrueFalseQuestionDto>> = trueFalseQuestionDao.getTrueFalseQuestionsByType(typeFk)
-       override fun getAllTrueFalseQuestionQuestion() = trueFalseQuestionDao.getAllTrueFalseQuestionQuestion()
+        override fun getAllTrueFalseQuestions(): Flow<List<TrueFalseQuestionDto>> = trueFalseQuestionDao.getAllTrueFalseQuestions()
+        override fun getTrueFalseQuestionById(id: Int): Flow<TrueFalseQuestionDto> = trueFalseQuestionDao.getTrueFalseQuestionById(id)
+        override fun getTrueFalseQuestionsByTopic(topicFk: Int): Flow<Map<TopicDto, List<TrueFalseQuestionDto>>> = trueFalseQuestionDao.getTrueFalseQuestionsByTopic(topicFk)
+        override fun getTrueFalseQuestionsByType(typeFk: Int): Flow<List<TrueFalseQuestionDto>> = trueFalseQuestionDao.getTrueFalseQuestionsByType(typeFk)
+        override fun getAllTrueFalseQuestionQuestion() = trueFalseQuestionDao.getAllTrueFalseQuestionQuestion()
+        override fun getTrueFalseQuestionByQuestion(question: String): Flow<TrueFalseQuestionDto> = trueFalseQuestionDao.getTrueFalseQuestionByQuestion(question)
 
 }

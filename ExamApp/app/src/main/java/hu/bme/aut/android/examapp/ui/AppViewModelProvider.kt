@@ -8,10 +8,15 @@ import hu.bme.aut.android.examapp.ExamApplication
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicEditViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicEntryViewModel
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory
+import androidx.lifecycle.viewmodel.InitializerViewModelFactoryBuilder
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.PointRepository
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TypeRepository
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TrueFalseQuestionRepository
+import hu.bme.aut.android.examapp.ui.viewmodel.exam.ExamDetailsViewModel
+import hu.bme.aut.android.examapp.ui.viewmodel.exam.ExamEditViewModel
+import hu.bme.aut.android.examapp.ui.viewmodel.exam.ExamEntryViewModel
+import hu.bme.aut.android.examapp.ui.viewmodel.exam.ExamListViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionDetailsViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionEditViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionEntryViewModel
@@ -31,12 +36,30 @@ import hu.bme.aut.android.examapp.ui.viewmodel.type.TypeViewModel
 object AppViewModelProvider {
     val Factory = viewModelFactory {
 
+        typeViewModel()
+
+        topicViewModel()
+
+        pointViewModel()
+
+        trueFalseViewModel()
+
+        multipleChoiceViewModel()
+
+        examViewModel()
+    }
+
+
+    private fun InitializerViewModelFactoryBuilder.typeViewModel() {
         /**
          * Initializes the TypeViewModels with the [TypeRepository] from the [ExamApplication]'s container.
          */
         initializer {
             TypeViewModel(examApplication().container.typeRepository)
         }
+    }
+
+    private fun InitializerViewModelFactoryBuilder.topicViewModel() {
 
         /**
          * Initializes the TopicViewModels with the [TopicRepository] from the [ExamApplication]'s container.
@@ -62,8 +85,9 @@ object AppViewModelProvider {
                 examApplication().container.topicRepository
             )
         }
+    }
 
-
+    private fun InitializerViewModelFactoryBuilder.pointViewModel() {
         /**
          * Initializes the PointViewModels with the [PointRepository] from the [ExamApplication]'s container.
          */
@@ -88,14 +112,16 @@ object AppViewModelProvider {
                 examApplication().container.pointRepository
             )
         }
+    }
 
+    private fun InitializerViewModelFactoryBuilder.trueFalseViewModel() {
         /**
          * Initializes the TrueFalseQuestionViewModels with the [TrueFalseQuestionRepository] from the [ExamApplication]'s container.
          */
         initializer {
             TrueFalseQuestionListViewModel(
-                trueFalseQuestionRepository =  examApplication().container.trueFalseQuestionRepository,
-                topicRepository =  examApplication().container.topicRepository
+                trueFalseQuestionRepository = examApplication().container.trueFalseQuestionRepository,
+                topicRepository = examApplication().container.topicRepository
             )
         }
 
@@ -122,13 +148,14 @@ object AppViewModelProvider {
                 examApplication().container.trueFalseQuestionRepository
             )
         }
+    }
 
-
+    private fun InitializerViewModelFactoryBuilder.multipleChoiceViewModel() {
         initializer {
             MultipleChoiceQuestionListViewModel(
                 examApplication().container.multipleChoiceQuestionRepository,
                 examApplication().container.topicRepository
-                )
+            )
         }
 
         initializer {
@@ -155,6 +182,43 @@ object AppViewModelProvider {
             )
         }
     }
+
+    private fun InitializerViewModelFactoryBuilder.examViewModel() {
+        initializer {
+            ExamListViewModel(
+                examApplication().container.examRepository
+            )
+        }
+
+        initializer {
+            ExamDetailsViewModel(
+                this.createSavedStateHandle(),
+                examApplication().container.examRepository,
+                examApplication().container.trueFalseQuestionRepository,
+                examApplication().container.multipleChoiceQuestionRepository,
+                examApplication().container.topicRepository,
+                examApplication().container.pointRepository
+            )
+        }
+
+        initializer {
+            ExamEditViewModel(
+                this.createSavedStateHandle(),
+                examApplication().container.topicRepository,
+                examApplication().container.examRepository,
+                examApplication().container.trueFalseQuestionRepository,
+                examApplication().container.multipleChoiceQuestionRepository
+            )
+        }
+
+        initializer {
+            ExamEntryViewModel(
+                examApplication().container.examRepository,
+                examApplication().container.topicRepository
+            )
+        }
+    }
+
 }
 
 fun CreationExtras.examApplication(): ExamApplication =

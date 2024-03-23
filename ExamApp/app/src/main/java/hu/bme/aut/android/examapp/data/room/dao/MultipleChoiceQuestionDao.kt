@@ -39,4 +39,7 @@ interface MultipleChoiceQuestionDao {
 
     @Query("SELECT question FROM multipleChoiceQuestion ORDER BY question ASC")
     fun getAllMultipleChoiceQuestionQuestion(): Flow<List<String>>
+
+    @Query("SELECT * FROM multipleChoiceQuestion WHERE question = :question")
+    fun getMultipleChoiceQuestionByQuestion(question: String): Flow<MultipleChoiceQuestionDto>
 }

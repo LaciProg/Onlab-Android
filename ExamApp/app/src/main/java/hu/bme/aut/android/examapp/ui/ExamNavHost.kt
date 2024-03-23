@@ -28,6 +28,10 @@ import androidx.navigation.navArgument
 import hu.bme.aut.android.examapp.DefaultMulti
 import hu.bme.aut.android.examapp.DefaultTrueFalse
 import hu.bme.aut.android.examapp.MainScreen
+import hu.bme.aut.android.examapp.ui.exam.ExamDetailsScreen
+import hu.bme.aut.android.examapp.ui.exam.ExamEditScreen
+import hu.bme.aut.android.examapp.ui.exam.ExamListScreen
+import hu.bme.aut.android.examapp.ui.exam.NewExamScreen
 import hu.bme.aut.android.examapp.ui.multiplechoicequestion.MultipleChoiceQuestionDetailsScreen
 import hu.bme.aut.android.examapp.ui.multiplechoicequestion.MultipleChoiceQuestionEditScreen
 import hu.bme.aut.android.examapp.ui.multiplechoicequestion.MultipleChoiceQuestionListScreen
@@ -62,7 +66,8 @@ fun ExamNavHost(
                 navigateToTopicList = { navController.navigateSingleTopTo(TopicListDestination.route) },
                 navigateToPointList = { navController.navigateSingleTopTo(PointListDestination.route) },
                 navigateToTrueFalseQuestionList = { navController.navigateSingleTopTo(TrueFalseQuestionListDestination.route) },
-                navigateToMultipleChoiceQuestionList = {navController.navigateSingleTopTo(MultipleChoiceQuestionListDestination.route)}
+                navigateToMultipleChoiceQuestionList = {navController.navigateSingleTopTo(MultipleChoiceQuestionListDestination.route)},
+                navigateToExamList = {navController.navigateSingleTopTo(ExamListDestination.route)}
             )
         }
 
@@ -230,6 +235,55 @@ fun ExamNavHost(
         }
 
 
+
+
+
+        composable(
+            route = ExamListDestination.route
+        ) {
+            ExamListScreen(
+                addNewExam = { navController.navigate(/*ExamDestination.*/NewExamDestination.route) },
+                navigateToExamDetails = { navController.navigate("${ ExamDetailsDestination.route}/$it") }
+            )
+        }
+
+
+        composable(
+            route = ExamDetailsDestination.routeWithArgs
+        ){
+            ExamDetailsScreen(
+                navigateToEditMultipleChoiceQuestion = {navController.navigate("${ ExamEditDestination.route}/$it") },
+                navigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route =  ExamEditDestination.routeWithArgs,
+            /*arguments = listOf(navArgument(PointEditDestination.pointIdArg.toString()) {
+                type = NavType.StringType
+            })*/
+        ) {
+            ExamEditScreen(
+                navigateBack = { navController.popBackStack() },
+                //onNavigateUp = { navController.navigateUp() }
+            )
+        }
+
+
+        composable(
+            route = /*ExamDestination.*/NewExamDestination.route
+        ) {
+            NewExamScreen(
+                navigateBack = { navController.popBackStack() },
+                onNavigateUp = { navController.navigateUp() },
+            )
+        }
+
+
+
+
+
+
         composable(route = /*ExamDestination.*/ScreenSecond.route) {
             DefaultTrueFalse(
                 /*onAccountClick = { accountType ->
@@ -240,6 +294,10 @@ fun ExamNavHost(
         composable(route = /*ExamDestination.*/ScreenThird.route) {
             DefaultMulti()
         }
+
+
+
+
 
     }
 }

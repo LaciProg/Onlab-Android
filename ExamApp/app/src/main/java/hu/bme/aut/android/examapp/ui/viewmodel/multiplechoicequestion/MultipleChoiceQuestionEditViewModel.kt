@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.PointRepository
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.MultipleChoiceQuestionRepository
+import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.toTrueFalseQuestion
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -49,8 +50,17 @@ class MultipleChoiceQuestionEditViewModel(
     /**
      * Update the topic in the [MultipleChoiceQuestionRepository]'s data source
      */
-    suspend fun updateMultipleChoiceQuestion() =
+    suspend fun updateMultipleChoiceQuestion() : Boolean {
+        return if (validateInput(multipleChoiceQuestionUiState.multipleChoiceQuestionDetails) && validateUniqueMultipleChoiceQuestion(multipleChoiceQuestionUiState.multipleChoiceQuestionDetails)) {
+            multipleChoiceQuestionUiState.multipleChoiceQuestionDetails.correctAnswersList.removeIf(String::isBlank)
             multipleChoiceQuestionRepository.updateMultipleChoiceQuestion(multipleChoiceQuestionUiState.multipleChoiceQuestionDetails.toMultipleChoiceQuestion())
+            true
+        }
+        else {
+            multipleChoiceQuestionUiState = multipleChoiceQuestionUiState.copy(isEntryValid = false)
+            false
+        }
+    }
 
 
     /**

@@ -32,7 +32,10 @@ class TopicEditViewModel(
                 .filterNotNull()
                 .first()
                 .toTopicUiState(true,
-                    parentName =  topicRepository.getTopicById(
+                    parentName =
+                    if (topicRepository.getTopicById(topicId.toInt()).map { it.parentTopic }.first() == -1) ""
+                    else
+                    topicRepository.getTopicById(
                         topicRepository.getTopicById(topicId.toInt()).map { it.parentTopic }.first())
                         .map{it.topic}.first())
             originalTopic = topicUiState.topicDetails.topic

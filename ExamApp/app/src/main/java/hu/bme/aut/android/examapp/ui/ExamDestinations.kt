@@ -102,7 +102,28 @@ object MultipleChoiceQuestionEditDestination : ExamDestination {
 }
 
 object NewMultipleChoiceQuestionDestination : ExamDestination{
-    override val route: String = "MultipleChoiceFalseQuestion"
+    override val route: String = "MultipleChoiceQuestion"
+}
+
+
+object ExamListDestination : ExamDestination {
+    override val route = "ExamList"
+}
+
+object ExamDetailsDestination : ExamDestination{
+    override val route: String = "ExamDetails"
+    const val examIdArg = 0
+    val routeWithArgs = "$route/{$examIdArg}"
+}
+
+object ExamEditDestination : ExamDestination {
+    override val route = "ExamEdit"
+    const val examIdArg = 0
+    val routeWithArgs = "$route/{$examIdArg}"
+}
+
+object NewExamDestination : ExamDestination{
+    override val route: String = "ExamQuestion"
 }
 
 

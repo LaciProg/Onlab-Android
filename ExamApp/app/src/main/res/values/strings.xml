@@ -41,5 +41,13 @@
     <string name="correct_answer">Correct answer</string>
     <string name="question_answer_req">Answer*</string>
     <string name="multiple_choice_question">Multiple choice question</string>
+    <string name="exam_name_req">Exam name*</string>
+    <string name="exam">Exam</string>
+    <string name="exam_info">Edit exam informations</string>
+    <string name="true_false">True-False</string>
+    <string name="multiple">Multiple</string>
+    <string name="remove_question">Remove question</string>
+    <string name="exams">Exams</string>
+    <string name="add_question">Add question</string>
 
 </resources>

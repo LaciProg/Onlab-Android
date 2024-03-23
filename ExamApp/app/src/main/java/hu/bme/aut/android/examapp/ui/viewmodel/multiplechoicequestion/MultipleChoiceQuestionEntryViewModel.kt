@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.MultipleChoiceQuestionRepository
 import hu.bme.aut.android.examapp.data.room.dto.MultipleChoiceQuestionDto
+import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.toTrueFalseQuestion
 import hu.bme.aut.android.examapp.ui.viewmodel.type.Type
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -24,8 +25,16 @@ class MultipleChoiceQuestionEntryViewModel(private val multipleChoiceQuestionRep
             )
     }
 
-    suspend fun saveMultipleChoiceQuestion()  =
+    suspend fun saveMultipleChoiceQuestion() : Boolean {
+        return if (validateInput() && validateUniqueMultipleChoiceQuestion()) {
+            multipleChoiceQuestionUiState.multipleChoiceQuestionDetails.correctAnswersList.removeIf(String::isBlank)
             multipleChoiceQuestionRepository.insertMultipleChoiceQuestion(multipleChoiceQuestionUiState.multipleChoiceQuestionDetails.toMultipleChoiceQuestion())
+            true
+        } else {
+            multipleChoiceQuestionUiState = multipleChoiceQuestionUiState.copy(isEntryValid = false)
+            false
+        }
+    }
 
 
     private fun validateInput(uiState: MultipleChoiceQuestionDetails = multipleChoiceQuestionUiState.multipleChoiceQuestionDetails): Boolean {

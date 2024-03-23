@@ -211,8 +211,9 @@ private fun TrueFalseQuestionDetailsRow(
     }
 }
 
+//TODO: Move to a separate file
 @Composable
-private fun DeleteConfirmationDialog(
+fun DeleteConfirmationDialog(
     onDeleteConfirm: () -> Unit, onDeleteCancel: () -> Unit, modifier: Modifier = Modifier
 ) {
     AlertDialog(onDismissRequest = { /* Do nothing */ },

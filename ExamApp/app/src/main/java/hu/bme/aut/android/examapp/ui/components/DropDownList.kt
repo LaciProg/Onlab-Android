@@ -75,7 +75,7 @@ fun DropDownList(
                     },
                     onClick = {
                         item = i
-                        Log.d("DropDownList", "i: $i")
+                        //Log.d("DropDownList", "i: $i")
                         isExpanded = false
                         onChoose(i)
                     },

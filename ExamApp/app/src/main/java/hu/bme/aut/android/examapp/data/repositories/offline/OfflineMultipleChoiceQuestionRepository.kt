@@ -17,4 +17,5 @@ class OfflineMultipleChoiceQuestionRepository(private val multipleChoiceQuestion
         override fun getMultipleChoiceQuestionsByTopic(topicFk: Int) = multipleChoiceQuestionDao.getMultipleChoiceQuestionsByTopic(topicFk)
         override fun getMultipleChoiceQuestionsByType(typeFk: Int) = multipleChoiceQuestionDao.getMultipleChoiceQuestionsByType(typeFk)
         override fun getAllMultipleChoiceQuestionQuestion() = multipleChoiceQuestionDao.getAllMultipleChoiceQuestionQuestion()
+        override fun getMultipleChoiceQuestionByQuestion(question: String) = multipleChoiceQuestionDao.getMultipleChoiceQuestionByQuestion(question)
 }
