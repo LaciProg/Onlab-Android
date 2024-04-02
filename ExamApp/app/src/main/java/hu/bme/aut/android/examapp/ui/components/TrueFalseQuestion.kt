@@ -1,6 +1,7 @@
 package hu.bme.aut.android.examapp.ui.components
 
 import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,9 +20,40 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hu.bme.aut.android.examapp.data.TrueFalseData
+import hu.bme.aut.android.examapp.data.room.dto.PointDto
+import hu.bme.aut.android.examapp.ui.viewmodel.type.Type
+
+@Composable
+fun ExportedTrueFalseQuestion(number: Int, question: String, point: Double, color: Color = Color.Black)
+{
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+            Text(text = "$number. $question", color = color)
+            Text(text = "Point: $point\\", modifier = Modifier.padding(end = 50.dp), color = color)
+        }
+        Spacer(modifier = Modifier.padding(8.dp))
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.padding(horizontal = 16.dp)
+        ) {
+            Text("True", color = color)
+            Spacer(modifier = Modifier.width(100.dp))
+            Text("False", color = color)
+        }
+    }
+}
+
+@Composable
+@Preview(showBackground = true)
+fun ExportedTrueFalseQuestionPreview() {
+    ExportedTrueFalseQuestion(1, "Default question", 2.0 /*PointDto(1, 1.0, Type.trueFalseQuestion.name, 1.0, 1.0 )*/)
+}
+
+
 
 @Composable
 fun TrueFalseQuestion(question: String = "Default question") {
@@ -94,11 +126,6 @@ fun TrueFalseQuestionRow(question: String = "Default question",
                 text = question
             )
         }
-        /*TextField(
-            modifier = Modifier.weight(4f),
-            value = question,
-            onValueChange = { onTextChange(it) }
-        )*/
         Spacer(Modifier.width(16.dp))
         TextButton(
             modifier = Modifier.weight(1f),
@@ -115,15 +142,15 @@ fun TrueFalseQuestionRow(question: String = "Default question",
         }
     }
 }
-
+/*
 @Composable
 @Preview(showBackground = true)
 fun TrueFalseQuestionPreview() {
     TrueFalseQuestion()
-}
-
+}*/
+/*
 @Composable
 @Preview(showBackground = true)
 fun EditTrueFalseQuestionPreview() {
     EditTrueFalseQuestion()
-}
+}*/

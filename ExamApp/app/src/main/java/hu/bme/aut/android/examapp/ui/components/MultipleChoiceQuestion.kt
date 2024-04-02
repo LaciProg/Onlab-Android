@@ -1,10 +1,13 @@
 package hu.bme.aut.android.examapp.ui.components
 
 import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -19,9 +22,53 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hu.bme.aut.android.examapp.data.MultipleChoiceData
+
+
+
+@Composable
+fun ExportedMultipleChoiceQuestion(number: Int, question: String, point: Double, answers: List<String>, color: Color = Color.Black)
+{
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+            Text(text = "$number. $question", color = color)
+            Text(text = "Point: $point\\", modifier = Modifier.padding(end = 50.dp), color = color)
+        }
+        Spacer(modifier = Modifier.padding(8.dp))
+        for ((index, answer) in answers.withIndex()) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            ) {
+                Text(text = (index+'A'.code).toChar().toString(), color = color)
+                Spacer(modifier = Modifier.width(100.dp))
+                Text(text = answer, color = color)
+            }
+            if(index != question.length-1) Spacer(modifier = Modifier.padding(8.dp))
+        }
+    }
+}
+
+@Composable
+@Preview(showBackground = true)
+fun ExportedMultipleChoicePreview() {
+    ExportedMultipleChoiceQuestion(1, "Default question", 2.0, listOf("Alma", "Barack", "Körte", "Banán") /*PointDto(1, 1.0, Type.trueFalseQuestion.name, 1.0, 1.0 )*/)
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 @Composable
 fun MultipleChoiceQuestion(question: MultipleChoiceData = MultipleChoiceData("Default question", previewAnswerList, 0, "Compose", "Plus/4")) {
