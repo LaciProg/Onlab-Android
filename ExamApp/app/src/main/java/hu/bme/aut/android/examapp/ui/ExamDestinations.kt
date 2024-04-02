@@ -127,6 +127,16 @@ object NewExamDestination : ExamDestination{
 }
 
 
+object ExportExamListDestination : ExamDestination {
+    override val route = "ExportExamList"
+}
+
+object ExportExamDetailsDestination : ExamDestination{
+    override val route: String = "ExportExamDetails"
+    const val examIdArg = 0
+    val routeWithArgs = "$route/{$examIdArg}"
+}
+
 val examTabRowScreens = listOf(MainScreenDestination, ScreenSecond, ScreenThird, ScreenFourth, ScreenFive)
 
 /*

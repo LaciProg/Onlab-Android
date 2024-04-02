@@ -49,5 +49,23 @@
     <string name="remove_question">Remove question</string>
     <string name="exams">Exams</string>
     <string name="add_question">Add question</string>
+    <string name="export_exams">Export exams</string>
+    <string name="name">Name:</string>
+    <string name="neptun_code">Neptun:</string>
+    <string name="grade_boundaries">Grade boundaries</string>
+    <string name="one_percent">0-39%</string>
+    <string name="one_grade">1 insufficient</string>
+    <string name="two_percent">40-54%</string>
+    <string name="two_grade">2 sufficient</string>
+    <string name="three_percent">55-69%</string>
+    <string name="three_grade">3 average</string>
+    <string name="four_percent">70-84%</string>
+    <string name="four_grade">4 good</string>
+    <string name="five_percent">85-100%</string>
+    <string name="five_grade">5 excellent</string>
+    <string name="total_points">Total points:\n</string>
+    <string name="reached_points">Reached points:\n</string>
+    <string name="percent">Percent:\n</string>
+    <string name="questions">Qusetions</string>
 
 </resources>

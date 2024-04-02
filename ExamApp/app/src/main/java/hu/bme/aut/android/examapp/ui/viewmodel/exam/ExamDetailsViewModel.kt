@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlin.reflect.typeOf
+import kotlinx.coroutines.launch
 
 class ExamDetailsViewModel(
     savedStateHandle: SavedStateHandle,
@@ -144,6 +144,35 @@ class ExamDetailsViewModel(
     suspend fun getExamById(id: Int): String {
         return examRepository.getExamById(id).filterNotNull().map { it.name }.first()
     }
+
+    private suspend fun getPointByPointId(id: Int): PointDto {
+        return pointRepository.getPointById(id).filterNotNull().first()
+    }
+
+    suspend fun getPoints(examId: Int): ExamDetails {
+        val examDto = examRepository.getExamById(examId).filterNotNull().first()
+        val examDetails =examDto.toExamDetails(
+            topicRepository.getTopicById(examRepository.getExamById(examId).map { it.topicId }.first())
+                .map{it.topic}.first(),
+            examDto.questionList.split("¤").map { it.toQuestion() }
+            )
+        return examDetails
+        /*
+        return examDetails.questionList.map {
+            when (it) {
+                is TrueFalseQuestionDto -> {
+                    getPointByPointId(it.point)
+                }
+
+                is MultipleChoiceQuestionDto -> {
+                    getPointByPointId(it.point)
+                }
+                else -> throw IllegalArgumentException("Unknown question type")
+            }
+        }.toList()*/
+    }
+
+
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L

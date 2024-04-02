@@ -62,6 +62,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialogDefaults.shape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -111,6 +112,7 @@ import hu.bme.aut.android.examapp.ui.theme.PaleDogwood
 import hu.bme.aut.android.examapp.ui.theme.Seashell
 import hu.bme.aut.android.examapp.ui.truefalsequestion.TrueFalseQuestionDetails
 import hu.bme.aut.android.examapp.ui.multiplechoicequestion.MultipleChoiceQuestionDetails
+import hu.bme.aut.android.examapp.ui.theme.Purple40
 import hu.bme.aut.android.examapp.ui.truefalsequestion.DeleteConfirmationDialog
 import hu.bme.aut.android.examapp.ui.viewmodel.exam.ExamDetailsViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionDetails
@@ -460,7 +462,8 @@ fun ExpandableQuestionItem(
         }
     ) {
         Row(
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.background(if(question.typeOrdinal == Type.trueFalseQuestion.ordinal) PaleDogwood else Green)
         ) {
             Column(
                 modifier = Modifier
@@ -479,11 +482,18 @@ fun ExpandableQuestionItem(
                                         pointList.first { it.id == trueFalseQuestion.point }.type
                                     else ""
                                 ),
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = PaleDogwood,
+                                    contentColor = Purple40
+                                )
                             )
                             RemoveButton(coroutineScope, examViewModel, question)
                         } else {
-                            CollapsedQuestion(trueFalseQuestion.question)
+                            CollapsedQuestion(
+                                question = trueFalseQuestion.question,
+                                containerColor = PaleDogwood, contentColor = Purple40
+                                )
                         }
                     }
 
@@ -499,11 +509,18 @@ fun ExpandableQuestionItem(
                                         pointList.first { it.id == multipleChoiceQuestion.point }.type
                                     else ""
                                 ),
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = Green,
+                                    contentColor = Purple40
+                                )
                             )
                             RemoveButton(coroutineScope, examViewModel, question)
                         } else {
-                            CollapsedQuestion(multipleChoiceQuestion.question)
+                            CollapsedQuestion(
+                                question =  multipleChoiceQuestion.question,
+                                containerColor = Green, contentColor = Purple40
+                            )
                         }
                     }
 
@@ -548,12 +565,18 @@ private fun RemoveButton(
 }
 
 @Composable
-private fun CollapsedQuestion(question: String){
+private fun CollapsedQuestion(
+    question: String,
+    containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
+    contentColor: Color = MaterialTheme.colorScheme.onPrimaryContainer,
+    colors: CardColors = CardDefaults.cardColors(
+        containerColor = containerColor,
+        contentColor = contentColor
+    )
+){
     Card(
-        modifier = Modifier, colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-        )
+        modifier = Modifier.background(containerColor),
+        colors = colors,
     ) {
         Column(
             modifier = Modifier

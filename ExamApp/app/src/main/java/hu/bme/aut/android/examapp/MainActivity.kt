@@ -120,7 +120,8 @@ fun MainScreen(
     navigateToPointList: () -> Unit,
     navigateToTrueFalseQuestionList: () -> Unit,
     navigateToMultipleChoiceQuestionList: () -> Unit,
-    navigateToExamList: () -> Unit
+    navigateToExamList: () -> Unit,
+    navigateToExportExamList: () -> Unit
 ){
     Column(
         modifier = Modifier
@@ -167,10 +168,19 @@ fun MainScreen(
         ) {
             Text(stringResource(R.string.exams))
         }
+        OutlinedButton(
+            onClick = { navigateToExportExamList() },
+            shape = MaterialTheme.shapes.small,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(stringResource(R.string.export_exams))
+        }
     }
     //VerticalReorderList()
 }
 
+
+//TODO: Remove
 @Composable
 fun VerticalReorderList() {
     val data = remember { mutableStateOf(List(100) { "Item $it" }) }

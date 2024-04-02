@@ -31,6 +31,7 @@ import hu.bme.aut.android.examapp.MainScreen
 import hu.bme.aut.android.examapp.ui.exam.ExamDetailsScreen
 import hu.bme.aut.android.examapp.ui.exam.ExamEditScreen
 import hu.bme.aut.android.examapp.ui.exam.ExamListScreen
+import hu.bme.aut.android.examapp.ui.exam.ExportExamDetailsScreen
 import hu.bme.aut.android.examapp.ui.exam.NewExamScreen
 import hu.bme.aut.android.examapp.ui.multiplechoicequestion.MultipleChoiceQuestionDetailsScreen
 import hu.bme.aut.android.examapp.ui.multiplechoicequestion.MultipleChoiceQuestionEditScreen
@@ -67,7 +68,8 @@ fun ExamNavHost(
                 navigateToPointList = { navController.navigateSingleTopTo(PointListDestination.route) },
                 navigateToTrueFalseQuestionList = { navController.navigateSingleTopTo(TrueFalseQuestionListDestination.route) },
                 navigateToMultipleChoiceQuestionList = {navController.navigateSingleTopTo(MultipleChoiceQuestionListDestination.route)},
-                navigateToExamList = {navController.navigateSingleTopTo(ExamListDestination.route)}
+                navigateToExamList = {navController.navigateSingleTopTo(ExamListDestination.route)},
+                navigateToExportExamList = {navController.navigateSingleTopTo(ExportExamListDestination.route)},
             )
         }
 
@@ -281,6 +283,24 @@ fun ExamNavHost(
 
 
 
+        composable(
+            route = ExportExamListDestination.route
+        ) {
+            ExamListScreen(
+                addNewExam = { navController.navigate(/*ExamDestination.*/NewExamDestination.route) },
+                navigateToExamDetails = { navController.navigate("${ ExportExamDetailsDestination.route}/$it") }
+            )
+        }
+
+
+        composable(
+            route = ExportExamDetailsDestination.routeWithArgs
+        ){
+            ExportExamDetailsScreen(
+                //navigateToEditMultipleChoiceQuestion = {navController.navigate("${ ExamEditDestination.route}/$it") },
+                navigateBack = { navController.popBackStack() }
+            )
+        }
 
 
 
