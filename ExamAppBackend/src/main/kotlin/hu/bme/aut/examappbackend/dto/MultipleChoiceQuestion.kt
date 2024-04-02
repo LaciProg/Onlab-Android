@@ -7,8 +7,8 @@ import kotlinx.serialization.Serializable
 data class MultipleChoiceQuestionDto(
     val uuid: String,
     val question: String,
-    val answers: String,
-    val correctAnswersList: String,
+    val answers: List<String>,
+    val correctAnswersList: List<String>,
     val point: String,
     val topic: String,
     val type: String

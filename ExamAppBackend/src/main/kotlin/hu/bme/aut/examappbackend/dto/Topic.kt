@@ -7,5 +7,5 @@ data class TopicDto(
     val uuid: String,
     val topic: String,
     val description: String,
-    val parentTopic: Int
+    val parentTopic: String
 )

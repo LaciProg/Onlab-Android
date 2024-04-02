@@ -6,6 +6,6 @@ import kotlinx.serialization.Serializable
 data class ExamDto(
     val uuid: String,
     val name: String,
-    val questionList: String,
+    val questionList: List<Question?>,
     val topicId: String
 )

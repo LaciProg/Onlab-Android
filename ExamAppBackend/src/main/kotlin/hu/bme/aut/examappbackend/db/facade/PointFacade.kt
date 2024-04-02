@@ -6,7 +6,7 @@ interface PointFacade {
     suspend fun getAllPoint() : List<PointDto>
     suspend fun getPointById(uuid: String) : PointDto?
     suspend fun insertPoint(pointDto: PointDto) : PointDto?
-    suspend fun deletePoint(pointDto: PointDto) : Boolean
-    suspend fun updatePoint(pointDto: PointDto) : PointDto?
+    suspend fun deletePoint(uuid: String) : Boolean
+    suspend fun updatePoint(pointDto: PointDto) : Boolean
     suspend fun getAllPointType() : List<String>
 }
