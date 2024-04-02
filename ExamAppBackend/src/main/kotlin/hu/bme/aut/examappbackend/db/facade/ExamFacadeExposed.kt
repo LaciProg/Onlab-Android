@@ -8,8 +8,6 @@ import hu.bme.aut.examappbackend.dto.MultipleChoiceQuestionDto
 import hu.bme.aut.examappbackend.dto.Question
 import hu.bme.aut.examappbackend.dto.TrueFalseQuestionDto
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import java.util.*
