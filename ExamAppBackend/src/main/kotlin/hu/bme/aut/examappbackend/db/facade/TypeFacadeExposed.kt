@@ -28,7 +28,6 @@ class TypeFacadeExposed : TypeFacade {
             .singleOrNull()
     }
 
-
     override suspend fun updateType(type: TypeDto): Boolean = dbQuery {
         TypeDB.update({ TypeDB.id eq UUID.fromString(type.uuid) }){
             it[this.type] = type.type

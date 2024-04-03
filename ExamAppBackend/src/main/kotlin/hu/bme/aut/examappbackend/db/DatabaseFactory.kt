@@ -1,12 +1,16 @@
 package hu.bme.aut.examappbackend.db
 
+import enums.Type
+import hu.bme.aut.examappbackend.db.facade.FacadeExposed
 import hu.bme.aut.examappbackend.db.model.*
+import hu.bme.aut.examappbackend.dto.TypeDto
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
+import java.util.UUID
 
 object DatabaseFactory {
 
@@ -32,6 +36,20 @@ object DatabaseFactory {
 
     fun createSampleData() {
         runBlocking {
+            if(FacadeExposed.typeDao.getAllType().isEmpty()){
+                val type1 = FacadeExposed.typeDao.insertType(
+                    TypeDto(
+                        type = Type.trueFalseQuestion.name,
+                        uuid = UUID.randomUUID().toString()
+                    )
+                )
+                val type2 = FacadeExposed.typeDao.insertType(
+                    TypeDto(
+                        type = Type.multipleChoiceQuestion.name,
+                        uuid = UUID.randomUUID().toString()
+                    )
+                )
+            }
             /*if (userDAO.allUsers().isEmpty()) {
                 val user1 = userDAO.registerNewUser(
                     UserRegistration(
