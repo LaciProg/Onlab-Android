@@ -38,12 +38,8 @@ fun Route.trueFalseRoutes(){
 
     get<TrueFalseRoutes.TrueFalseUUID> {
         val question = FacadeExposed.trueFalseQuestionDao.getTrueFalseQuestionById(it.trueFalseId)
-
-        if(question == null){
-            call.respond(status = HttpStatusCode.BadRequest, message = "")
-        } else {
-            call.respond(status = HttpStatusCode.OK, message = question)
-        }
+            ?: return@get call.respond(status = HttpStatusCode.BadRequest, message = "")
+        call.respond(status = HttpStatusCode.OK, message = question)
     }
 
     put<TrueFalseRoutes> {
@@ -59,12 +55,8 @@ fun Route.trueFalseRoutes(){
     post<TrueFalseRoutes> {
         val question = call.receive<TrueFalseQuestionDto>()
         val created = FacadeExposed.trueFalseQuestionDao.insertTrueFalseQuestion(question)
-        if(created == null){
-            call.respond(status = HttpStatusCode.InternalServerError, message = "")
-        }
-        else{
-            call.respond(status = HttpStatusCode.Created, message = created)
-        }
+            ?: return@post call.respond(status = HttpStatusCode.InternalServerError, message = "")
+        call.respond(status = HttpStatusCode.Created, message = created)
     }
 
     delete<TrueFalseRoutes.TrueFalseUUID> {

@@ -27,7 +27,7 @@ class TrueFalseQuestionFacadeExposed : TrueFalseQuestionFacade {
     }
 
     override suspend fun getTrueFalseQuestionById(uuid: String): TrueFalseQuestionDto? = dbQuery {
-        TrueFalseQuestionDB.select(TrueFalseQuestionDB.id eq UUID.fromString(uuid))
+        TrueFalseQuestionDB.selectAll().where(TrueFalseQuestionDB.id eq UUID.fromString(uuid))
             .map(::resultRowToTrueFalseQuestion)
             .singleOrNull()
     }

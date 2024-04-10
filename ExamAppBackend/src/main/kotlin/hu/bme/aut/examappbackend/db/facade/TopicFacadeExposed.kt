@@ -25,13 +25,13 @@ class TopicFacadeExposed : TopicFacade {
     }
 
     override suspend fun getTopicById(uuid: String): TopicDto? = dbQuery {
-        TopicDB.select(TopicDB.id eq UUID.fromString(uuid))
+        TopicDB.selectAll().where(TopicDB.id eq UUID.fromString(uuid))
             .map(::resultRowToTopic)
             .singleOrNull()
     }
 
     override suspend fun getTopicByTopic(topic: String): TopicDto? = dbQuery {
-        TopicDB.select(TopicDB.topic eq topic)
+        TopicDB.selectAll().where(TopicDB.topic eq topic)
             .map(::resultRowToTopic)
             .singleOrNull()
     }

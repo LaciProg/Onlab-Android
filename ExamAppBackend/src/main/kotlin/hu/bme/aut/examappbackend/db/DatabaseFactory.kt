@@ -5,6 +5,7 @@ import hu.bme.aut.examappbackend.db.facade.FacadeExposed
 import hu.bme.aut.examappbackend.db.model.*
 import hu.bme.aut.examappbackend.dto.PointDto
 import hu.bme.aut.examappbackend.dto.TypeDto
+import hu.bme.aut.examappbackend.dto.UserDto
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -29,6 +30,7 @@ object DatabaseFactory {
             SchemaUtils.create(TrueFalseQuestionDB)
             SchemaUtils.create(MultipleChoiceQuestionDB)
             SchemaUtils.create(ExamDB)
+            SchemaUtils.create(UserDB)
         }
     }
 
@@ -66,6 +68,14 @@ object DatabaseFactory {
                         point = 4.0,
                         goodAnswer = 4.0,
                         badAnswer = 0.0
+                    )
+                )
+            }
+            if(FacadeExposed.userDao.getUserByName("user") == null){
+                val user1 = FacadeExposed.userDao.insertUser(
+                    UserDto(
+                        name = "user",
+                        password = "xdlol"
                     )
                 )
             }

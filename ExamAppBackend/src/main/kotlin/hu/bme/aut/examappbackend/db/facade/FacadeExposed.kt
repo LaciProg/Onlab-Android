@@ -7,4 +7,5 @@ object FacadeExposed {
     val topicDao: TopicFacade = TopicFacadeExposed()
     val trueFalseQuestionDao: TrueFalseQuestionFacade = TrueFalseQuestionFacadeExposed()
     val typeDao: TypeFacade = TypeFacadeExposed()
+    val userDao: UserFacade = UserFacadeExposed()
 }

@@ -1,10 +1,8 @@
 package hu.bme.aut.examappbackend
 
 import hu.bme.aut.examappbackend.db.DatabaseFactory
-import hu.bme.aut.examappbackend.plugins.configureHTTP
-import hu.bme.aut.examappbackend.plugins.configureMonitoring
-import hu.bme.aut.examappbackend.plugins.configureRouting
-import hu.bme.aut.examappbackend.plugins.configureSerialization
+import hu.bme.aut.examappbackend.plugins.*
+import hu.bme.aut.examappbackend.services.JwtService
 import io.ktor.server.application.*
 import io.ktor.server.resources.*
 
@@ -13,10 +11,12 @@ fun main(args: Array<String>) {
 }
 
 fun Application.module() {
+    val jwtService = JwtService(this)
     DatabaseFactory.init()
     install(Resources)
     configureHTTP()
     configureMonitoring()
+    configureSecurity(jwtService)
     configureSerialization()
-    configureRouting()
+    configureRouting(jwtService)
 }

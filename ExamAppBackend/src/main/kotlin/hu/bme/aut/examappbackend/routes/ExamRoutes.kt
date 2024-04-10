@@ -38,12 +38,8 @@ fun Route.examRoutes(){
 
     get<ExamRoutes.ExamUUID> {
         val exam = FacadeExposed.examDao.getExamById(it.examId)
-
-        if(exam == null) {
-            call.respond(status = HttpStatusCode.BadRequest, message = "")
-        } else {
-            call.respond(status = HttpStatusCode.OK, message = exam)
-        }
+            ?: return@get call.respond(status = HttpStatusCode.BadRequest, message = "")
+        call.respond(status = HttpStatusCode.OK, message = exam)
     }
 
     put<ExamRoutes> {
@@ -59,12 +55,8 @@ fun Route.examRoutes(){
     post<ExamRoutes> {
         val exam = call.receive<ExamDto>()
         val created = FacadeExposed.examDao.insertExam(exam)
-        if(created == null){
-            call.respond(status = HttpStatusCode.InternalServerError, message = "")
-        }
-        else{
-            call.respond(status = HttpStatusCode.Created, message = created)
-        }
+            ?: return@post call.respond(status = HttpStatusCode.InternalServerError, message = "")
+        call.respond(status = HttpStatusCode.Created, message = created)
     }
 
     delete<ExamRoutes.ExamUUID> {

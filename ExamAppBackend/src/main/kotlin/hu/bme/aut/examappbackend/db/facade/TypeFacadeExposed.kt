@@ -23,7 +23,7 @@ class TypeFacadeExposed : TypeFacade {
     }
 
     override suspend fun getTypeById(uuid: String): TypeDto? = dbQuery {
-        TypeDB.select{ TypeDB.id eq UUID.fromString(uuid)}
+        TypeDB.selectAll().where { TypeDB.id eq UUID.fromString(uuid) }
             .map(::resultRowToType)
             .singleOrNull()
     }

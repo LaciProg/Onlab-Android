@@ -38,12 +38,8 @@ fun Route.multipleChoiceRoutes(){
 
     get<MultipleChoiceRoutes.MultipleChoiceUUID> {
         val question = FacadeExposed.multipleChoiceQuestionDao.getMultipleChoiceQuestionById(it.multipleChoiceId)
-
-        if(question == null){
-            call.respond(status = HttpStatusCode.BadRequest, message = "")
-        } else {
-            call.respond(status = HttpStatusCode.OK, message = question)
-        }
+            ?: return@get call.respond(status = HttpStatusCode.BadRequest, message = "")
+        call.respond(status = HttpStatusCode.OK, message = question)
     }
 
     put<MultipleChoiceRoutes> {
@@ -59,12 +55,8 @@ fun Route.multipleChoiceRoutes(){
     post<MultipleChoiceRoutes> {
         val question = call.receive<MultipleChoiceQuestionDto>()
         val created = FacadeExposed.multipleChoiceQuestionDao.insertMultipleChoiceQuestion(question)
-        if(created == null){
-            call.respond(status = HttpStatusCode.InternalServerError, message = "")
-        }
-        else{
-            call.respond(status = HttpStatusCode.Created, message = created)
-        }
+            ?: return@post call.respond(status = HttpStatusCode.InternalServerError, message = "")
+        call.respond(status = HttpStatusCode.Created, message = created)
     }
 
     delete<MultipleChoiceRoutes.MultipleChoiceUUID> {

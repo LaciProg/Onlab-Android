@@ -26,7 +26,7 @@ class PointFacadeExposed : PointFacade {
     }
 
     override suspend fun getPointById(uuid: String): PointDto? = dbQuery {
-        PointDB.select { PointDB.id eq UUID.fromString(uuid) }
+        PointDB.selectAll().where { PointDB.id eq UUID.fromString(uuid) }
             .map(::resultRowToPoint)
             .singleOrNull()
     }

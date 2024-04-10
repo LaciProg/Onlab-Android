@@ -38,12 +38,8 @@ fun Route.typeRoutes(){
 
     get<TypeRoutes.TypeUUID> {
         val type = FacadeExposed.typeDao.getTypeById(it.typeId)
-
-        if(type == null) {
-            call.respond(status = HttpStatusCode.BadRequest, message = "")
-        } else {
-            call.respond(status = HttpStatusCode.OK, message = type)
-        }
+            ?: return@get call.respond(status = HttpStatusCode.BadRequest, message = "")
+        call.respond(status = HttpStatusCode.OK, message = type)
     }
 
     put<TypeRoutes> {
@@ -59,12 +55,8 @@ fun Route.typeRoutes(){
     post<TypeRoutes> {
         val type = call.receive<TypeDto>()
         val created = FacadeExposed.typeDao.insertType(type)
-        if(created == null){
-            call.respond(status = HttpStatusCode.InternalServerError, message = "")
-        }
-        else{
-            call.respond(status = HttpStatusCode.Created, message = created)
-        }
+            ?: return@post call.respond(status = HttpStatusCode.InternalServerError, message = "")
+        call.respond(status = HttpStatusCode.Created, message = created)
     }
 
     delete<TypeRoutes.TypeUUID> {

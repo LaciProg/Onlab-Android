@@ -38,12 +38,8 @@ fun Route.pointRoutes(){
 
     get<PointRoutes.PointUUID> {
         val point = FacadeExposed.pointDao.getPointById(it.pointId)
-
-        if(point == null) {
-            call.respond(status = HttpStatusCode.BadRequest, message = "")
-        } else {
-            call.respond(status = HttpStatusCode.OK, message = point)
-        }
+            ?: return@get call.respond(status = HttpStatusCode.BadRequest, message = "")
+        call.respond(status = HttpStatusCode.OK, message = point)
     }
 
     put<PointRoutes> {
@@ -59,12 +55,8 @@ fun Route.pointRoutes(){
     post<PointRoutes> {
         val point = call.receive<PointDto>()
         val created = FacadeExposed.pointDao.insertPoint(point)
-        if(created == null){
-            call.respond(status = HttpStatusCode.InternalServerError, message = "")
-        }
-        else{
-            call.respond(status = HttpStatusCode.Created, message = created)
-        }
+            ?: return@post call.respond(status = HttpStatusCode.InternalServerError, message = "")
+        call.respond(status = HttpStatusCode.Created, message = created)
     }
 
     delete<PointRoutes.PointUUID> {

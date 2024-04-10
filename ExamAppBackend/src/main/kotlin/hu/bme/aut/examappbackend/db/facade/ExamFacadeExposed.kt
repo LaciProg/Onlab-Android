@@ -30,7 +30,7 @@ class ExamFacadeExposed : ExamFacade{
     }
 
     override suspend fun getExamById(uuid: String): ExamDto? = dbQuery {
-        ExamDB.select { ExamDB.id eq UUID.fromString(uuid) }
+        ExamDB.selectAll().where { ExamDB.id eq UUID.fromString(uuid) }
             .map(::resultRowToExam)
             .singleOrNull()
     }

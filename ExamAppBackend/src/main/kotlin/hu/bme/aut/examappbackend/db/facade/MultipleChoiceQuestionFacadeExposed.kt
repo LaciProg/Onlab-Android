@@ -27,7 +27,7 @@ class MultipleChoiceQuestionFacadeExposed : MultipleChoiceQuestionFacade {
     }
 
     override suspend fun getMultipleChoiceQuestionById(uuid: String): MultipleChoiceQuestionDto? = dbQuery {
-        MultipleChoiceQuestionDB.select{MultipleChoiceQuestionDB.id eq UUID.fromString(uuid)}
+        MultipleChoiceQuestionDB.selectAll().where { MultipleChoiceQuestionDB.id eq UUID.fromString(uuid) }
             .map(::resultRowToMultipleChoiceQuestion)
             .singleOrNull()
     }

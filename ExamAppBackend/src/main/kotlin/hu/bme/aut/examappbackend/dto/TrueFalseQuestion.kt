@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TrueFalseQuestionDto(
-    val uuid: String,
+    val uuid: String = "",
     val question: String,
     val correctAnswer: Boolean,
     val point: String,

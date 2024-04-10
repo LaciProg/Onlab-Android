@@ -15,7 +15,7 @@ import io.ktor.server.routing.Route
 class TopicRoutes{
     @Resource("{topicId}")
     class TopicUUID(
-        val parent: TopicRoutes = TopicRoutes(),
+        val topicParent: TopicRoutes = TopicRoutes(),
         val topicId: String
     )
 
@@ -54,12 +54,8 @@ fun Route.topicRoutes(){
 
     get<TopicRoutes.TopicList> {
         val topic = FacadeExposed.topicDao.getTopicByTopic(it.topic)
-
-        if(topic == null){
-            call.respond(status = HttpStatusCode.BadRequest, message = "")
-        } else {
-            call.respond(status = HttpStatusCode.OK, message = topic)
-        }
+            ?: return@get call.respond(status = HttpStatusCode.BadRequest, message = "")
+        call.respond(status = HttpStatusCode.OK, message = topic)
     }
 
     put<TopicRoutes> {
@@ -75,12 +71,8 @@ fun Route.topicRoutes(){
     post<TopicRoutes> {
         val topic = call.receive<TopicDto>()
         val created = FacadeExposed.topicDao.insertTopic(topic)
-        if(created == null){
-            call.respond(status = HttpStatusCode.InternalServerError, message = "")
-        }
-        else{
-            call.respond(status = HttpStatusCode.Created, message = created)
-        }
+            ?: return@post call.respond(status = HttpStatusCode.InternalServerError, message = "")
+        call.respond(status = HttpStatusCode.Created, message = created)
     }
 
     delete<TopicRoutes.TopicUUID> {
