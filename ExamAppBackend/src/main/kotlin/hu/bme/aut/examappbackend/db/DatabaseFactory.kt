@@ -3,6 +3,7 @@ package hu.bme.aut.examappbackend.db
 import enums.Type
 import hu.bme.aut.examappbackend.db.facade.FacadeExposed
 import hu.bme.aut.examappbackend.db.model.*
+import hu.bme.aut.examappbackend.dto.PointDto
 import hu.bme.aut.examappbackend.dto.TypeDto
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -50,30 +51,25 @@ object DatabaseFactory {
                     )
                 )
             }
-            /*if (userDAO.allUsers().isEmpty()) {
-                val user1 = userDAO.registerNewUser(
-                    UserRegistration(
-                        "totlaci",
-                        "Tóth László",
-                        "totlaci@sch.bme.hu"
+            if(FacadeExposed.pointDao.getAllPoint().isEmpty()){
+                val point1 = FacadeExposed.pointDao.insertPoint(
+                    PointDto(
+                        type = "IH",
+                        point = 2.0,
+                        goodAnswer = 2.0,
+                        badAnswer = -2.0
                     )
                 )
-
-                if (user1 != null)
-                    userDAO.addNewUserPreferences(user1.uuid)
-
-                val user2 = userDAO.registerNewUser(
-                    UserRegistration(
-                        "tesztelek",
-                        "Teszt Elek",
-                        "tesztelek@sch.bme.hu"
+                val point2 = FacadeExposed.pointDao.insertPoint(
+                    PointDto(
+                        type = "MC",
+                        point = 4.0,
+                        goodAnswer = 4.0,
+                        badAnswer = 0.0
                     )
                 )
-                if (user2 != null)
-                    userDAO.addNewUserPreferences(user2.uuid)
-            }*/
-        
-        }
+            }
+       }
     }
 }
 

@@ -3,7 +3,7 @@ package hu.bme.aut.examappbackend.db.facade
 import hu.bme.aut.examappbackend.dto.TopicDto
 
 interface TopicFacade {
-    suspend fun getAppTopic() : List<TopicDto>
+    suspend fun getAllTopic() : List<TopicDto>
     suspend fun getTopicById(uuid: String) : TopicDto?
     suspend fun insertTopic(topicDto: TopicDto) : TopicDto?
     suspend fun updateTopic(topicDto: TopicDto) : Boolean

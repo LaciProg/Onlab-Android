@@ -7,23 +7,21 @@ import io.ktor.resources.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.resources.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
 import io.ktor.server.resources.put
-import io.ktor.server.resources.post
-import io.ktor.server.resources.delete
+import io.ktor.server.response.*
+import io.ktor.server.routing.Route
 
 @Resource("/type")
-class TypeRoutes(){
-    @Resource("{id}")
+class TypeRoutes{
+    @Resource("{typeId}")
     class TypeUUID(
-        val parent: TypeRoutes = TypeRoutes(),
-        val id: String
+        val typeParent: TypeRoutes = TypeRoutes(),
+        val typeId: String
     )
 
     @Resource("name")
-    class NameList(
-        val parent: TypeRoutes = TypeRoutes(),
+    class TypeNameList(
+        val typeParent: TypeRoutes = TypeRoutes(),
     )
 }
 
@@ -33,13 +31,13 @@ fun Route.typeRoutes(){
         call.respond(status = HttpStatusCode.OK, message = types)
     }
 
-    get<TypeRoutes.NameList> {
+    get<TypeRoutes.TypeNameList> {
         val types = FacadeExposed.typeDao.getAllTypeType()
         call.respond(status = HttpStatusCode.OK, message = types)
     }
 
     get<TypeRoutes.TypeUUID> {
-        val type = FacadeExposed.typeDao.getTypeById(it.id)
+        val type = FacadeExposed.typeDao.getTypeById(it.typeId)
 
         if(type == null) {
             call.respond(status = HttpStatusCode.BadRequest, message = "")
@@ -65,12 +63,12 @@ fun Route.typeRoutes(){
             call.respond(status = HttpStatusCode.InternalServerError, message = "")
         }
         else{
-            call.respond(status = HttpStatusCode.Created, message = created);
+            call.respond(status = HttpStatusCode.Created, message = created)
         }
     }
 
     delete<TypeRoutes.TypeUUID> {
-        if(FacadeExposed.typeDao.deleteType(it.id)){
+        if(FacadeExposed.typeDao.deleteType(it.typeId)){
             call.respond(status = HttpStatusCode.NoContent, message = "")
         } else {
             call.respond(status = HttpStatusCode.BadRequest, message = "")

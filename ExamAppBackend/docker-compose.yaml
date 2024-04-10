@@ -1,5 +1,4 @@
 version: "3"
-name: "examapp-db"
 services:
     DB:
         image: postgres:latest

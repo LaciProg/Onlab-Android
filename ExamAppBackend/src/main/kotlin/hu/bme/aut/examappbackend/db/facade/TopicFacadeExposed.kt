@@ -16,7 +16,7 @@ class TopicFacadeExposed : TopicFacade {
         parentTopic = row[TopicDB.parentTopic].toString()
     )
 
-    override suspend fun getAppTopic(): List<TopicDto> = dbQuery {
+    override suspend fun getAllTopic(): List<TopicDto> = dbQuery {
         TopicDB.selectAll().map(::resultRowToTopic)
     }
 
