@@ -2,6 +2,7 @@ package hu.bme.aut.examappbackend.routes
 
 import hu.bme.aut.examappbackend.db.facade.FacadeExposed
 import hu.bme.aut.examappbackend.dto.ExamDto
+import hu.bme.aut.examappbackend.dto.Question
 import io.ktor.http.*
 import io.ktor.resources.*
 import io.ktor.server.application.*
@@ -17,12 +18,19 @@ class ExamRoutes{
     class ExamUUID(
         val examParent: ExamRoutes = ExamRoutes(),
         val examId: String
-    )
+    ){
+        @Resource("/question")
+        class QuestionList(
+            val examParent: ExamRoutes = ExamRoutes(),
+        )
+    }
 
     @Resource("/name")
     class ExamList(
         val examParent: ExamRoutes = ExamRoutes(),
     )
+
+
 }
 
 fun Route.examRoutes(){
@@ -34,6 +42,13 @@ fun Route.examRoutes(){
     get<ExamRoutes.ExamList> {
         val exams = FacadeExposed.examDao.getAllExamNames()
         call.respond(status = HttpStatusCode.OK, message = exams)
+    }
+
+    get<ExamRoutes.ExamUUID.QuestionList> {
+        val questions: MutableList<Question> = mutableListOf()
+        questions.addAll(FacadeExposed.multipleChoiceQuestionDao.getAllMultipleChoiceQuestion())
+        questions.addAll(FacadeExposed.trueFalseQuestionDao.getAllTrueFalseQuestion())
+        call.respond(status = HttpStatusCode.OK, message = questions)
     }
 
     get<ExamRoutes.ExamUUID> {

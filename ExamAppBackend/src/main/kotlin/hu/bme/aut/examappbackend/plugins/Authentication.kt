@@ -4,6 +4,7 @@ import hu.bme.aut.examappbackend.services.JwtService
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
+
 fun Application.configureSecurity(
     jwtService: JwtService
 ) {

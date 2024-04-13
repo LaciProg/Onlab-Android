@@ -39,8 +39,8 @@ class MultipleChoiceQuestionFacadeExposed : MultipleChoiceQuestionFacade {
     override suspend fun insertMultipleChoiceQuestion(multipleChoiceQuestion: MultipleChoiceQuestionDto): MultipleChoiceQuestionDto? = dbQuery {
         val insertStatement = MultipleChoiceQuestionDB.insert {
             it[question] = multipleChoiceQuestion.question
-            it[answers] = multipleChoiceQuestion.answers.joinToString { "¤" }
-            it[correctAnswersList] = multipleChoiceQuestion.correctAnswersList.joinToString { "¤" }
+            it[answers] = multipleChoiceQuestion.answers.joinToString("¤" )
+            it[correctAnswersList] = multipleChoiceQuestion.correctAnswersList.joinToString("¤" )
             it[point] = UUID.fromString(multipleChoiceQuestion.point)
             it[topic] = UUID.fromString(multipleChoiceQuestion.topic)
             it[type] = UUID.fromString(multipleChoiceQuestion.type)
@@ -51,8 +51,8 @@ class MultipleChoiceQuestionFacadeExposed : MultipleChoiceQuestionFacade {
     override suspend fun updateMultipleChoiceQuestion(multipleChoiceQuestion: MultipleChoiceQuestionDto): Boolean = dbQuery {
         MultipleChoiceQuestionDB.update ( {MultipleChoiceQuestionDB.id eq UUID.fromString(multipleChoiceQuestion.uuid)} ){
             it[question] = multipleChoiceQuestion.question
-            it[answers] = multipleChoiceQuestion.answers.joinToString { "¤" }
-            it[correctAnswersList] = multipleChoiceQuestion.correctAnswersList.joinToString { "¤" }
+            it[answers] = multipleChoiceQuestion.answers.joinToString("¤" )
+            it[correctAnswersList] = multipleChoiceQuestion.correctAnswersList.joinToString("¤" )
             it[point] = UUID.fromString(multipleChoiceQuestion.point)
             it[topic] = UUID.fromString(multipleChoiceQuestion.topic)
             it[type] = UUID.fromString(multipleChoiceQuestion.type)

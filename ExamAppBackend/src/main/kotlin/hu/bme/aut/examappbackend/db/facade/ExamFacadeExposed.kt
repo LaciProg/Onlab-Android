@@ -17,7 +17,7 @@ class ExamFacadeExposed : ExamFacade{
     private fun resultRowToExam(row: ResultRow) = ExamDto(
         uuid = row[ExamDB.id].toString(),
         name = row[ExamDB.name],
-        questionList = row[ExamDB.questionList].split("¤").map { it.toQuestion() },
+        questionList = row[ExamDB.questionList] /*row[ExamDB.questionList].split("¤").map { it.toQuestion() }*/,
         topicId = row[ExamDB.topicId].toString()
     )
 
@@ -29,8 +29,20 @@ class ExamFacadeExposed : ExamFacade{
         ExamDB.selectAll().map{it[ExamDB.name]}
     }
 
+    override suspend fun getAllQuestionString(exam: String): String? = dbQuery {
+        ExamDB.selectAll().where { ExamDB.name eq exam }
+            .map { it[ExamDB.questionList] }
+            .singleOrNull()
+    }
+
     override suspend fun getExamById(uuid: String): ExamDto? = dbQuery {
         ExamDB.selectAll().where { ExamDB.id eq UUID.fromString(uuid) }
+            .map(::resultRowToExam)
+            .singleOrNull()
+    }
+
+    override suspend fun getExamByName(exam: String): ExamDto? = dbQuery {
+        ExamDB.selectAll().where { ExamDB.name eq exam }
             .map(::resultRowToExam)
             .singleOrNull()
     }
@@ -42,7 +54,7 @@ class ExamFacadeExposed : ExamFacade{
     override suspend fun insertExam(exam: ExamDto): ExamDto? = dbQuery{
         val insertStatement = ExamDB.insert {
             it[name] = exam.name
-            it[questionList] = exam.questionList.joinToString("¤") { question -> question?.toQuestionString() ?: "" }
+            it[questionList] = exam.questionList//.joinToString("¤") { question -> question?.toQuestionString() ?: "" }
             it[topicId] = UUID.fromString(exam.topicId)
         }
         return@dbQuery insertStatement.resultedValues?.singleOrNull<ResultRow>()?.let(::resultRowToExam)
@@ -52,7 +64,7 @@ class ExamFacadeExposed : ExamFacade{
     override suspend fun updateExam(exam: ExamDto): Boolean = dbQuery {
         ExamDB.update( {ExamDB.id eq UUID.fromString(exam.uuid)} ){
             it[name] = exam.name
-            it[questionList] = exam.questionList.joinToString("¤") { question -> question?.toQuestionString() ?: "" }
+            it[questionList] = exam.questionList//.joinToString("¤") { question -> question?.toQuestionString() ?: "" }
             it[topicId] = UUID.fromString(exam.topicId)
         } > 0
     }
@@ -75,36 +87,4 @@ class ExamFacadeExposed : ExamFacade{
         }
 
     }
-
-
-/*
-    private fun toTrueFalseQuestion(uuid: String) : TrueFalseQuestionDto?  {
-        //var job: Job? = null
-        //var question: TrueFalseQuestionDto? = null
-        //coroutineScope {
-        //    job = launch {
-
-              return runBlocking { FacadeExposed.trueFalseQuestionDao.getTrueFalseQuestionById(uuid) }
-        //   }
-        //}
-        //job?.join()
-        //job?.invokeOnCompletion {
-        //    if(it == null){
-        //         return@invokeOnCompletion question
-        //    }
-        //}
-    }
-
-    private suspend fun toMultipleChoiceQuestion(uuid: String) : MultipleChoiceQuestionDto? = dbQuery {
-        var job: Job? = null
-        var question: MultipleChoiceQuestionDto? = null
-        coroutineScope {
-            job = launch {
-                question = FacadeExposed.multipleChoiceQuestionDao.getMultipleChoiceQuestionById(uuid)
-            }
-        }
-        job?.join()
-        return@dbQuery question
-    }*/
-
 }

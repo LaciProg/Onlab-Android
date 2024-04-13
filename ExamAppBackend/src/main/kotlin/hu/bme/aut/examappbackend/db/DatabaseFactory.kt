@@ -3,9 +3,7 @@ package hu.bme.aut.examappbackend.db
 import enums.Type
 import hu.bme.aut.examappbackend.db.facade.FacadeExposed
 import hu.bme.aut.examappbackend.db.model.*
-import hu.bme.aut.examappbackend.dto.PointDto
-import hu.bme.aut.examappbackend.dto.TypeDto
-import hu.bme.aut.examappbackend.dto.UserDto
+import hu.bme.aut.examappbackend.dto.*
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -24,6 +22,14 @@ object DatabaseFactory {
             password = System.getenv("DB_PASSWORD") ?: "examapp"
         )
         transaction(db) {
+            //SchemaUtils.drop(ExamDB)
+            //SchemaUtils.drop(TrueFalseQuestionDB)
+            //SchemaUtils.drop(MultipleChoiceQuestionDB)
+            //SchemaUtils.drop(TypeDB)
+            //SchemaUtils.drop(TopicDB)
+            //SchemaUtils.drop(PointDB)
+            //SchemaUtils.drop(UserDB)
+
             SchemaUtils.create(TypeDB)
             SchemaUtils.create(TopicDB)
             SchemaUtils.create(PointDB)
@@ -38,15 +44,27 @@ object DatabaseFactory {
         newSuspendedTransaction(Dispatchers.IO) { block() }
 
     fun createSampleData() {
+        var type1: TypeDto? = null
+        var type2: TypeDto? = null
+        var point1: PointDto? = null
+        var point2: PointDto? = null
+        var topic1: TopicDto? = null
+        var topic2: TopicDto? = null
+        var tf1: TrueFalseQuestionDto? = null
+        var tf2: TrueFalseQuestionDto? = null
+        var mc1: MultipleChoiceQuestionDto? = null
+        var mc2: MultipleChoiceQuestionDto? = null
+        var exam1: ExamDto? = null
+        var exam2: ExamDto? = null
         runBlocking {
             if(FacadeExposed.typeDao.getAllType().isEmpty()){
-                val type1 = FacadeExposed.typeDao.insertType(
+                type1 = FacadeExposed.typeDao.insertType(
                     TypeDto(
                         type = Type.trueFalseQuestion.name,
                         uuid = UUID.randomUUID().toString()
                     )
                 )
-                val type2 = FacadeExposed.typeDao.insertType(
+                type2 = FacadeExposed.typeDao.insertType(
                     TypeDto(
                         type = Type.multipleChoiceQuestion.name,
                         uuid = UUID.randomUUID().toString()
@@ -54,7 +72,7 @@ object DatabaseFactory {
                 )
             }
             if(FacadeExposed.pointDao.getAllPoint().isEmpty()){
-                val point1 = FacadeExposed.pointDao.insertPoint(
+                point1 = FacadeExposed.pointDao.insertPoint(
                     PointDto(
                         type = "IH",
                         point = 2.0,
@@ -62,16 +80,31 @@ object DatabaseFactory {
                         badAnswer = -2.0
                     )
                 )
-                val point2 = FacadeExposed.pointDao.insertPoint(
+                point2 = FacadeExposed.pointDao.insertPoint(
                     PointDto(
                         type = "MC",
                         point = 4.0,
-                        goodAnswer = 4.0,
+                        goodAnswer = 1.0,
                         badAnswer = 0.0
                     )
                 )
             }
-            if(FacadeExposed.userDao.getUserByName("user") == null){
+            if(FacadeExposed.topicDao.getAllTopic().isEmpty()){
+                topic1 = FacadeExposed.topicDao.insertTopic(
+                    TopicDto(
+                        topic = "Topic1",
+                        description = "Első",
+                    )
+                )
+                topic2 = FacadeExposed.topicDao.insertTopic(
+                    TopicDto(
+                        topic = "Topic2",
+                        description = "Második",
+                        parentTopic = topic1?.uuid!!
+                    )
+                )
+            }
+            if(FacadeExposed.userDao.getAllUser().isEmpty()){
                 val user1 = FacadeExposed.userDao.insertUser(
                     UserDto(
                         name = "user",
@@ -80,6 +113,68 @@ object DatabaseFactory {
                 )
             }
        }
+        runBlocking {
+            if(FacadeExposed.trueFalseQuestionDao.getAllTrueFalseQuestion().isEmpty()){
+                tf1 = FacadeExposed.trueFalseQuestionDao.insertTrueFalseQuestion(
+                    TrueFalseQuestionDto(
+                        question = "Almaaa????",
+                        correctAnswer = true,
+                        point = point1?.uuid!!,
+                        topic = topic1?.uuid!!,
+                        type = type1?.uuid!!
+                    )
+                )
+                tf2 = FacadeExposed.trueFalseQuestionDao.insertTrueFalseQuestion(
+                    TrueFalseQuestionDto(
+                        question = "YEEEAH????",
+                        correctAnswer = true,
+                        point = point2?.uuid!!,
+                        topic = topic2?.uuid!!,
+                        type = type2?.uuid!!
+                    )
+                )
+            }
+            if(FacadeExposed.multipleChoiceQuestionDao.getAllMultipleChoiceQuestion().isEmpty()){
+                mc1 = FacadeExposed.multipleChoiceQuestionDao.insertMultipleChoiceQuestion(
+                    MultipleChoiceQuestionDto(
+                        question = "Almaaa????",
+                        correctAnswersList = listOf("Alma", "Igen"),
+                        answers = listOf("Alma", "Igen", "Nem"),
+                        point = point1?.uuid!!,
+                        topic = topic1?.uuid!!,
+                        type = type1?.uuid!!
+                    )
+                )
+                mc2 = FacadeExposed.multipleChoiceQuestionDao.insertMultipleChoiceQuestion(
+                    MultipleChoiceQuestionDto(
+                        question = "YEEEAH????",
+                        answers = listOf("Alma", "Banán", "Körte", "Barack"),
+                        correctAnswersList = listOf("Barack"),
+                        point = point2?.uuid!!,
+                        topic = topic2?.uuid!!,
+                        type = type2?.uuid!!
+                    )
+                )
+            }
+        }
+        runBlocking {
+            if(FacadeExposed.examDao.getAllExam().isEmpty()){
+                exam1 = FacadeExposed.examDao.insertExam(
+                    ExamDto(
+                        name = "Elso",
+                        questionList = "${tf1?.typeOrdinal}~${tf1?.uuid}#${tf2?.typeOrdinal}~${tf2?.uuid}#${mc1?.typeOrdinal}~${mc1?.uuid}"/*listOf(tf1, tf2, mc1)*/,
+                        topicId = topic1?.uuid!!
+                    )
+                )
+                exam2 = FacadeExposed.examDao.insertExam(
+                    ExamDto(
+                        name = "Masodik",
+                        questionList = "${mc2?.typeOrdinal}~${mc2?.uuid}#${mc1?.typeOrdinal}~${mc1?.uuid}#${tf1?.typeOrdinal}~${tf1?.uuid}"/*listOf(mc2, mc1, tf1)*/,
+                        topicId = topic2?.uuid!!
+                    )
+                )
+            }
+        }
     }
 }
 

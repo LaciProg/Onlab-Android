@@ -40,7 +40,7 @@ class TopicFacadeExposed : TopicFacade {
         val insertStatement = TopicDB.insert {
             it[topic] = topicDto.topic
             it[description] = topicDto.description
-            it[parentTopic] = UUID.fromString(topicDto.parentTopic)
+            it[parentTopic] = if(topicDto.parentTopic.isNotEmpty()) UUID.fromString(topicDto.parentTopic) else null
         }
         return@dbQuery insertStatement.resultedValues?.singleOrNull<ResultRow>()?.let(::resultRowToTopic)
 
@@ -50,7 +50,7 @@ class TopicFacadeExposed : TopicFacade {
         TopicDB.update({ TopicDB.id eq UUID.fromString(topicDto.uuid) }) {
             it[topic] = topicDto.topic
             it[description] = topicDto.description
-            it[parentTopic] = UUID.fromString(topicDto.parentTopic)
+            it[parentTopic] = if(topicDto.parentTopic.isNotEmpty()) UUID.fromString(topicDto.parentTopic) else null
         } > 0
     }
 

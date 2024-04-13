@@ -9,7 +9,7 @@ import io.ktor.server.application.*
 import io.ktor.server.auth.jwt.*
 import java.util.*
 
-class JwtService(private val application: Application, ) {
+class JwtService(private val application: Application ) {
     private val secret = getConfigProperty("jwt.secret")
     private val issuer = getConfigProperty("jwt.issuer")
     private val audience = getConfigProperty("jwt.audience")
@@ -23,7 +23,7 @@ class JwtService(private val application: Application, ) {
             .build()
 
     suspend fun createJwtToken(loginRequest: UserDto): String? {
-        val foundUser: UserDto? =   FacadeExposed.userDao.getUserByName(loginRequest.name)
+        val foundUser: UserDto? = FacadeExposed.userDao.getUserByName(loginRequest.name)
         return if (foundUser != null && loginRequest.password == foundUser.password)
             JWT.create()
                 .withAudience(audience)
@@ -39,7 +39,7 @@ class JwtService(private val application: Application, ) {
         credential: JWTCredential,
     ): JWTPrincipal? {
         val username: String = extractUsername(credential) ?: return null
-        val foundUser: UserDto? =   FacadeExposed.userDao.getUserByName(username)
+        val foundUser: UserDto? = FacadeExposed.userDao.getUserByName(username)
         return foundUser?.let {
             if (audienceMatches(credential))
                 JWTPrincipal(credential.payload)
