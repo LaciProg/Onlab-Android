@@ -16,6 +16,7 @@ services:
             context: .
         env_file:
             - src/main/resources/backend.env
+            - .env
         networks:
             - shared
             - public
