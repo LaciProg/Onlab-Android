@@ -5,6 +5,7 @@ import hu.bme.aut.examappbackend.services.CorrectionService
 import hu.bme.aut.examappbackend.services.JwtService
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
+import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
 fun Application.configureRouting(jwtService: JwtService) {
@@ -25,8 +26,8 @@ fun Application.configureRouting(jwtService: JwtService) {
             trueFalseRoutes()
             typeRoutes()
         }
-        //get("/") {
-        //    call.respondText("Hello World!")
-        //}
+        get("/") {
+            call.respondText("Hello World!")
+        }
     }
 }

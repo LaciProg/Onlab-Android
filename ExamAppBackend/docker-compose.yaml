@@ -2,8 +2,10 @@ version: "3"
 services:
     DB:
         image: postgres:latest
-        volumes: 
+        volumes:
             - /data:/data/db
+        ports:
+            - 5432:5432
         container_name: ExamApp
         env_file: .env
         networks:

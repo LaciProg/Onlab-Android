@@ -13,6 +13,7 @@ fun main(args: Array<String>) {
 fun Application.module() {
     val jwtService = JwtService(this)
     DatabaseFactory.init()
+    DatabaseFactory.createSampleData()
     install(Resources)
     configureHTTP()
     configureMonitoring()
