@@ -1,5 +1,6 @@
 package hu.bme.aut.examappbackend.db.facade
 
+import hu.bme.aut.examappbackend.dto.NameDto
 import hu.bme.aut.examappbackend.dto.TypeDto
 
 interface TypeFacade {
@@ -8,5 +9,6 @@ interface TypeFacade {
     suspend fun deleteType(uuid: String) : Boolean
     suspend fun insertType(type: TypeDto) : TypeDto?
     suspend fun getTypeById(uuid: String) : TypeDto?
-    suspend fun getAllTypeType() : List<String>
+    suspend fun getTypeByType(type: String) : TypeDto?
+    suspend fun getAllTypeType() : List<NameDto>
 }

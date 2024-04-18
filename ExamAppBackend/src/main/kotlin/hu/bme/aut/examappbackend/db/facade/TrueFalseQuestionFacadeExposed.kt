@@ -2,6 +2,7 @@ package hu.bme.aut.examappbackend.db.facade
 
 import hu.bme.aut.examappbackend.db.DatabaseFactory.dbQuery
 import hu.bme.aut.examappbackend.db.model.TrueFalseQuestionDB
+import hu.bme.aut.examappbackend.dto.NameDto
 import hu.bme.aut.examappbackend.dto.TrueFalseQuestionDto
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -22,8 +23,11 @@ class TrueFalseQuestionFacadeExposed : TrueFalseQuestionFacade {
         TrueFalseQuestionDB.selectAll().map(::resultRowToTrueFalseQuestion)
     }
 
-    override suspend fun getAllTrueFalseQuestionQuestion(): List<String> = dbQuery {
-        TrueFalseQuestionDB.selectAll().map{ it[TrueFalseQuestionDB.question] }
+    override suspend fun getAllTrueFalseQuestionQuestion(): List<NameDto> = dbQuery {
+        TrueFalseQuestionDB.selectAll().map{ NameDto(
+            name = it[TrueFalseQuestionDB.question] ,
+            uuid = it[TrueFalseQuestionDB.id].toString()
+        ) }
     }
 
     override suspend fun getTrueFalseQuestionById(uuid: String): TrueFalseQuestionDto? = dbQuery {

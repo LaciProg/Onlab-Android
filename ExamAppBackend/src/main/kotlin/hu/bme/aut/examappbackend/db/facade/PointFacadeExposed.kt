@@ -2,6 +2,7 @@ package hu.bme.aut.examappbackend.db.facade
 
 import hu.bme.aut.examappbackend.db.DatabaseFactory.dbQuery
 import hu.bme.aut.examappbackend.db.model.PointDB
+import hu.bme.aut.examappbackend.dto.NameDto
 import hu.bme.aut.examappbackend.dto.PointDto
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -21,8 +22,11 @@ class PointFacadeExposed : PointFacade {
         PointDB.selectAll().map(::resultRowToPoint)
     }
 
-    override suspend fun getAllPointType(): List<String> = dbQuery {
-        PointDB.selectAll().map{ it[PointDB.type]}
+    override suspend fun getAllPointType(): List<NameDto> = dbQuery {
+        PointDB.selectAll().map{ NameDto(
+            name = it[PointDB.type],
+            uuid = it[PointDB.id].toString()
+        ) }
     }
 
     override suspend fun getPointById(uuid: String): PointDto? = dbQuery {

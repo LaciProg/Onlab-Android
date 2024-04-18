@@ -14,7 +14,7 @@ import io.ktor.server.routing.Route
 
 @Resource("/exam")
 class ExamRoutes{
-    @Resource("//{examId}")
+    @Resource("/{examId}")
     class ExamUUID(
         val examParent: ExamRoutes = ExamRoutes(),
         val examId: String

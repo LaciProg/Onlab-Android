@@ -2,6 +2,7 @@ package hu.bme.aut.examappbackend.db.facade
 
 import hu.bme.aut.examappbackend.db.DatabaseFactory.dbQuery
 import hu.bme.aut.examappbackend.db.model.TopicDB
+import hu.bme.aut.examappbackend.dto.NameDto
 import hu.bme.aut.examappbackend.dto.TopicDto
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -20,8 +21,11 @@ class TopicFacadeExposed : TopicFacade {
         TopicDB.selectAll().map(::resultRowToTopic)
     }
 
-    override suspend fun getAllTopicName(): List<String> = dbQuery {
-        TopicDB.selectAll().map{it[TopicDB.topic]}
+    override suspend fun getAllTopicName(): List<NameDto> = dbQuery {
+        TopicDB.selectAll().map{ NameDto(
+            name = it[TopicDB.topic],
+            uuid = it[TopicDB.id].toString()
+        ) }
     }
 
     override suspend fun getTopicById(uuid: String): TopicDto? = dbQuery {

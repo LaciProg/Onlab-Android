@@ -2,6 +2,7 @@ package hu.bme.aut.examappbackend.routes
 
 import hu.bme.aut.examappbackend.db.facade.FacadeExposed
 import hu.bme.aut.examappbackend.dto.MultipleChoiceQuestionDto
+import hu.bme.aut.examappbackend.dto.TrueFalseQuestionDto
 import io.ktor.http.*
 import io.ktor.resources.*
 import io.ktor.server.application.*
@@ -44,7 +45,17 @@ fun Route.multipleChoiceRoutes(){
 
     put<MultipleChoiceRoutes> {
         val question = call.receive<MultipleChoiceQuestionDto>()
-        if(FacadeExposed.multipleChoiceQuestionDao.updateMultipleChoiceQuestion(question)){
+        val typeID = FacadeExposed.typeDao.getTypeByType(question.type)?.uuid ?: ""
+        val questionWithTypeID = MultipleChoiceQuestionDto(
+            uuid = question.uuid,
+            question = question.question,
+            answers = question.answers,
+            correctAnswersList = question.correctAnswersList,
+            point = question.point,
+            topic = question.topic,
+            type = typeID
+        )
+        if(FacadeExposed.multipleChoiceQuestionDao.updateMultipleChoiceQuestion(questionWithTypeID)){
             call.respond(status = HttpStatusCode.OK, message = "")
         }
         else{
@@ -54,7 +65,17 @@ fun Route.multipleChoiceRoutes(){
 
     post<MultipleChoiceRoutes> {
         val question = call.receive<MultipleChoiceQuestionDto>()
-        val created = FacadeExposed.multipleChoiceQuestionDao.insertMultipleChoiceQuestion(question)
+        val typeID = FacadeExposed.typeDao.getTypeByType(question.type)?.uuid ?: ""
+        val questionWithTypeID = MultipleChoiceQuestionDto(
+            uuid = question.uuid,
+            question = question.question,
+            answers = question.answers,
+            correctAnswersList = question.correctAnswersList,
+            point = question.point,
+            topic = question.topic,
+            type = typeID
+        )
+        val created = FacadeExposed.multipleChoiceQuestionDao.insertMultipleChoiceQuestion(questionWithTypeID)
             ?: return@post call.respond(status = HttpStatusCode.InternalServerError, message = "")
         call.respond(status = HttpStatusCode.Created, message = created)
     }

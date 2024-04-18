@@ -22,13 +22,14 @@ class TopicRoutes{
     @Resource("name")
     class TopicNameList(
         val topicParent: TopicRoutes = TopicRoutes(),
-    )
+    ) {
 
-    @Resource("topic")
-    class TopicList(
-        val topicParent: TopicRoutes = TopicRoutes(),
-        val topic: String
-    )
+        @Resource("{topic}")
+        class TopicName(
+            val topicParent: TopicNameList = TopicNameList(),
+            val topic: String
+        )
+    }
 }
 
 fun Route.topicRoutes(){
@@ -52,7 +53,7 @@ fun Route.topicRoutes(){
         }
     }
 
-    get<TopicRoutes.TopicList> {
+    get<TopicRoutes.TopicNameList.TopicName> {
         val topic = FacadeExposed.topicDao.getTopicByTopic(it.topic)
             ?: return@get call.respond(status = HttpStatusCode.BadRequest, message = "")
         call.respond(status = HttpStatusCode.OK, message = topic)

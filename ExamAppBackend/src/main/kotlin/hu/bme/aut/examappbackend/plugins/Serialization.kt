@@ -14,7 +14,6 @@ fun Application.configureSerialization() {
     install(ContentNegotiation) {
         json(Json {
             encodeDefaults = false
-            namingStrategy = JsonNamingStrategy.SnakeCase
         })
     }
 }
