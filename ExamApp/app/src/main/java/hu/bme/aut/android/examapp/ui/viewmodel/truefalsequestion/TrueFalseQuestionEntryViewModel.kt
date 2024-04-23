@@ -4,11 +4,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import hu.bme.aut.android.examapp.api.ExamAppApi
+import hu.bme.aut.android.examapp.api.dto.TrueFalseQuestionDto
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TrueFalseQuestionRepository
-import hu.bme.aut.android.examapp.data.room.dto.TrueFalseQuestionDto
+//import hu.bme.aut.android.examapp.data.room.dto.TrueFalseQuestionDto
 import hu.bme.aut.android.examapp.ui.viewmodel.type.Type
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 class TrueFalseQuestionEntryViewModel(private val trueFalseQuestionRepository: TrueFalseQuestionRepository) : ViewModel(){
 
@@ -26,7 +30,10 @@ class TrueFalseQuestionEntryViewModel(private val trueFalseQuestionRepository: T
 
     suspend fun saveTrueFalseQuestion() : Boolean {
         return if (validateInput() && validateUniqueTrueFalseQuestion()) {
-            trueFalseQuestionRepository.insertTrueFalseQuestion(trueFalseQuestionUiState.trueFalseQuestionDetails.toTrueFalseQuestion())
+            viewModelScope.launch {
+                ExamAppApi.retrofitService.postTrueFalse(trueFalseQuestionUiState.trueFalseQuestionDetails.toTrueFalseQuestion())
+            }
+            //trueFalseQuestionRepository.insertTrueFalseQuestion(trueFalseQuestionUiState.trueFalseQuestionDetails.toTrueFalseQuestion())
             true
         }
         else{
@@ -37,12 +44,13 @@ class TrueFalseQuestionEntryViewModel(private val trueFalseQuestionRepository: T
 
     private fun validateInput(uiState: TrueFalseQuestionDetails = trueFalseQuestionUiState.trueFalseQuestionDetails): Boolean {
         return with(uiState) {
-            question.isNotBlank() && isAnswerChosen && point!= -1 && topic != -1 && !question.contains("/")
+            question.isNotBlank() && isAnswerChosen && point!= "" && topic != "" && !question.contains("/")
         }
     }
 
     private suspend fun validateUniqueTrueFalseQuestion(uiState: TrueFalseQuestionDetails = trueFalseQuestionUiState.trueFalseQuestionDetails): Boolean {
-        return !trueFalseQuestionRepository.getAllTrueFalseQuestionQuestion().filterNotNull().first().contains(uiState.question)
+        return !ExamAppApi.retrofitService.getAllTrueFalseName().map{it.name}.contains(uiState.question)
+        //return !trueFalseQuestionRepository.getAllTrueFalseQuestionQuestion().filterNotNull().first().contains(uiState.question)
     }
 
 }
@@ -53,18 +61,18 @@ data class TrueFalseQuestionUiState(
 )
 
 data class TrueFalseQuestionDetails(
-    val id: Int = 0,
+    val id: String = "",
     val question: String = "",
     val correctAnswer: Boolean = false,
-    val point: Int = -1,
-    val topic: Int = -1,
+    val point: String = "",
+    val topic: String = "",
     val isAnswerChosen: Boolean = false,
     val pointName: String = "",
     val topicName: String = ""
 )
 
 fun TrueFalseQuestionDetails.toTrueFalseQuestion(): TrueFalseQuestionDto = TrueFalseQuestionDto(
-    id = id,
+    uuid = id,
     question = question,
     correctAnswer = correctAnswer,
     point = point,
@@ -78,7 +86,7 @@ fun TrueFalseQuestionDto.toTrueFalseQuestionUiState(isEntryValid: Boolean = fals
 )
 
 fun TrueFalseQuestionDto.toTrueFalseQuestionDetails(pointName: String, topicName: String, isAnswerChosen: Boolean = false): TrueFalseQuestionDetails = TrueFalseQuestionDetails(
-    id = id,
+    id = uuid,
     question = question,
     correctAnswer = correctAnswer,
     point = point,

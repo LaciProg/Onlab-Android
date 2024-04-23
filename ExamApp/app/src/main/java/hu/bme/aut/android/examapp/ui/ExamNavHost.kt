@@ -79,7 +79,7 @@ fun ExamNavHost(
             TopicListScreen(
                 addNewTopic = { navController.navigate(/*ExamDestination.*/NewTopicDestination.route) },
                 navigateToTopicDetails = { topicId ->
-                    navController.navigate(/*ExamDestination.*/"${TopicDetailsDestination.route}/$topicId")
+                    navController.navigate(/*ExamDestination.*/"${TopicDetailsDestination.route}/${topicId}")
                 }
             )
         }
@@ -114,6 +114,17 @@ fun ExamNavHost(
             )
         }
 
+        //composable(
+        //    route = /*ExamDestination.*/TopicListDestination.route,
+        //) {
+        //    TopicListScreen(
+        //        addNewTopic = { navController.navigate(/*ExamDestination.*/NewTopicDestination.route) },
+        //        navigateToTopicDetails = { topicId ->
+        //            navController.navigate(/*ExamDestination.*/"${TopicDetailsDestination.route}/$topicId")
+        //        }
+        //    )
+        //}
+
         composable(
             route = /*ExamDestination.*/PointListDestination.route,
         ) {
@@ -125,8 +136,17 @@ fun ExamNavHost(
             )
         }
 
+        //composable(
+        //    route = TopicDetailsDestination.routeWithArgs,
+        //) {
+        //    TopicDetailsScreen(
+        //        navigateToEditTopic = { navController.navigate("${TopicEditDestination.route}/$it") },
+        //        navigateBack = { navController.popBackStack() }
+        //    )
+        //}
+
         composable(
-            route = PointDetailsDestination.routeWithArgs
+            route = PointDetailsDestination.routeWithArgs,
         ) {
             PointDetailsScreen(
                 navigateToEditPoint = { navController.navigate("${PointEditDestination.route}/$it") },

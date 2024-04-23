@@ -42,9 +42,7 @@ fun NewTrueFalseQuestionScreen(
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     Scaffold(
-        topBar = {
-                Text(text = "New true-false question")
-        }
+        topBar = {}
     ) { innerPadding ->
         TrueFalseQuestionEntryBody(
             trueFalseQuestionUiState = viewModel.trueFalseQuestionUiState,
@@ -113,15 +111,15 @@ fun TrueFalseQuestionInputForm(
     ) {
         DropDownList(
             name = stringResource(R.string.topic_name_req),
-            items = topicListViewModel.topicListUiState.collectAsState().value.topicList.map{it.topic}.filterNot{ it == trueFalseQuestionDetails.topicName },
-            onChoose = { topicName -> onValueChange(trueFalseQuestionDetails.copy(topicName = topicName, topic = if(topicName.isNotBlank()) topicListViewModel.topicListUiState.value.topicList.filter { it.topic == topicName }.map{it.id}.first() else -1)) },
+            items = topicListViewModel.topicListUiState.topicList.map{it.topic}.filterNot{ it == trueFalseQuestionDetails.topicName },
+            onChoose = { topicName -> onValueChange(trueFalseQuestionDetails.copy(topicName = topicName, topic = if(topicName.isNotBlank()) topicListViewModel.topicListUiState.topicList.filter { it.topic == topicName }.map{it.id}.first() else "")) },
             default = trueFalseQuestionDetails.topicName,
             modifier = Modifier.fillMaxWidth(),
         )
         DropDownList(
             name = stringResource(R.string.point_req),
-            items = pointListViewModel.pointListUiState.collectAsState().value.pointList.map{it.point}.filterNot{ it == trueFalseQuestionDetails.pointName },
-            onChoose = { pointName -> onValueChange(trueFalseQuestionDetails.copy(pointName = pointName, point = if(pointName.isNotBlank()) pointListViewModel.pointListUiState.value.pointList.filter { it.point ==  pointName}.map{it.id}.first() else -1)) },
+            items = pointListViewModel.pointListUiState.pointList.map{it.point}.filterNot{ it == trueFalseQuestionDetails.pointName },
+            onChoose = { pointName -> onValueChange(trueFalseQuestionDetails.copy(pointName = pointName, point = if(pointName.isNotBlank()) pointListViewModel.pointListUiState.pointList.filter { it.point ==  pointName}.map{it.id}.first() else "")) },
             default = trueFalseQuestionDetails.pointName,
             modifier = Modifier.fillMaxWidth(),
         )

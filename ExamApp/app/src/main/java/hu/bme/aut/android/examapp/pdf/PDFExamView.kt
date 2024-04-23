@@ -10,8 +10,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.AbstractComposeView
-import hu.bme.aut.android.examapp.data.room.dto.PointDto
-import hu.bme.aut.android.examapp.data.room.dto.Question
+import hu.bme.aut.android.examapp.api.dto.PointDto
+import hu.bme.aut.android.examapp.api.dto.Question
+//import hu.bme.aut.android.examapp.data.room.dto.PointDto
+//import hu.bme.aut.android.examapp.data.room.dto.Question
 import hu.bme.aut.android.examapp.ui.exam.ExportExamDetailsBody
 
 class PDFExamView@JvmOverloads constructor(

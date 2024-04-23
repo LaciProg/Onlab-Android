@@ -64,6 +64,7 @@ import androidx.compose.material3.AlertDialogDefaults.shape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -76,6 +77,7 @@ import androidx.compose.material3.TabPosition
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -97,11 +99,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import hu.bme.aut.android.examapp.data.room.dto.MultipleChoiceQuestionDto
-import hu.bme.aut.android.examapp.data.room.dto.PointDto
-import hu.bme.aut.android.examapp.data.room.dto.Question
-import hu.bme.aut.android.examapp.data.room.dto.TopicDto
-import hu.bme.aut.android.examapp.data.room.dto.TrueFalseQuestionDto
+import hu.bme.aut.android.examapp.api.dto.ExamDto
+import hu.bme.aut.android.examapp.api.dto.MultipleChoiceQuestionDto
+import hu.bme.aut.android.examapp.api.dto.PointDto
+import hu.bme.aut.android.examapp.api.dto.Question
+import hu.bme.aut.android.examapp.api.dto.TopicDto
+import hu.bme.aut.android.examapp.api.dto.TrueFalseQuestionDto
+//import hu.bme.aut.android.examapp.data.room.dto.MultipleChoiceQuestionDto
+//import hu.bme.aut.android.examapp.data.room.dto.PointDto
+//import hu.bme.aut.android.examapp.data.room.dto.Question
+//import hu.bme.aut.android.examapp.data.room.dto.TopicDto
+//import hu.bme.aut.android.examapp.data.room.dto.TrueFalseQuestionDto
 import hu.bme.aut.android.examapp.ui.AppViewModelProvider
 import hu.bme.aut.android.examapp.ui.components.DropDownList
 import hu.bme.aut.android.examapp.ui.multiplechoicequestion.MultipleChoiceQuestionDetailsBody
@@ -114,8 +122,12 @@ import hu.bme.aut.android.examapp.ui.truefalsequestion.TrueFalseQuestionDetails
 import hu.bme.aut.android.examapp.ui.multiplechoicequestion.MultipleChoiceQuestionDetails
 import hu.bme.aut.android.examapp.ui.theme.Purple40
 import hu.bme.aut.android.examapp.ui.truefalsequestion.DeleteConfirmationDialog
+import hu.bme.aut.android.examapp.ui.viewmodel.exam.ExamDetails
+import hu.bme.aut.android.examapp.ui.viewmodel.exam.ExamDetailsScreenUiState
+import hu.bme.aut.android.examapp.ui.viewmodel.exam.ExamDetailsUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.exam.ExamDetailsViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionDetails
+import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionDetailsScreenUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionDetailsUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionDetailsViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.toMultipleChoiceQuestionDetails
@@ -138,12 +150,32 @@ import org.burnoutcrew.reorderable.reorderable
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExamDetailsScreen(
-    navigateToEditMultipleChoiceQuestion: (Int) -> Unit,
+    navigateToEditMultipleChoiceQuestion: (String) -> Unit,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     examViewModel: ExamDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
-    val  examUiState = examViewModel.uiState.collectAsState()
+    when(examViewModel.examDetailsScreenUiState){
+        is ExamDetailsScreenUiState.Loading -> CircularProgressIndicator(modifier = Modifier.fillMaxSize())
+        is ExamDetailsScreenUiState.Success -> {
+            ExamDetailsDetailsScreenUiState(
+                exam =  (examViewModel.examDetailsScreenUiState as ExamDetailsScreenUiState.Success).exam,
+                navigateToEditMultipleChoiceQuestion = navigateToEditMultipleChoiceQuestion,
+                examViewModel = examViewModel,
+                modifier = modifier,
+                navigateBack = navigateBack
+            )
+        }
+        is ExamDetailsScreenUiState.Error -> Text(text = "Error...")
+    }
+
+    LaunchedEffect(key1 = Unit) {
+        examViewModel.getExam(examViewModel.examId)
+    }
+
+
+
+    /*val  examUiState = examViewModel.uiState//.collectAsState()
     var tabPage by remember { mutableStateOf(Type.trueFalseQuestion) }
     val coroutineScope = rememberCoroutineScope()
     val backgroundColor by animateColorAsState(
@@ -156,11 +188,11 @@ fun ExamDetailsScreen(
                 backgroundColor = backgroundColor,
                 tabPage = tabPage,
                 onTabSelected = { tabPage = it },
-                topics = examViewModel.topicList.collectAsState().value,
-                trueFalse =  examViewModel.trueFalseList.collectAsState().value,
-                multipleChoice =  examViewModel.multipleChoiceList.collectAsState().value,
-                questions = examUiState.value.examDetails.questionList,
-                examTopic = examUiState.value.examDetails.topicId,
+                topics = examViewModel.topicList,
+                trueFalse =  examViewModel.trueFalseList,
+                multipleChoice =  examViewModel.multipleChoiceList,
+                questions = examUiState.examDetails.questionList,
+                examTopic = examUiState.examDetails.topicId,
             ){
                 coroutineScope.launch {
                     when (tabPage) {
@@ -173,7 +205,7 @@ fun ExamDetailsScreen(
         //containerColor = backgroundColor,
         floatingActionButton = {
             SmallFloatingActionButton(
-                onClick = { navigateToEditMultipleChoiceQuestion(examUiState.value.examDetails.id) },
+                onClick = { navigateToEditMultipleChoiceQuestion(examUiState.examDetails.id) },
                 shape = MaterialTheme.shapes.medium,
             ) {
                 Icon(
@@ -188,9 +220,72 @@ fun ExamDetailsScreen(
         modifier = modifier
     ) { innerPadding ->
         ExamDetailsBody(
-            questions = examUiState.value.examDetails.questionList,
-            topicList = examViewModel.topicList.collectAsState().value,
-            pointList = examViewModel.pointList.collectAsState().value,
+            questions = examUiState.examDetails.questionList,
+            topicList = examViewModel.topicList,
+            pointList = examViewModel.pointList,
+            modifier = Modifier.padding(innerPadding),
+            tabPage = tabPage
+        )
+    }*/
+}
+
+@Composable
+fun ExamDetailsDetailsScreenUiState(
+    exam: ExamDto,
+    navigateToEditMultipleChoiceQuestion: (String) -> Unit,
+    navigateBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    examViewModel: ExamDetailsViewModel
+){
+    val  examUiState = examViewModel.uiState//.collectAsState()
+    var tabPage by remember { mutableStateOf(Type.trueFalseQuestion) }
+    val coroutineScope = rememberCoroutineScope()
+    val backgroundColor by animateColorAsState(
+        if (tabPage == Type.trueFalseQuestion) Seashell else GreenLight,
+        label = "background color"
+    )
+
+    Scaffold(
+        topBar = {
+            SearchBar(
+                backgroundColor = backgroundColor,
+                tabPage = tabPage,
+                onTabSelected = { tabPage = it },
+                topics = examViewModel.topicList,
+                trueFalse =  examViewModel.trueFalseList,
+                multipleChoice =  examViewModel.multipleChoiceList,
+                questions = examUiState.examDetails.questionList,
+                examTopic = examUiState.examDetails.topicId,
+            ){
+                coroutineScope.launch {
+                    when (tabPage) {
+                        Type.trueFalseQuestion -> examViewModel.saveQuestion(tabPage.ordinal, it)
+                        Type.multipleChoiceQuestion -> examViewModel.saveQuestion(tabPage.ordinal, it)
+                    }
+                }
+            }
+        },
+        //containerColor = backgroundColor,
+        floatingActionButton = {
+            SmallFloatingActionButton(
+                onClick = { navigateToEditMultipleChoiceQuestion(examUiState.examDetails.id) },
+                shape = MaterialTheme.shapes.medium,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = stringResource(R.string.exam_info),
+                )
+            }
+        },
+        bottomBar = {
+            Spacer(modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium)))
+        },
+        modifier = modifier
+    ) { innerPadding ->
+        ExamDetailsBody(
+            exam = examUiState.examDetails,
+            topicList = examViewModel.topicList,
+            pointList = examViewModel.pointList,
             modifier = Modifier.padding(innerPadding),
             tabPage = tabPage
         )
@@ -202,7 +297,7 @@ fun ExamDetailsScreen(
 private fun SearchBar(
     backgroundColor: Color,
     tabPage: Type,
-    examTopic: Int,
+    examTopic: String,
     onTabSelected: (tabPage: Type) -> Unit,
     topics: List<TopicDto>,
     trueFalse: List<TrueFalseQuestionDto>,
@@ -233,13 +328,13 @@ private fun SearchBar(
         }
 
         var topicFilter by rememberSaveable { mutableStateOf("") }
-        var topicId by rememberSaveable { mutableIntStateOf(-1) }
+        var topicId by rememberSaveable { mutableStateOf("") }
         DropDownList(
             name = stringResource(R.string.topic),
             items = topics.map { it.topic },
             onChoose = { topicName ->
                 topicFilter = topicName
-                topicId = topics.filter { it.topic.contains(topicFilter) }.map { it.id }.first()
+                topicId = topics.filter { it.topic.contains(topicFilter) }.map { it.uuid }.first()
             }
         )
 
@@ -251,7 +346,7 @@ private fun SearchBar(
                     name = stringResource(R.string.question),
                     items = trueFalse
                         .filterNot{ tFQuestions.contains(it) }
-                        .filter{ it.topic == if(topicId==-1) examTopic else topicId }
+                        .filter{ it.topic == if(topicId=="") examTopic else topicId }
                         .map { it.question},
                     onChoose = { question = it }
                 )
@@ -262,7 +357,7 @@ private fun SearchBar(
                     name = stringResource(R.string.question),
                     items = multipleChoice
                         .filterNot { mCQuestions.contains(it) }
-                        .filter{ it.topic == if(topicId==-1) examTopic else topicId }
+                        .filter{ it.topic == if(topicId=="") examTopic else topicId }
                         .map { it.question },
                     onChoose = { question = it }
                 )
@@ -288,8 +383,9 @@ private fun SearchBar(
 @Composable
 private fun QuestionTabIndicator(
     tabPositions: List<TabPosition>,
-    tabPage: Type
+    tabPage: Type,
 ) {
+
     val transition = updateTransition(
         tabPage,
         label = "Tab indicator"
@@ -371,7 +467,7 @@ private fun QuestionTab(
 
 @Composable
 fun ExamDetailsBody(
-    questions: List<Question>,
+    exam: ExamDetails,
     topicList: List<TopicDto>,
     pointList: List<PointDto>,
     tabPage: Type,
@@ -380,13 +476,14 @@ fun ExamDetailsBody(
 ){
     val coroutineScope = rememberCoroutineScope()
     var deleteConfirmationRequired by rememberSaveable { mutableStateOf(false) }
-    var lazyQuestions by remember { mutableStateOf(questions) }
-    lazyQuestions = questions.toMutableList()
+    var lazyQuestions by remember { mutableStateOf(exam.questionList) }
+    lazyQuestions = exam.questionList.toMutableList()
     val state = rememberReorderableLazyListState(onMove = { from, to ->
         lazyQuestions = lazyQuestions.toMutableList().apply {
             add(to.index, removeAt(from.index))
             coroutineScope.launch {
                 examViewModel.saveQuestionOrdering(lazyQuestions)
+                examViewModel.uiState = ExamDetailsUiState(exam.copy(questionList = lazyQuestions))
             }
         }
     })
@@ -396,7 +493,7 @@ fun ExamDetailsBody(
             .reorderable(state = state)
             .detectReorderAfterLongPress(state)
     ) {
-        items(lazyQuestions, {if(it is TrueFalseQuestionDto) "${it.type}-${it.id}" else if(it is MultipleChoiceQuestionDto) "${it.type}-${it.id}" else 0}) { question ->
+        items(lazyQuestions, {if(it is TrueFalseQuestionDto) "${it.type}~${it.uuid}" else if(it is MultipleChoiceQuestionDto) "${it.type}~${it.uuid}" else 0}) { question ->
             ReorderableItem(state, key = question) { isDragging ->
                 val elevation = animateDpAsState(if (isDragging) 16.dp else 0.dp, label = "")
                 Column(
@@ -475,11 +572,11 @@ fun ExpandableQuestionItem(
                         if (expandedState) {
                             TrueFalseQuestionDetails(
                                 trueFalseQuestion = trueFalseQuestion.toTrueFalseQuestionDetails(
-                                    topicName = if (trueFalseQuestion.topic != -1)
-                                        topicList.first { it.id == trueFalseQuestion.topic }.topic
+                                    topicName = if (trueFalseQuestion.topic != "")
+                                        topicList.first { it.uuid == trueFalseQuestion.topic }.topic
                                     else "",
-                                    pointName = if (trueFalseQuestion.point != -1)
-                                        pointList.first { it.id == trueFalseQuestion.point }.type
+                                    pointName = if (trueFalseQuestion.point != "")
+                                        pointList.first { it.uuid == trueFalseQuestion.point }.type
                                     else ""
                                 ),
                                 modifier = Modifier.fillMaxWidth(),
@@ -502,11 +599,11 @@ fun ExpandableQuestionItem(
                         if (expandedState) {
                             MultipleChoiceQuestionDetails(
                                 multipleChoiceQuestion = multipleChoiceQuestion.toMultipleChoiceQuestionDetails(
-                                    topicName = if (multipleChoiceQuestion.topic != -1)
-                                        topicList.first { it.id == multipleChoiceQuestion.topic }.topic
+                                    topicName = if (multipleChoiceQuestion.topic != "")
+                                        topicList.first { it.uuid == multipleChoiceQuestion.topic }.topic
                                     else "",
-                                    pointName = if (multipleChoiceQuestion.point != -1)
-                                        pointList.first { it.id == multipleChoiceQuestion.point }.type
+                                    pointName = if (multipleChoiceQuestion.point != "")
+                                        pointList.first { it.uuid == multipleChoiceQuestion.point }.type
                                     else ""
                                 ),
                                 modifier = Modifier.fillMaxWidth(),

@@ -31,6 +31,7 @@ import hu.bme.aut.android.examapp.ui.viewmodel.exam.ExamDetails
 import hu.bme.aut.android.examapp.ui.viewmodel.exam.ExamEntryViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.exam.ExamListViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.exam.ExamUiState
+import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicListViewModel
 import kotlinx.coroutines.launch
 
 @Composable
@@ -43,9 +44,7 @@ fun NewExamScreen(
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     Scaffold(
-        topBar = {
-                Text(text = "New Exam")
-        }
+        topBar = { }
     ) { innerPadding ->
         ExamEntryBody(
             examUiState = viewModel.examUiState,
@@ -105,8 +104,10 @@ fun ExamInputForm(
     modifier: Modifier = Modifier,
     onValueChange: (ExamDetails) -> Unit = {},
     enabled: Boolean = true,
-    entryViewModel: ExamEntryViewModel = viewModel(factory = AppViewModelProvider.Factory)
-) {
+    entryViewModel: ExamEntryViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    topicListViewModel: TopicListViewModel = viewModel(factory = AppViewModelProvider.Factory),
+
+    ) {
     val coroutineScope = rememberCoroutineScope()
     Column(
         modifier = modifier,
@@ -127,7 +128,7 @@ fun ExamInputForm(
         )
         DropDownList(
             name = stringResource(R.string.exam),
-            items = entryViewModel.topicList.collectAsState(initial = listOf()).value.map { it.topic },
+            items = topicListViewModel.topicListUiState.topicList.map{it.topic}.filterNot{ it == examDetails.topicName },
             onChoose = {topic ->
                 coroutineScope.launch{
                     onValueChange(examDetails.copy(topicId = entryViewModel.getTopicIdByTopic(topic)))

@@ -6,14 +6,26 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import hu.bme.aut.android.examapp.api.ExamAppApi
+import hu.bme.aut.android.examapp.api.dto.MultipleChoiceQuestionDto
+import hu.bme.aut.android.examapp.api.dto.TrueFalseQuestionDto
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.PointRepository
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.MultipleChoiceQuestionRepository
+import hu.bme.aut.android.examapp.ui.MultipleChoiceQuestionDetailsDestination
+import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionEditScreenUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.toTrueFalseQuestion
+import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.toTrueFalseQuestionUiState
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+
+sealed interface MultipleChoiceQuestionEditScreenUiState {
+    data class Success(val question: MultipleChoiceQuestionDto) : MultipleChoiceQuestionEditScreenUiState
+    object Error : MultipleChoiceQuestionEditScreenUiState
+    object Loading : MultipleChoiceQuestionEditScreenUiState
+}
 
 class MultipleChoiceQuestionEditViewModel(
     savedStateHandle: SavedStateHandle,
@@ -29,31 +41,65 @@ class MultipleChoiceQuestionEditViewModel(
     var multipleChoiceQuestionUiState by mutableStateOf(MultipleChoiceQuestionUiState())
         private set
 
-    private val multipleChoiceQuestionId: String = checkNotNull(savedStateHandle[hu.bme.aut.android.examapp.ui.MultipleChoiceQuestionDetailsDestination.multipleChoiceQuestionIdArg.toString()])
+    private val multipleChoiceQuestionId: String = checkNotNull(savedStateHandle[MultipleChoiceQuestionDetailsDestination.multipleChoiceQuestionIdArg])
+
+    var multipleChoiceEditScreenUiState: MultipleChoiceQuestionEditScreenUiState by mutableStateOf(
+        MultipleChoiceQuestionEditScreenUiState.Loading)
 
     init {
-        viewModelScope.launch {
-            multipleChoiceQuestionUiState = multipleChoiceQuestionRepository.getMultipleChoiceQuestionById(multipleChoiceQuestionId.toInt())
-                .filterNotNull()
-                .first()
-                .toMultipleChoiceQuestionUiState(
-                    isEntryValid = true,
-                    topicName = topicRepository.getTopicById(multipleChoiceQuestionRepository.getMultipleChoiceQuestionById(multipleChoiceQuestionId.toInt()).map { it.topic }.first()).map { it.topic }.first(),
-                    pointName = pointRepository.getPointById(multipleChoiceQuestionRepository.getMultipleChoiceQuestionById(multipleChoiceQuestionId.toInt()).map{ it.point }.first()).map{ it.type }.first(),
-                    isAnswerChosen = true
-                )
-            originalQuestion = multipleChoiceQuestionUiState.multipleChoiceQuestionDetails.question
-        }
-
+        getTrueFalseQuestion(multipleChoiceQuestionId)
     }
+
+    fun getTrueFalseQuestion(topicId: String){
+        multipleChoiceEditScreenUiState = MultipleChoiceQuestionEditScreenUiState.Loading
+        viewModelScope.launch {
+            //try{
+            val result = ExamAppApi.retrofitService.getMultipleChoice(topicId)
+            multipleChoiceEditScreenUiState =  MultipleChoiceQuestionEditScreenUiState.Success(result)
+            multipleChoiceQuestionUiState = result.toMultipleChoiceQuestionUiState(isEntryValid = true,
+                topicName =
+                if (result.topic == "null") "" //TODO check this
+                else ExamAppApi.retrofitService.getTopic(result.topic).topic,
+                pointName =
+                if (result.point == "null") "" //TODO check this
+                else ExamAppApi.retrofitService.getPoint(result.point).type,
+                isAnswerChosen = true
+            )
+            originalQuestion = multipleChoiceQuestionUiState.multipleChoiceQuestionDetails.question
+            //} catch (e: IOException) {
+            //    MultipleChoiceQuestionEditScreenUiState.Error
+            //} /*catch (e: HttpException) {
+            MultipleChoiceQuestionEditScreenUiState.Error
+            //}
+        }
+    }
+
+    //init {
+    //    viewModelScope.launch {
+    //        multipleChoiceQuestionUiState = multipleChoiceQuestionRepository.getMultipleChoiceQuestionById(multipleChoiceQuestionId.toInt())
+    //            .filterNotNull()
+    //            .first()
+    //            .toMultipleChoiceQuestionUiState(
+    //                isEntryValid = true,
+    //                topicName = topicRepository.getTopicById(multipleChoiceQuestionRepository.getMultipleChoiceQuestionById(multipleChoiceQuestionId.toInt()).map { it.topic }.first()).map { it.topic }.first(),
+    //                pointName = pointRepository.getPointById(multipleChoiceQuestionRepository.getMultipleChoiceQuestionById(multipleChoiceQuestionId.toInt()).map{ it.point }.first()).map{ it.type }.first(),
+    //                isAnswerChosen = true
+    //            )
+    //        originalQuestion = multipleChoiceQuestionUiState.multipleChoiceQuestionDetails.question
+    //    }
+    //}
 
     /**
      * Update the topic in the [MultipleChoiceQuestionRepository]'s data source
      */
     suspend fun updateMultipleChoiceQuestion() : Boolean {
         return if (validateInput(multipleChoiceQuestionUiState.multipleChoiceQuestionDetails) && validateUniqueMultipleChoiceQuestion(multipleChoiceQuestionUiState.multipleChoiceQuestionDetails)) {
-            multipleChoiceQuestionUiState.multipleChoiceQuestionDetails.correctAnswersList.removeIf(String::isBlank)
-            multipleChoiceQuestionRepository.updateMultipleChoiceQuestion(multipleChoiceQuestionUiState.multipleChoiceQuestionDetails.toMultipleChoiceQuestion())
+            viewModelScope.launch {
+                multipleChoiceQuestionUiState.multipleChoiceQuestionDetails.correctAnswersList.removeIf(String::isBlank)
+                ExamAppApi.retrofitService.updateMultipleChoice(multipleChoiceQuestionUiState.multipleChoiceQuestionDetails.toMultipleChoiceQuestion())
+            }
+            //multipleChoiceQuestionUiState.multipleChoiceQuestionDetails.correctAnswersList.removeIf(String::isBlank)
+            //multipleChoiceQuestionRepository.updateMultipleChoiceQuestion(multipleChoiceQuestionUiState.multipleChoiceQuestionDetails.toMultipleChoiceQuestion())
             true
         }
         else {
@@ -74,12 +120,13 @@ class MultipleChoiceQuestionEditViewModel(
 
     private fun validateInput(uiState: MultipleChoiceQuestionDetails = multipleChoiceQuestionUiState.multipleChoiceQuestionDetails): Boolean {
         return with(uiState) {
-            question.isNotBlank() && isAnswerChosen && point!= -1 && topic != -1 && !question.contains("/")
+            question.isNotBlank() && isAnswerChosen && point!= "" && topic != "" && !question.contains("/")
         }
     }
 
     private suspend fun validateUniqueMultipleChoiceQuestion(uiState: MultipleChoiceQuestionDetails = multipleChoiceQuestionUiState.multipleChoiceQuestionDetails): Boolean {
-        return !multipleChoiceQuestionRepository.getAllMultipleChoiceQuestionQuestion().filterNotNull().first().contains(uiState.question) || originalQuestion == uiState.question
+        return !ExamAppApi.retrofitService.getAllMultipleChoiceName().map{it.name}.contains(uiState.question) || originalQuestion == uiState.question
+        //return !multipleChoiceQuestionRepository.getAllMultipleChoiceQuestionQuestion().filterNotNull().first().contains(uiState.question) || originalQuestion == uiState.question
     }
 }
 

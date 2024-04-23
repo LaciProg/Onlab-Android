@@ -6,10 +6,18 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import hu.bme.aut.android.examapp.api.ExamAppApi
+import hu.bme.aut.android.examapp.api.dto.PointDto
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.PointRepository
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+
+sealed interface PointEditScreenUiState {
+    data class Success(val point: PointDto) : PointEditScreenUiState
+    object Error : PointEditScreenUiState
+    object Loading : PointEditScreenUiState
+}
 
 class PointEditViewModel(
     savedStateHandle: SavedStateHandle,
@@ -19,23 +27,49 @@ class PointEditViewModel(
     var pointUiState by mutableStateOf(PointUiState())
         private set
 
-    private val pointId: String = checkNotNull(savedStateHandle[hu.bme.aut.android.examapp.ui.PointDetailsDestination.pointIdArg.toString()])
+    private val pointId: String = checkNotNull(savedStateHandle[hu.bme.aut.android.examapp.ui.PointDetailsDestination.pointIdArg])
 
     private lateinit var originalPoint: String
 
+    var pointEditScreenUiState: PointEditScreenUiState by mutableStateOf(PointEditScreenUiState.Loading)
+
+
     init {
+        //viewModelScope.launch {
+        //    pointUiState = pointRepository.getPointById(pointId.toInt())
+        //        .filterNotNull()
+        //        .first()
+        //        .toPointUiState(true)
+        //    originalPoint = pointUiState.pointDetails.type
+        //}
+    }
+
+    init {
+        getPoint(pointId)
+    }
+
+    fun getPoint(pointId: String){
+        pointEditScreenUiState = PointEditScreenUiState.Loading
         viewModelScope.launch {
-            pointUiState = pointRepository.getPointById(pointId.toInt())
-                .filterNotNull()
-                .first()
-                .toPointUiState(true)
+            //try{
+            val result = ExamAppApi.retrofitService.getPoint(pointId)
+            pointEditScreenUiState =  PointEditScreenUiState.Success(result)
+            pointUiState = result.toPointUiState(true)
             originalPoint = pointUiState.pointDetails.type
+            //} catch (e: IOException) {
+            //    PointDetailsScreenUiState.Error
+            //} /*catch (e: HttpException) {
+            PointEditScreenUiState.Error
+            //}
         }
     }
 
     suspend fun updatePoint() : Boolean{
-        return if (validateInput(pointUiState.pointDetails) && validateUniqueTopic(pointUiState.pointDetails)) {
-            pointRepository.updatePoint(pointUiState.pointDetails.toPoint())
+        return if (validateInput(pointUiState.pointDetails) && validateUniquePoint(pointUiState.pointDetails)) {
+            viewModelScope.launch {
+                ExamAppApi.retrofitService.updatePoint(pointUiState.pointDetails.toPoint())
+            }
+            //pointRepository.updatePoint(pointUiState.pointDetails.toPoint())
             true
         }
         else{
@@ -56,7 +90,7 @@ class PointEditViewModel(
         }
     }
 
-    private suspend fun validateUniqueTopic(uiState: PointDetails = pointUiState.pointDetails): Boolean {
+    private suspend fun validateUniquePoint(uiState: PointDetails = pointUiState.pointDetails): Boolean {
         return !pointRepository.getAllPointType().filterNotNull().first().contains(uiState.type) || originalPoint == uiState.type
     }
 }

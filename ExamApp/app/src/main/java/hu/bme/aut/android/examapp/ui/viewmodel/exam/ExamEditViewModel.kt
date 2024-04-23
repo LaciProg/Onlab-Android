@@ -6,14 +6,27 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import hu.bme.aut.android.examapp.api.ExamAppApi
+import hu.bme.aut.android.examapp.api.dto.ExamDto
+import hu.bme.aut.android.examapp.api.dto.MultipleChoiceQuestionDto
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.ExamRepository
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.MultipleChoiceQuestionRepository
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TrueFalseQuestionRepository
+import hu.bme.aut.android.examapp.ui.ExamDetailsDestination
+import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionEditScreenUiState
+import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.toMultipleChoiceQuestionUiState
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+
+sealed interface ExamEditScreenUiState {
+    data class Success(val question: ExamDto) : ExamEditScreenUiState
+    object Error : ExamEditScreenUiState
+    object Loading : ExamEditScreenUiState
+}
+
 
 class ExamEditViewModel(
     savedStateHandle: SavedStateHandle,
@@ -30,32 +43,60 @@ class ExamEditViewModel(
     var examUiState by mutableStateOf(ExamUiState())
         private set
 
-    private val examId: String = checkNotNull(savedStateHandle[hu.bme.aut.android.examapp.ui.ExamDetailsDestination.examIdArg.toString()])
+    private val examId: String = checkNotNull(savedStateHandle[ExamDetailsDestination.examIdArg])
+
+    var examEditScreenUiState: ExamEditScreenUiState by mutableStateOf(
+        ExamEditScreenUiState.Loading)
 
     init {
-        viewModelScope.launch {
-            examUiState = examRepository.getExamById(examId.toInt())
-                .filterNotNull()
-                .first()
-                .toExamUiState(true,
-                    topicName = topicRepository.getTopicById(
-                        examRepository.getExamById(examId.toInt()).map { it.topicId }.first())
-                        .map{it.topic}.first(),
-                    questionList = examRepository.getExamById(examId.toInt()).map { it.questionList }.first(),
-                    trueFalseQuestionRepository = trueFalseQuestionRepository,
-                    multipleChoiceQuestionRepository = multipleChoiceQuestionRepository
-                )
-            originalExam = examUiState.examDetails.name
-        }
-
+        getExam(examId)
     }
+
+    fun getExam(topicId: String){
+        examEditScreenUiState = ExamEditScreenUiState.Loading
+        viewModelScope.launch {
+            //try{
+            val result = ExamAppApi.retrofitService.getExam(topicId)
+            examEditScreenUiState =  ExamEditScreenUiState.Success(result)
+            examUiState = result.toExamUiState(isEntryValid = true,
+                topicName =
+                if (result.topicId == "null") "" //TODO check this
+                else ExamAppApi.retrofitService.getTopic(result.topicId).topic,
+                questionList = result.questionList,
+            )
+            originalExam = examUiState.examDetails.name
+            //} catch (e: IOException) {
+            //    ExamEditScreenUiState.Error
+            //} /*catch (e: HttpException) {
+            ExamEditScreenUiState.Error
+            //}
+        }
+    }
+
+    //init {
+    //    viewModelScope.launch {
+    //        examUiState = examRepository.getExamById(examId.toInt())
+    //            .filterNotNull()
+    //            .first()
+    //            .toExamUiState(true,
+    //                topicName = topicRepository.getTopicById(
+    //                    examRepository.getExamById(examId.toInt()).map { it.topicId }.first())
+    //                    .map{it.topic}.first(),
+    //                questionList = examRepository.getExamById(examId.toInt()).map { it.questionList }.first(),
+    //                trueFalseQuestionRepository = trueFalseQuestionRepository,
+    //                multipleChoiceQuestionRepository = multipleChoiceQuestionRepository
+    //            )
+    //        originalExam = examUiState.examDetails.name
+    //    }
+    //}
 
     /**
      * Update the exam in the [ExamRepository]'s data source
      */
     suspend fun updateExam() : Boolean{
         return if (validateInput(examUiState.examDetails) && validateUniqueExam(examUiState.examDetails)) {
-            examRepository.updateExam(examUiState.examDetails.toExam())
+            ExamAppApi.retrofitService.updateExam(examUiState.examDetails.toExam())
+            //examRepository.updateExam(examUiState.examDetails.toExam())
             true
         }
         else {
@@ -75,7 +116,7 @@ class ExamEditViewModel(
 
     private fun validateInput(uiState: ExamDetails = examUiState.examDetails): Boolean {
         return with(uiState) {
-            name.isNotBlank() && topicId != -1
+            name.isNotBlank() && topicId != ""
         }
     }
 

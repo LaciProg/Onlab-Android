@@ -43,9 +43,7 @@ fun NewTopic(
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     Scaffold(
-        topBar = {
-                Text(text = "New topic")
-        }
+        topBar = {  }
     ) { innerPadding ->
         TopicEntryBody(
             topicUiState = viewModel.topicUiState,
@@ -143,7 +141,7 @@ fun TopicInputForm(
         )
         DropDownList(
             name = stringResource(R.string.topic),
-            items = listViewModel.topicListUiState.collectAsState().value.topicList.map { it.topic } .filterNot{ it == topicDetails.topic },
+            items = listViewModel.topicListUiState.topicList.map { it.topic } .filterNot{ it == topicDetails.topic },
             onChoose = {parent ->
                 coroutineScope.launch{
                     Log.d("NewTopicScreen", "parent: $parent")

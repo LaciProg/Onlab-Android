@@ -6,11 +6,23 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import hu.bme.aut.android.examapp.api.ExamAppApi
+import hu.bme.aut.android.examapp.api.dto.PointDto
+import hu.bme.aut.android.examapp.api.dto.TopicDto
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
+import hu.bme.aut.android.examapp.ui.TopicDetailsDestination
+import hu.bme.aut.android.examapp.ui.viewmodel.point.PointEditScreenUiState
+import hu.bme.aut.android.examapp.ui.viewmodel.point.toPointUiState
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+
+sealed interface TopicEditScreenUiState {
+    data class Success(val topic: TopicDto) : TopicEditScreenUiState
+    object Error : TopicEditScreenUiState
+    object Loading : TopicEditScreenUiState
+}
 
 class TopicEditViewModel(
     savedStateHandle: SavedStateHandle,
@@ -18,29 +30,53 @@ class TopicEditViewModel(
 ) : ViewModel() {
 
     private lateinit var originalTopic: String
-    /**
-     * Holds current topic ui state
-     */
+
     var topicUiState by mutableStateOf(TopicUiState())
         private set
 
-    private val topicId: String = checkNotNull(savedStateHandle[hu.bme.aut.android.examapp.ui.TopicDetailsDestination.topicIdArg.toString()])
+    private val topicId: String = checkNotNull(savedStateHandle[TopicDetailsDestination.topicIdArg])
+
+    var topicEditScreenUiState: TopicEditScreenUiState by mutableStateOf(TopicEditScreenUiState.Loading)
+
+    //init {
+    //    viewModelScope.launch {
+    //        topicUiState = topicRepository.getTopicById(topicId.toInt())
+    //            .filterNotNull()
+    //            .first()
+    //            .toTopicUiState(true,
+    //                parentName =
+    //                if (topicRepository.getTopicById(topicId.toInt()).map { it.parentTopic }.first() == -1) ""
+    //                else
+    //                topicRepository.getTopicById(
+    //                    topicRepository.getTopicById(topicId.toInt()).map { it.parentTopic }.first())
+    //                    .map{it.topic}.first())
+    //        originalTopic = topicUiState.topicDetails.topic
+    //    }
+    //}
 
     init {
-        viewModelScope.launch {
-            topicUiState = topicRepository.getTopicById(topicId.toInt())
-                .filterNotNull()
-                .first()
-                .toTopicUiState(true,
-                    parentName =
-                    if (topicRepository.getTopicById(topicId.toInt()).map { it.parentTopic }.first() == -1) ""
-                    else
-                    topicRepository.getTopicById(
-                        topicRepository.getTopicById(topicId.toInt()).map { it.parentTopic }.first())
-                        .map{it.topic}.first())
-            originalTopic = topicUiState.topicDetails.topic
-        }
+        getTopic(topicId)
+    }
 
+    fun getTopic(topicId: String){
+        topicEditScreenUiState = TopicEditScreenUiState.Loading
+        viewModelScope.launch {
+            //try{
+            val result = ExamAppApi.retrofitService.getTopic(topicId)
+            topicEditScreenUiState =  TopicEditScreenUiState.Success(result)
+            topicUiState = result.toTopicUiState(true,
+                parentName =
+                if (result.parentTopic == "null") "" //TODO check this
+                else
+                    ExamAppApi.retrofitService.getTopic(result.parentTopic).topic
+            )
+            originalTopic = topicUiState.topicDetails.topic
+            //} catch (e: IOException) {
+            //    TopicEditScreenUiState.Error
+            //} /*catch (e: HttpException) {
+            TopicEditScreenUiState.Error
+            //}
+        }
     }
 
     /**
@@ -48,7 +84,13 @@ class TopicEditViewModel(
      */
     suspend fun updateTopic() : Boolean{
         return if (validateInput(topicUiState.topicDetails) && validateUniqueTopic(topicUiState.topicDetails)) {
-            topicRepository.updateTopic(topicUiState.topicDetails.toTopic())
+            viewModelScope.launch {
+                ExamAppApi.retrofitService.updateTopic(topicUiState.topicDetails.toTopic())
+                //topicDetailsScreenEffected = true
+                //topicListScreenEffected = topicUiState.topicDetails.topic != originalTopic
+            }
+            //ExamAppApi.retrofitService.updateTopic(topicUiState.topicDetails.toTopic())
+            //topicRepository.updateTopic(topicUiState.topicDetails.toTopic())
             true
         }
         else {
@@ -73,7 +115,8 @@ class TopicEditViewModel(
     }
 
     private suspend fun validateUniqueTopic(uiState: TopicDetails = topicUiState.topicDetails): Boolean {
-        return !topicRepository.getAllTopicName().filterNotNull().first().contains(uiState.topic) || originalTopic == uiState.topic
+        return !ExamAppApi.retrofitService.getAllTopicName().map{it.name}.contains(uiState.topic) || originalTopic == uiState.topic
+        //return !topicRepository.getAllTopicName().filterNotNull().first().contains(uiState.topic) || originalTopic == uiState.topic
     }
 }
 

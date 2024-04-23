@@ -53,9 +53,7 @@ fun NewMultipleChoiceQuestionScreen(
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     Scaffold(
-        topBar = {
-                Text(text = "New true-false question")
-        }
+        topBar = {}
     ) { innerPadding ->
         MultipleChoiceQuestionEntryBody(
             multipleChoiceQuestionUiState = viewModel.multipleChoiceQuestionUiState,
@@ -91,7 +89,7 @@ fun MultipleChoiceQuestionEntryBody(
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
-        modifier = modifier.padding(dimensionResource(id = R.dimen.padding_medium))
+        modifier = modifier.verticalScroll(rememberScrollState()).padding(dimensionResource(id = R.dimen.padding_medium))
     ) {
         MultipleChoiceQuestionInputForm(
             multipleChoiceQuestionDetails = multipleChoiceQuestionUiState.multipleChoiceQuestionDetails,
@@ -124,15 +122,15 @@ fun MultipleChoiceQuestionInputForm(
     ) {
         DropDownList(
             name = stringResource(R.string.topic_name_req),
-            items = topicListViewModel.topicListUiState.collectAsState().value.topicList.map{it.topic}.filterNot{ it == multipleChoiceQuestionDetails.topicName },
-            onChoose = { topicName -> onValueChange(multipleChoiceQuestionDetails.copy(topicName = topicName, topic = if(topicName.isNotBlank()) topicListViewModel.topicListUiState.value.topicList.filter { it.topic == topicName }.map{it.id}.first() else -1)) },
+            items = topicListViewModel.topicListUiState.topicList.map{it.topic}.filterNot{ it == multipleChoiceQuestionDetails.topicName },
+            onChoose = { topicName -> onValueChange(multipleChoiceQuestionDetails.copy(topicName = topicName, topic = if(topicName.isNotBlank()) topicListViewModel.topicListUiState.topicList.filter { it.topic == topicName }.map{it.id}.first() else "")) },
             default = multipleChoiceQuestionDetails.topicName,
             modifier = Modifier.fillMaxWidth(),
         )
         DropDownList(
             name = stringResource(R.string.point_req),
-            items = pointListViewModel.pointListUiState.collectAsState().value.pointList.map{it.point}.filterNot{ it == multipleChoiceQuestionDetails.pointName },
-            onChoose = { pointName -> onValueChange(multipleChoiceQuestionDetails.copy(pointName = pointName, point = if(pointName.isNotBlank()) pointListViewModel.pointListUiState.value.pointList.filter { it.point ==  pointName}.map{it.id}.first() else -1)) },
+            items = pointListViewModel.pointListUiState.pointList.map{it.point}.filterNot{ it == multipleChoiceQuestionDetails.pointName },
+            onChoose = { pointName -> onValueChange(multipleChoiceQuestionDetails.copy(pointName = pointName, point = if(pointName.isNotBlank()) pointListViewModel.pointListUiState.pointList.filter { it.point ==  pointName}.map{it.id}.first() else "")) },
             default = multipleChoiceQuestionDetails.pointName,
             modifier = Modifier.fillMaxWidth(),
         )

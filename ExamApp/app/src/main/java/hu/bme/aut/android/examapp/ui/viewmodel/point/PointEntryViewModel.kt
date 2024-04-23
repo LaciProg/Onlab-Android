@@ -4,10 +4,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import hu.bme.aut.android.examapp.api.ExamAppApi
+import hu.bme.aut.android.examapp.api.dto.PointDto
+
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.PointRepository
-import hu.bme.aut.android.examapp.data.room.dto.PointDto
+//import hu.bme.aut.android.examapp.data.room.dto.PointDto
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 class PointEntryViewModel(private val pointRepository: PointRepository) : ViewModel(){
 
@@ -21,7 +26,10 @@ class PointEntryViewModel(private val pointRepository: PointRepository) : ViewMo
 
     suspend fun savePoint() : Boolean {
         return if (validateInput() && validateUniqueTopic()) {
-            pointRepository.insertPoint(pointUiState.pointDetails.toPoint())
+            viewModelScope.launch {
+                ExamAppApi.retrofitService.postPoint(pointUiState.pointDetails.toPoint())
+            }
+            //pointRepository.insertPoint(pointUiState.pointDetails.toPoint())
             true
         }
         else{
@@ -32,12 +40,13 @@ class PointEntryViewModel(private val pointRepository: PointRepository) : ViewMo
 
     private fun validateInput(uiState: PointDetails = pointUiState.pointDetails): Boolean {
         return with(uiState) {
-            type.isNotBlank() && point.isNotBlank() && goodAnswer.isNotBlank() && badAnswer.isNotBlank() && !type.contains("/")
+            type.isNotBlank() && point.isNotBlank() && goodAnswer.isNotBlank() && badAnswer.isNotBlank()
         }
     }
 
     private suspend fun validateUniqueTopic(uiState: PointDetails = pointUiState.pointDetails): Boolean {
-        return !pointRepository.getAllPointType().filterNotNull().first().contains(uiState.type)
+        return !ExamAppApi.retrofitService.getAllPointName().map{it.name}.contains(uiState.type)
+        //return !pointRepository.getAllPointType().filterNotNull().first().contains(uiState.type)
     }
 
 }
@@ -48,7 +57,7 @@ data class PointUiState(
 )
 
 data class PointDetails(
-    val id: Int = 0,
+    val id: String = "",
     val point: String = "0",
     val type: String = "",
     val goodAnswer: String = "0",
@@ -56,7 +65,7 @@ data class PointDetails(
 )
 
 fun PointDetails.toPoint(): PointDto = PointDto(
-    id = id,
+    uuid = id,
     point = point.toDouble(),
     type = type,
     goodAnswer = goodAnswer.toDouble(),
@@ -69,7 +78,7 @@ fun PointDto.toPointUiState(isEntryValid: Boolean = false): PointUiState = Point
 )
 
 fun PointDto.toPointDetails(): PointDetails = PointDetails(
-    id = id,
+    id = uuid,
     point = point.toString(),
     type = type,
     goodAnswer = goodAnswer.toString(),

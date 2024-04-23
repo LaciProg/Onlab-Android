@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
 <!-- internalba open file input/output-->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:name=".ExamApplication"
@@ -17,6 +17,7 @@
         android:enableOnBackInvokedCallback="true"
         android:supportsRtl="true"
         android:theme="@style/Theme.ExamApp"
+        android:usesCleartextTraffic="true"
         tools:targetApi="tiramisu">
         <activity
             android:name=".MainActivity"

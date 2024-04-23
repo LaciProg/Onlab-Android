@@ -16,6 +16,7 @@
 
 package hu.bme.aut.android.examapp.ui.topic
 
+import android.util.Log
 import hu.bme.aut.android.examapp.R
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
@@ -31,6 +32,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -40,6 +42,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,8 +54,14 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.viewmodel.compose.viewModel
+import hu.bme.aut.android.examapp.api.dto.PointDto
+import hu.bme.aut.android.examapp.api.dto.TopicDto
 import hu.bme.aut.android.examapp.ui.AppViewModelProvider
+import hu.bme.aut.android.examapp.ui.point.PointDetailsResultScreen
+import hu.bme.aut.android.examapp.ui.viewmodel.point.PointDetailsScreenUiState
+import hu.bme.aut.android.examapp.ui.viewmodel.point.PointDetailsViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicDetails
+import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicDetailsScreenUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicDetailsUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicDetailsViewModel
 import kotlinx.coroutines.launch
@@ -60,11 +69,28 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopicDetailsScreen(
-    navigateToEditTopic: (Int) -> Unit,
+    navigateToEditTopic: (String) -> Unit,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TopicDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+    when(viewModel.topicDetailsScreenUiState){
+        is TopicDetailsScreenUiState.Loading -> CircularProgressIndicator()
+        is TopicDetailsScreenUiState.Success -> TopicDetailsScreenUiState(
+            topic =  (viewModel.topicDetailsScreenUiState as TopicDetailsScreenUiState.Success).point,
+            navigateToEditPoint = navigateToEditTopic,
+            navigateBack = navigateBack,
+            modifier = modifier,
+            viewModel = viewModel
+        )
+        is TopicDetailsScreenUiState.Error -> Text(text = "Error...")
+    }
+
+    LaunchedEffect(key1 = Unit){
+        viewModel.getTopic(viewModel.topicId)
+    }
+
+    /*
     val uiState = viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     Scaffold(
@@ -86,6 +112,53 @@ fun TopicDetailsScreen(
     ) { innerPadding ->
         TopicDetailsBody(
             topicDetailsUiState = uiState.value,
+            onDelete = {
+                // Note: If the user rotates the screen very fast, the operation may get cancelled
+                // and the item may not be deleted from the Database. This is because when config
+                // change occurs, the Activity will be recreated and the rememberCoroutineScope will
+                // be cancelled - since the scope is bound to composition.
+                coroutineScope.launch {
+                    viewModel.deleteTopic()
+                    navigateBack()
+                }
+            },
+            modifier = Modifier
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
+        )
+    }
+    */
+
+}
+
+@Composable
+fun TopicDetailsScreenUiState(
+    topic: TopicDto,
+    navigateToEditPoint: (String) -> Unit,
+    navigateBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: TopicDetailsViewModel
+){
+    //val uiState = viewModel.uiState.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
+    Scaffold(
+        topBar = {},
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { navigateToEditPoint(topic.uuid) },
+                shape = MaterialTheme.shapes.medium,
+                modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large))
+
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = stringResource(R.string.edit_topic),
+                )
+            }
+        }, modifier = modifier
+    ) { innerPadding ->
+        TopicDetailsBody(
+            topicDetailsUiState = viewModel.uiState,
             onDelete = {
                 // Note: If the user rotates the screen very fast, the operation may get cancelled
                 // and the item may not be deleted from the Database. This is because when config
@@ -177,7 +250,7 @@ fun TopicDetails(
             )
             TopicDetailsRow(
                 labelResID = R.string.parent_topic,
-                topicDetail = if(topic.parent == -1) stringResource(R.string.no_parent) else topic.parentTopicName /* viewModel.getTopicById(topic.parentTopic)*/,
+                topicDetail = if(topic.parent == "null") stringResource(R.string.no_parent) else topic.parentTopicName /* viewModel.getTopicById(topic.parentTopic)*/,
                 modifier = Modifier.padding(
                     horizontal = dimensionResource(
                         id = R.dimen

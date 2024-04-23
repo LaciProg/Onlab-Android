@@ -47,10 +47,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import hu.bme.aut.android.examapp.R
-import hu.bme.aut.android.examapp.data.room.dto.MultipleChoiceQuestionDto
-import hu.bme.aut.android.examapp.data.room.dto.PointDto
-import hu.bme.aut.android.examapp.data.room.dto.Question
-import hu.bme.aut.android.examapp.data.room.dto.TrueFalseQuestionDto
+import hu.bme.aut.android.examapp.api.dto.MultipleChoiceQuestionDto
+import hu.bme.aut.android.examapp.api.dto.PointDto
+import hu.bme.aut.android.examapp.api.dto.Question
+import hu.bme.aut.android.examapp.api.dto.TrueFalseQuestionDto
+//import hu.bme.aut.android.examapp.data.room.dto.MultipleChoiceQuestionDto
+//import hu.bme.aut.android.examapp.data.room.dto.PointDto
+//import hu.bme.aut.android.examapp.data.room.dto.Question
+//import hu.bme.aut.android.examapp.data.room.dto.TrueFalseQuestionDto
 import hu.bme.aut.android.examapp.pdf.PDFExamView
 import hu.bme.aut.android.examapp.ui.AppViewModelProvider
 import hu.bme.aut.android.examapp.ui.components.ExportedMultipleChoiceQuestion
@@ -71,13 +75,13 @@ fun ExportExamDetailsScreen(
     modifier: Modifier = Modifier,
     examViewModel: ExamDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
-    val  examUiState = examViewModel.uiState.collectAsState()
-    val pointList = examViewModel.pointList.collectAsState().value
+    val  examUiState = examViewModel.uiState
+    val pointList = examViewModel.pointList
     //var jetCaptureView: MutableState<PDFExamView>? = null
     Scaffold(
         topBar = {
             TopBar(
-                examName = examUiState.value.examDetails.name,
+                examName = examUiState.examDetails.name,
                 modifier = modifier
             )
         },
@@ -100,8 +104,8 @@ fun ExportExamDetailsScreen(
     ) { padding ->
 
         ExportExamDetailsBodyView(
-            examName = examUiState.value.examDetails.name,
-            questions =  examUiState.value.examDetails.questionList,
+            examName = examUiState.examDetails.name,
+            questions =  examUiState.examDetails.questionList,
             pointList = pointList,
             modifier = modifier.padding(padding)
         )
@@ -185,15 +189,15 @@ fun ExportExamDetailsBody(
                         ExportedTrueFalseQuestion(
                             number = index + 1,
                             question = question.question,
-                            point = pointList.find { it.id == question.topic }?.point ?: 0.0
+                            point = pointList.find { it.uuid == question.topic }?.point ?: 0.0
                         )
                     }
                     is MultipleChoiceQuestionDto -> {
                         ExportedMultipleChoiceQuestion(
                             number = index + 1,
                             question = question.question,
-                            point = pointList.find { it.id == question.topic }?.point ?: 0.0,
-                            answers = question.answers.split("¤"),
+                            point = pointList.find { it.uuid == question.topic }?.point ?: 0.0,
+                            answers = question.answers,
                         )
                     }
                     else -> throw IllegalArgumentException("Invalid type")
@@ -286,11 +290,11 @@ private fun getExamPointList (
     for (question in questions) {
         when (question) {
             is TrueFalseQuestionDto -> {
-                points.add(pointList.find { it.id == question.topic }?.point ?: 0.0)
+                points.add(pointList.find { it.uuid == question.topic }?.point ?: 0.0)
             }
 
             is MultipleChoiceQuestionDto -> {
-                points.add(pointList.find { it.id == question.topic }?.point ?: 0.0)
+                points.add(pointList.find { it.uuid == question.topic }?.point ?: 0.0)
             }
 
             else -> throw IllegalArgumentException("Invalid type")

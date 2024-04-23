@@ -15,6 +15,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -39,9 +40,7 @@ fun NewPoint(
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     Scaffold(
-        topBar = {
-                Text(text = "New point")
-        }
+        topBar = {}
     ) { innerPadding ->
         PointEntryBody(
             pointUiState = viewModel.pointUiState,
@@ -73,6 +72,7 @@ fun PointEntryBody(
     onSaveClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    onPointValueChange(pointUiState.pointDetails)
     Column(
         verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
         modifier = modifier.padding(dimensionResource(id = R.dimen.padding_medium))
