@@ -31,7 +31,7 @@ class ExamEntryViewModel(
     var examUiState by mutableStateOf(ExamUiState())
         private set
 
-    var examEntryScreenUiState: ExamEntryScreenUiState by mutableStateOf(ExamEntryScreenUiState.Loading)
+    var examEntryScreenUiState: ExamEntryScreenUiState by mutableStateOf(ExamEntryScreenUiState.Success)
 
     fun updateUiState(examDetails: ExamDetails) {
         examUiState =

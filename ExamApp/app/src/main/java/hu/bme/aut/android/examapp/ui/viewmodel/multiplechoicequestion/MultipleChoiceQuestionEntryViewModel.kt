@@ -24,7 +24,7 @@ class MultipleChoiceQuestionEntryViewModel(private val multipleChoiceQuestionRep
     var multipleChoiceQuestionUiState by mutableStateOf(MultipleChoiceQuestionUiState())
         private set
 
-    var multipleChoiceQuestionScreenUiState: MultipleChoiceQuestionEntryScreenUiState by mutableStateOf(MultipleChoiceQuestionEntryScreenUiState.Loading)
+    var multipleChoiceQuestionScreenUiState: MultipleChoiceQuestionEntryScreenUiState by mutableStateOf(MultipleChoiceQuestionEntryScreenUiState.Success)
 
     fun updateUiState(multipleChoiceQuestionDetails: MultipleChoiceQuestionDetails) {
         multipleChoiceQuestionUiState =

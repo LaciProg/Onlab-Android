@@ -24,7 +24,7 @@ class TrueFalseQuestionEntryViewModel(private val trueFalseQuestionRepository: T
     var trueFalseQuestionUiState by mutableStateOf(TrueFalseQuestionUiState())
         private set
 
-    var trueFalseEntryScreenUiState: TrueFalseQuestionEntryScreenUiState by mutableStateOf(TrueFalseQuestionEntryScreenUiState.Loading)
+    var trueFalseEntryScreenUiState: TrueFalseQuestionEntryScreenUiState by mutableStateOf(TrueFalseQuestionEntryScreenUiState.Success)
 
     fun updateUiState(trueFalseQuestionDetails: TrueFalseQuestionDetails) {
         trueFalseQuestionUiState =

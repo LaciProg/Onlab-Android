@@ -23,7 +23,7 @@ class PointEntryViewModel(private val pointRepository: PointRepository) : ViewMo
     var pointUiState by mutableStateOf(PointUiState())
         private set
 
-    var pointScreenUiState: PointEntryScreenUiState by mutableStateOf(PointEntryScreenUiState.Loading)
+    var pointScreenUiState: PointEntryScreenUiState by mutableStateOf(PointEntryScreenUiState.Success)
 
     fun updateUiState(pointDetails: PointDetails) {
         pointUiState =

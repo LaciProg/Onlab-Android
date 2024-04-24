@@ -23,7 +23,7 @@ class TopicEntryViewModel(private val topicRepository: TopicRepository) : ViewMo
     var topicUiState by mutableStateOf(TopicUiState())
         private set
 
-    var topicScreenUiState: TopicEntryScreenUiState by mutableStateOf(TopicEntryScreenUiState.Loading)
+    var topicScreenUiState: TopicEntryScreenUiState by mutableStateOf(TopicEntryScreenUiState.Success)
 
     fun updateUiState(topicDetails: TopicDetails) {
         topicUiState =
