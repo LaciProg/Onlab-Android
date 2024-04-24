@@ -16,14 +16,16 @@ import hu.bme.aut.android.examapp.ui.MultipleChoiceQuestionDetailsDestination
 import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionEditScreenUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.toTrueFalseQuestion
 import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.toTrueFalseQuestionUiState
+import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
 sealed interface MultipleChoiceQuestionEditScreenUiState {
     data class Success(val question: MultipleChoiceQuestionDto) : MultipleChoiceQuestionEditScreenUiState
-    object Error : MultipleChoiceQuestionEditScreenUiState
+    object Error : MultipleChoiceQuestionEditScreenUiState{var errorMessage: String = ""}
     object Loading : MultipleChoiceQuestionEditScreenUiState
 }
 
@@ -53,24 +55,31 @@ class MultipleChoiceQuestionEditViewModel(
     fun getTrueFalseQuestion(topicId: String){
         multipleChoiceEditScreenUiState = MultipleChoiceQuestionEditScreenUiState.Loading
         viewModelScope.launch {
-            //try{
-            val result = ExamAppApi.retrofitService.getMultipleChoice(topicId)
-            multipleChoiceEditScreenUiState =  MultipleChoiceQuestionEditScreenUiState.Success(result)
-            multipleChoiceQuestionUiState = result.toMultipleChoiceQuestionUiState(isEntryValid = true,
-                topicName =
-                if (result.topic == "null") "" //TODO check this
-                else ExamAppApi.retrofitService.getTopic(result.topic).topic,
-                pointName =
-                if (result.point == "null") "" //TODO check this
-                else ExamAppApi.retrofitService.getPoint(result.point).type,
-                isAnswerChosen = true
-            )
-            originalQuestion = multipleChoiceQuestionUiState.multipleChoiceQuestionDetails.question
-            //} catch (e: IOException) {
-            //    MultipleChoiceQuestionEditScreenUiState.Error
-            //} /*catch (e: HttpException) {
-            MultipleChoiceQuestionEditScreenUiState.Error
-            //}
+            multipleChoiceEditScreenUiState = try{
+                val result = ExamAppApi.retrofitService.getMultipleChoice(topicId)
+                multipleChoiceQuestionUiState = result.toMultipleChoiceQuestionUiState(isEntryValid = true,
+                    topicName =
+                    if (result.topic == "null") ""
+                    else ExamAppApi.retrofitService.getTopic(result.topic).topic,
+                    pointName =
+                    if (result.point == "null") ""
+                    else ExamAppApi.retrofitService.getPoint(result.point).type,
+                    isAnswerChosen = true
+                )
+                originalQuestion = multipleChoiceQuestionUiState.multipleChoiceQuestionDetails.question
+                MultipleChoiceQuestionEditScreenUiState.Success(result)
+            } catch (e: IOException) {
+                MultipleChoiceQuestionEditScreenUiState.Error
+            } catch (e: HttpException) {
+                when(e.code()){
+                    400 -> MultipleChoiceQuestionEditScreenUiState.Error.errorMessage = "Bad request"
+                    401 -> MultipleChoiceQuestionEditScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                    404 -> MultipleChoiceQuestionEditScreenUiState.Error.errorMessage = "Content not found"
+                    500 -> MultipleChoiceQuestionEditScreenUiState.Error.errorMessage = "Server error"
+                    else -> MultipleChoiceQuestionEditScreenUiState.Error
+                }
+                MultipleChoiceQuestionEditScreenUiState.Error
+            }
         }
     }
 

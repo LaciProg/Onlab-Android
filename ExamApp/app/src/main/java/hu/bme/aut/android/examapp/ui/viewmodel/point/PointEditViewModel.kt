@@ -9,13 +9,15 @@ import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.PointDto
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.PointRepository
+import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
 sealed interface PointEditScreenUiState {
     data class Success(val point: PointDto) : PointEditScreenUiState
-    object Error : PointEditScreenUiState
+    object Error : PointEditScreenUiState{var errorMessage: String = ""}
     object Loading : PointEditScreenUiState
 }
 
@@ -51,16 +53,23 @@ class PointEditViewModel(
     fun getPoint(pointId: String){
         pointEditScreenUiState = PointEditScreenUiState.Loading
         viewModelScope.launch {
-            //try{
-            val result = ExamAppApi.retrofitService.getPoint(pointId)
-            pointEditScreenUiState =  PointEditScreenUiState.Success(result)
-            pointUiState = result.toPointUiState(true)
-            originalPoint = pointUiState.pointDetails.type
-            //} catch (e: IOException) {
-            //    PointDetailsScreenUiState.Error
-            //} /*catch (e: HttpException) {
-            PointEditScreenUiState.Error
-            //}
+            pointEditScreenUiState = try{
+                val result = ExamAppApi.retrofitService.getPoint(pointId)
+                pointUiState = result.toPointUiState(true)
+                originalPoint = pointUiState.pointDetails.type
+                PointEditScreenUiState.Success(result)
+            } catch (e: IOException) {
+                PointEditScreenUiState.Error
+            } catch (e: HttpException) {
+                when(e.code()){
+                    400 -> PointEditScreenUiState.Error.errorMessage = "Bad request"
+                    401 -> PointEditScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                    404 -> PointEditScreenUiState.Error.errorMessage = "Content not found"
+                    500 -> PointEditScreenUiState.Error.errorMessage = "Server error"
+                    else -> PointEditScreenUiState.Error
+                }
+                PointEditScreenUiState.Error
+            }
         }
     }
 

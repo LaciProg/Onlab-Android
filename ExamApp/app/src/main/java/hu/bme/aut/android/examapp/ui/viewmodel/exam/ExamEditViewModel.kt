@@ -20,10 +20,12 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
 
 sealed interface ExamEditScreenUiState {
     data class Success(val question: ExamDto) : ExamEditScreenUiState
-    object Error : ExamEditScreenUiState
+    object Error : ExamEditScreenUiState{var errorMessage: String = ""}
     object Loading : ExamEditScreenUiState
 }
 
@@ -55,21 +57,28 @@ class ExamEditViewModel(
     fun getExam(topicId: String){
         examEditScreenUiState = ExamEditScreenUiState.Loading
         viewModelScope.launch {
-            //try{
-            val result = ExamAppApi.retrofitService.getExam(topicId)
-            examEditScreenUiState =  ExamEditScreenUiState.Success(result)
-            examUiState = result.toExamUiState(isEntryValid = true,
-                topicName =
-                if (result.topicId == "null") "" //TODO check this
-                else ExamAppApi.retrofitService.getTopic(result.topicId).topic,
-                questionList = result.questionList,
-            )
-            originalExam = examUiState.examDetails.name
-            //} catch (e: IOException) {
-            //    ExamEditScreenUiState.Error
-            //} /*catch (e: HttpException) {
-            ExamEditScreenUiState.Error
-            //}
+            examEditScreenUiState =  try{
+                val result = ExamAppApi.retrofitService.getExam(topicId)
+                examUiState = result.toExamUiState(isEntryValid = true,
+                    topicName =
+                    if (result.topicId == "null") ""
+                    else ExamAppApi.retrofitService.getTopic(result.topicId).topic,
+                    questionList = result.questionList,
+                )
+                originalExam = examUiState.examDetails.name
+                ExamEditScreenUiState.Success(result)
+            } catch (e: IOException) {
+                ExamEditScreenUiState.Error
+            } catch (e: HttpException) {
+                when(e.code()){
+                    400 -> ExamEditScreenUiState.Error.errorMessage = "Bad request"
+                    401 -> ExamEditScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                    404 -> ExamEditScreenUiState.Error.errorMessage = "Content not found"
+                    500 -> ExamEditScreenUiState.Error.errorMessage = "Server error"
+                    else -> ExamEditScreenUiState.Error
+                }
+                ExamEditScreenUiState.Error
+            }
         }
     }
 

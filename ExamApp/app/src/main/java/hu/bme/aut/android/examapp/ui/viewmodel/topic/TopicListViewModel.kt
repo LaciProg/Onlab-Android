@@ -9,15 +9,17 @@ import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.NameDto
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
 import hu.bme.aut.android.examapp.ui.viewmodel.point.PointListScreenUiState
+import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
 sealed interface TopicListScreenUiState {
     data class Success(val topics: List<NameDto>) : TopicListScreenUiState
-    object Error : TopicListScreenUiState
+    object Error : TopicListScreenUiState{var errorMessage: String = ""}
     object Loading : TopicListScreenUiState
 }
 
@@ -32,22 +34,30 @@ class TopicListViewModel(topicRepository: TopicRepository) : ViewModel() {
     fun getAllTopicList(){
         topicListScreenUiState = TopicListScreenUiState.Loading
         viewModelScope.launch {
-            //try{
-            val result = ExamAppApi.retrofitService.getAllTopicName()
-            topicListScreenUiState =  TopicListScreenUiState.Success(result)
-            topicListUiState = TopicListUiState(
-                topicList = result.map { nameDto ->
-                    TopicRowUiState(
-                        topic = nameDto.name,
-                        id = nameDto.uuid
-                    )
+            topicListScreenUiState = try{
+                val result = ExamAppApi.retrofitService.getAllTopicName()
+                topicListUiState = TopicListUiState(
+                    topicList = result.map { nameDto ->
+                        TopicRowUiState(
+                            topic = nameDto.name,
+                            id = nameDto.uuid
+                        )
+                    }
+                )
+                TopicListScreenUiState.Success(result)
+            } catch (e: IOException) {
+                TopicListScreenUiState.Error.errorMessage = "Network error"
+                TopicListScreenUiState.Error
+            } catch (e: HttpException) {
+                when(e.code()){
+                    400 -> TopicListScreenUiState.Error.errorMessage = "Bad request"
+                    401 -> TopicListScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                    404 -> TopicListScreenUiState.Error.errorMessage = "Content not found"
+                    500 -> TopicListScreenUiState.Error.errorMessage = "Server error"
+                    else -> TopicListScreenUiState.Error
                 }
-            )
-            //} catch (e: IOException) {
-            //    TopicListScreenUiState.Error
-            //} /*catch (e: HttpException) {
-            TopicListScreenUiState.Error
-            //}
+                TopicListScreenUiState.Error
+            }
         }
     }
 

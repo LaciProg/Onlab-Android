@@ -36,10 +36,12 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
 
 sealed interface ExamDetailsScreenUiState {
     data class Success(val exam: ExamDto) : ExamDetailsScreenUiState
-    object Error : ExamDetailsScreenUiState
+    object Error : ExamDetailsScreenUiState{var errorMessage: String = ""}
     object Loading : ExamDetailsScreenUiState
 }
 
@@ -76,24 +78,27 @@ class ExamDetailsViewModel(
     fun getExam(topicId: String){
         examDetailsScreenUiState = ExamDetailsScreenUiState.Loading
         viewModelScope.launch {
-            //try{
-            val result = ExamAppApi.retrofitService.getExam(topicId)
-            examDetailsScreenUiState =  ExamDetailsScreenUiState.Success(result)
-            uiState = ExamDetailsUiState(result.toExamDetails(
-                topicName =
-                if (result.topicId == "null") "" //TODO check this
-                else ExamAppApi.retrofitService.getTopic(result.topicId).topic,
-                questionList = if(result.questionList == "") listOf() else result.questionList.split("#").map { it.toQuestion() }
-            ))
-            //trueFalseList = ExamAppApi.retrofitService.getAllTrueFalse()
-            //multipleChoiceList = ExamAppApi.retrofitService.getAllMultipleChoice()
-            //pointList = ExamAppApi.retrofitService.getAllPoint()
-            //topicList = ExamAppApi.retrofitService.getAllTopic()
-            //} catch (e: IOException) {
-            //    ExamDetailsScreenUiState.Error
-            //} /*catch (e: HttpException) {
-            ExamDetailsScreenUiState.Error
-            //}
+            examDetailsScreenUiState = try{
+                val result = ExamAppApi.retrofitService.getExam(topicId)
+                uiState = ExamDetailsUiState(result.toExamDetails(
+                    topicName =
+                    if (result.topicId == "null") ""
+                    else ExamAppApi.retrofitService.getTopic(result.topicId).topic,
+                    questionList = if(result.questionList == "") listOf() else result.questionList.split("#").map { it.toQuestion() }
+                ))
+                ExamDetailsScreenUiState.Success(result)
+            } catch (e: IOException) {
+                ExamDetailsScreenUiState.Error
+            } catch (e: HttpException) {
+                when(e.code()){
+                    400 -> ExamDetailsScreenUiState.Error.errorMessage = "Bad request"
+                    401 -> ExamDetailsScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                    404 -> ExamDetailsScreenUiState.Error.errorMessage = "Content not found"
+                    500 -> ExamDetailsScreenUiState.Error.errorMessage = "Server error"
+                    else -> ExamDetailsScreenUiState.Error
+                }
+                ExamDetailsScreenUiState.Error
+            }
         }
     }
 

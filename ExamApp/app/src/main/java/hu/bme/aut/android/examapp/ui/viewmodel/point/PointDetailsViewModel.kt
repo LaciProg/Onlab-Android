@@ -1,7 +1,5 @@
 package hu.bme.aut.android.examapp.ui.viewmodel.point
 
-import android.net.http.HttpException
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -10,22 +8,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.PointDto
-//import hu.bme.aut.android.examapp.api.dto.PointDto
-
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.PointRepository
 import hu.bme.aut.android.examapp.ui.PointDetailsDestination
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import java.io.IOException
+import retrofit2.HttpException
 
 sealed interface PointDetailsScreenUiState {
     data class Success(val point: PointDto) : PointDetailsScreenUiState
-    object Error : PointDetailsScreenUiState
+    object Error : PointDetailsScreenUiState{var errorMessage: String = ""}
     object Loading : PointDetailsScreenUiState
 }
 
@@ -45,14 +36,21 @@ class PointDetailsViewModel(
     fun getPoint(pointId: String){
         pointDetailsScreenUiState = PointDetailsScreenUiState.Loading
         viewModelScope.launch {
-             //try{
+            pointDetailsScreenUiState = try{
                 val result = ExamAppApi.retrofitService.getPoint(pointId)
-            pointDetailsScreenUiState =  PointDetailsScreenUiState.Success(result)
-            //} catch (e: IOException) {
-            //    PointDetailsScreenUiState.Error
-            //} /*catch (e: HttpException) {
+                PointDetailsScreenUiState.Success(result)
+            } catch (e: IOException) {
                 PointDetailsScreenUiState.Error
-            //}
+            } catch (e: HttpException) {
+                 when(e.code()){
+                     400 -> PointDetailsScreenUiState.Error.errorMessage = "Bad request"
+                     401 -> PointDetailsScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                     404 -> PointDetailsScreenUiState.Error.errorMessage = "Content not found"
+                     500 -> PointDetailsScreenUiState.Error.errorMessage = "Server error"
+                     else -> PointDetailsScreenUiState.Error
+                 }
+                PointDetailsScreenUiState.Error
+            }
         }
     }
 

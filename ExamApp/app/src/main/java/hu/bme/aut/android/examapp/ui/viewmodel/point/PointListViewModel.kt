@@ -11,15 +11,18 @@ import hu.bme.aut.android.examapp.api.dto.NameDto
 import hu.bme.aut.android.examapp.api.dto.PointDto
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.PointRepository
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicListUiState
+import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionDetailsScreenUiState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
 
 sealed interface PointListScreenUiState {
     data class Success(val points: List<NameDto>) : PointListScreenUiState
-    object Error : PointListScreenUiState
+    object Error : PointListScreenUiState{var errorMessage: String = ""}
     object Loading : PointListScreenUiState
 }
 
@@ -34,22 +37,29 @@ class PointListViewModel(pointRepository: PointRepository) : ViewModel() {
     fun getAllPointList(){
         pointListScreenUiState = PointListScreenUiState.Loading
         viewModelScope.launch {
-            //try{
-            val result = ExamAppApi.retrofitService.getAllPointName()
-            pointListScreenUiState =  PointListScreenUiState.Success(result)
-            pointListUiState = PointListUiState(
-                pointList = result.map { nameDto ->
-                    PointRowUiState(
-                        point = nameDto.name,
-                        id = nameDto.uuid
-                    )
+            pointListScreenUiState = try{
+                val result = ExamAppApi.retrofitService.getAllPointName()
+                pointListUiState = PointListUiState(
+                    pointList = result.map { nameDto ->
+                        PointRowUiState(
+                            point = nameDto.name,
+                            id = nameDto.uuid
+                        )
+                    }
+                )
+                PointListScreenUiState.Success(result)
+            } catch (e: IOException) {
+                PointListScreenUiState.Error
+            } catch (e: HttpException) {
+                when(e.code()){
+                    400 -> PointListScreenUiState.Error.errorMessage = "Bad request"
+                    401 -> PointListScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                    404 -> PointListScreenUiState.Error.errorMessage = "Content not found"
+                    500 -> PointListScreenUiState.Error.errorMessage = "Server error"
+                    else -> PointListScreenUiState.Error
                 }
-            )
-            //} catch (e: IOException) {
-            //    PointDetailsScreenUiState.Error
-            //} /*catch (e: HttpException) {
-            PointListScreenUiState.Error
-            //}
+                PointListScreenUiState.Error
+            }
         }
     }
 

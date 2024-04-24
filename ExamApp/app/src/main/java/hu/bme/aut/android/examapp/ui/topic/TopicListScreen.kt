@@ -40,7 +40,7 @@ fun TopicListScreen(
             navigateToPointDetails = navigateToTopicDetails,
             viewModel = viewModel,
         )
-        is TopicListScreenUiState.Error -> Text(text = "Error...")
+        is TopicListScreenUiState.Error -> Text(text = TopicListScreenUiState.Error.errorMessage.ifBlank { "Unexpected error " }, modifier = Modifier.fillMaxSize())
     }
 
     LaunchedEffect(key1 = Unit) {

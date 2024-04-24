@@ -23,10 +23,12 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
 
 sealed interface MultipleChoiceQuestionDetailsScreenUiState {
     data class Success(val question: MultipleChoiceQuestionDto) : MultipleChoiceQuestionDetailsScreenUiState
-    object Error : MultipleChoiceQuestionDetailsScreenUiState
+    object Error : MultipleChoiceQuestionDetailsScreenUiState{var errorMessage: String = ""}
     object Loading : MultipleChoiceQuestionDetailsScreenUiState
 }
 
@@ -48,22 +50,29 @@ class MultipleChoiceQuestionDetailsViewModel(
     fun getQuestion(topicId: String){
         multipleChoiceDetailsScreenUiState = MultipleChoiceQuestionDetailsScreenUiState.Loading
         viewModelScope.launch {
-            //try{
-            val result = ExamAppApi.retrofitService.getMultipleChoice(topicId)
-            multipleChoiceDetailsScreenUiState =  MultipleChoiceQuestionDetailsScreenUiState.Success(result)
-            uiState = MultipleChoiceQuestionDetailsUiState(result.toMultipleChoiceQuestionDetails(
-                topicName =
-                if (result.topic == "null") "" //TODO check this
-                else ExamAppApi.retrofitService.getTopic(result.topic).topic,
-                pointName =
-                if (result.point == "null") "" //TODO check this
-                else ExamAppApi.retrofitService.getPoint(result.point).type,
-            ))
-            //} catch (e: IOException) {
-            //    MultipleChoiceQuestionDetailsScreenUiState.Error
-            //} /*catch (e: HttpException) {
-            MultipleChoiceQuestionDetailsScreenUiState.Error
-            //}
+            multipleChoiceDetailsScreenUiState = try{
+                val result = ExamAppApi.retrofitService.getMultipleChoice(topicId)
+                uiState = MultipleChoiceQuestionDetailsUiState(result.toMultipleChoiceQuestionDetails(
+                    topicName =
+                    if (result.topic == "null") ""
+                    else ExamAppApi.retrofitService.getTopic(result.topic).topic,
+                    pointName =
+                    if (result.point == "null") ""
+                    else ExamAppApi.retrofitService.getPoint(result.point).type,
+                ))
+                MultipleChoiceQuestionDetailsScreenUiState.Success(result)
+            } catch (e: IOException) {
+                MultipleChoiceQuestionDetailsScreenUiState.Error
+            } catch (e: HttpException) {
+                when(e.code()){
+                    400 -> MultipleChoiceQuestionDetailsScreenUiState.Error.errorMessage = "Bad request"
+                    401 -> MultipleChoiceQuestionDetailsScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                    404 -> MultipleChoiceQuestionDetailsScreenUiState.Error.errorMessage = "Content not found"
+                    500 -> MultipleChoiceQuestionDetailsScreenUiState.Error.errorMessage = "Server error"
+                    else -> MultipleChoiceQuestionDetailsScreenUiState.Error
+                }
+                MultipleChoiceQuestionDetailsScreenUiState.Error
+            }
         }
     }
     /**

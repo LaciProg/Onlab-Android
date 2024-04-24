@@ -25,6 +25,9 @@ private const val BASE_URL = "http://152.66.182.116:46258"
 private const val token =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJodHRwOi8vMC4wLjAuMDo0NjI1OC8iLCJpc3MiOiJleGFtLWFwcC1iYWNrZW5kIiwidXNlcm5hbWUiOiJ1c2VyIiwiZXhwIjoxNzEzOTI0MTk0fQ.be2bRusb8SJIERBdDWywAcAzVeTsyI1_euMEnP4fJpo"
 
+//TODO add try catch to all requests
+//TODO Firebase login system + analytics
+//TODO Login screen + register screen + store users in Room
 @OptIn(ExperimentalSerializationApi::class)
 private val retrofit = Retrofit.Builder()
     .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))

@@ -13,10 +13,12 @@ import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TrueFalseQuestionRepository
 import hu.bme.aut.android.examapp.ui.TrueFalseQuestionDetailsDestination
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
 
 sealed interface TrueFalseQuestionDetailsScreenUiState {
     data class Success(val question: TrueFalseQuestionDto) : TrueFalseQuestionDetailsScreenUiState
-    object Error : TrueFalseQuestionDetailsScreenUiState
+    object Error : TrueFalseQuestionDetailsScreenUiState{var errorMessage: String = ""}
     object Loading : TrueFalseQuestionDetailsScreenUiState
 }
 
@@ -38,22 +40,29 @@ class TrueFalseQuestionDetailsViewModel(
     fun getQuestion(topicId: String){
         trueFalseDetailsScreenUiState = TrueFalseQuestionDetailsScreenUiState.Loading
         viewModelScope.launch {
-            //try{
-            val result = ExamAppApi.retrofitService.getTrueFalse(topicId)
-            trueFalseDetailsScreenUiState =  TrueFalseQuestionDetailsScreenUiState.Success(result)
-            uiState = TrueFalseQuestionDetailsUiState(result.toTrueFalseQuestionDetails(
-                topicName =
-                    if (result.topic == "null") "" //TODO check this
-                    else ExamAppApi.retrofitService.getTopic(result.topic).topic,
-                pointName =
-                    if (result.point == "null") "" //TODO check this
-                    else ExamAppApi.retrofitService.getPoint(result.point).type,
-            ))
-            //} catch (e: IOException) {
-            //    TrueFalseQuestionDetailsScreenUiState.Error
-            //} /*catch (e: HttpException) {
-            TrueFalseQuestionDetailsScreenUiState.Error
-            //}
+            trueFalseDetailsScreenUiState = try{
+                val result = ExamAppApi.retrofitService.getTrueFalse(topicId)
+                uiState = TrueFalseQuestionDetailsUiState(result.toTrueFalseQuestionDetails(
+                    topicName =
+                        if (result.topic == "null") ""
+                        else ExamAppApi.retrofitService.getTopic(result.topic).topic,
+                    pointName =
+                        if (result.point == "null") ""
+                        else ExamAppApi.retrofitService.getPoint(result.point).type,
+                ))
+                TrueFalseQuestionDetailsScreenUiState.Success(result)
+            } catch (e: IOException) {
+                TrueFalseQuestionDetailsScreenUiState.Error
+            } catch (e: HttpException) {
+                when(e.code()){
+                    400 -> TrueFalseQuestionDetailsScreenUiState.Error.errorMessage = "Bad request"
+                    401 -> TrueFalseQuestionDetailsScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                    404 -> TrueFalseQuestionDetailsScreenUiState.Error.errorMessage = "Content not found"
+                    500 -> TrueFalseQuestionDetailsScreenUiState.Error.errorMessage = "Server error"
+                    else -> TrueFalseQuestionDetailsScreenUiState.Error
+                }
+                TrueFalseQuestionDetailsScreenUiState.Error
+            }
         }
     }
     /**

@@ -13,14 +13,16 @@ import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
 import hu.bme.aut.android.examapp.ui.TopicDetailsDestination
 import hu.bme.aut.android.examapp.ui.viewmodel.point.PointEditScreenUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.point.toPointUiState
+import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
 sealed interface TopicEditScreenUiState {
     data class Success(val topic: TopicDto) : TopicEditScreenUiState
-    object Error : TopicEditScreenUiState
+    object Error : TopicEditScreenUiState{var errorMessage: String = ""}
     object Loading : TopicEditScreenUiState
 }
 
@@ -61,21 +63,28 @@ class TopicEditViewModel(
     fun getTopic(topicId: String){
         topicEditScreenUiState = TopicEditScreenUiState.Loading
         viewModelScope.launch {
-            //try{
-            val result = ExamAppApi.retrofitService.getTopic(topicId)
-            topicEditScreenUiState =  TopicEditScreenUiState.Success(result)
-            topicUiState = result.toTopicUiState(true,
-                parentName =
-                if (result.parentTopic == "null") "" //TODO check this
-                else
-                    ExamAppApi.retrofitService.getTopic(result.parentTopic).topic
-            )
-            originalTopic = topicUiState.topicDetails.topic
-            //} catch (e: IOException) {
-            //    TopicEditScreenUiState.Error
-            //} /*catch (e: HttpException) {
-            TopicEditScreenUiState.Error
-            //}
+            topicEditScreenUiState = try{
+                val result = ExamAppApi.retrofitService.getTopic(topicId)
+                topicUiState = result.toTopicUiState(true,
+                    parentName =
+                    if (result.parentTopic == "null") "" //TODO check this
+                    else
+                        ExamAppApi.retrofitService.getTopic(result.parentTopic).topic
+                )
+                originalTopic = topicUiState.topicDetails.topic
+                TopicEditScreenUiState.Success(result)
+            } catch (e: IOException) {
+                TopicEditScreenUiState.Error
+            } catch (e: HttpException) {
+                when(e.code()){
+                    400 -> TopicEditScreenUiState.Error.errorMessage = "Bad request"
+                    401 -> TopicEditScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                    404 -> TopicEditScreenUiState.Error.errorMessage = "Content not found"
+                    500 -> TopicEditScreenUiState.Error.errorMessage = "Server error"
+                    else -> TopicEditScreenUiState.Error
+                }
+                TopicEditScreenUiState.Error
+            }
         }
     }
 

@@ -12,6 +12,7 @@ import hu.bme.aut.android.examapp.api.dto.TopicDto
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
 import hu.bme.aut.android.examapp.ui.TopicDetailsDestination
 import hu.bme.aut.android.examapp.ui.viewmodel.point.PointDetailsScreenUiState
+import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -19,10 +20,11 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
 sealed interface TopicDetailsScreenUiState {
     data class Success(val point: TopicDto) : TopicDetailsScreenUiState
-    object Error : TopicDetailsScreenUiState
+    object Error : TopicDetailsScreenUiState{var errorMessage: String = ""}
     object Loading : TopicDetailsScreenUiState
 }
 
@@ -42,20 +44,27 @@ class TopicDetailsViewModel(
     fun getTopic(topicId: String){
         topicDetailsScreenUiState = TopicDetailsScreenUiState.Loading
         viewModelScope.launch {
-            //try{
-            val result = ExamAppApi.retrofitService.getTopic(topicId)
-            topicDetailsScreenUiState =  TopicDetailsScreenUiState.Success(result)
-            uiState = TopicDetailsUiState(result.toTopicDetails(
-                parentName =
-                if (result.parentTopic == "null") "" //TODO check this
-                else
-                    ExamAppApi.retrofitService.getTopic(result.parentTopic).topic
-            ))
-            //} catch (e: IOException) {
-            //    PointDetailsScreenUiState.Error
-            //} /*catch (e: HttpException) {
-            PointDetailsScreenUiState.Error
-            //}
+            topicDetailsScreenUiState = try{
+                val result = ExamAppApi.retrofitService.getTopic(topicId)
+                uiState = TopicDetailsUiState(result.toTopicDetails(
+                    parentName =
+                    if (result.parentTopic == "null") "" //TODO check this
+                    else
+                        ExamAppApi.retrofitService.getTopic(result.parentTopic).topic
+                ))
+            TopicDetailsScreenUiState.Success(result)
+            } catch (e: IOException) {
+                TopicDetailsScreenUiState.Error
+            } catch (e: HttpException) {
+                when(e.code()){
+                    400 -> TopicDetailsScreenUiState.Error.errorMessage = "Bad request"
+                    401 -> TopicDetailsScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                    404 -> TopicDetailsScreenUiState.Error.errorMessage = "Content not found"
+                    500 -> TopicDetailsScreenUiState.Error.errorMessage = "Server error"
+                    else -> TopicDetailsScreenUiState.Error
+                }
+                TopicDetailsScreenUiState.Error
+            }
         }
     }
 

@@ -15,14 +15,16 @@ import hu.bme.aut.android.examapp.data.repositories.inrefaces.TrueFalseQuestionR
 import hu.bme.aut.android.examapp.ui.TrueFalseQuestionDetailsDestination
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicEditScreenUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.toTopicUiState
+import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
 sealed interface TrueFalseQuestionEditScreenUiState {
     data class Success(val question: TrueFalseQuestionDto) : TrueFalseQuestionEditScreenUiState
-    object Error : TrueFalseQuestionEditScreenUiState
+    object Error : TrueFalseQuestionEditScreenUiState{var errorMessage: String = ""}
     object Loading : TrueFalseQuestionEditScreenUiState
 }
 
@@ -51,24 +53,31 @@ class TrueFalseQuestionEditViewModel(
     fun getTrueFalseQuestion(topicId: String){
         trueFalseEditScreenUiState = TrueFalseQuestionEditScreenUiState.Loading
         viewModelScope.launch {
-            //try{
-            val result = ExamAppApi.retrofitService.getTrueFalse(topicId)
-            trueFalseEditScreenUiState =  TrueFalseQuestionEditScreenUiState.Success(result)
-            trueFalseQuestionUiState = result.toTrueFalseQuestionUiState(isEntryValid = true,
-                topicName =
-                    if (result.topic == "null") "" //TODO check this
-                    else ExamAppApi.retrofitService.getTopic(result.topic).topic,
-                pointName =
-                    if (result.point == "null") "" //TODO check this
-                    else ExamAppApi.retrofitService.getPoint(result.point).type,
-                isAnswerChosen = true
-            )
-            originalQuestion = trueFalseQuestionUiState.trueFalseQuestionDetails.question
-            //} catch (e: IOException) {
-            //    TrueFalseQuestionEditScreenUiState.Error
-            //} /*catch (e: HttpException) {
-            TrueFalseQuestionEditScreenUiState.Error
-            //}
+            trueFalseEditScreenUiState = try{
+                val result = ExamAppApi.retrofitService.getTrueFalse(topicId)
+                trueFalseQuestionUiState = result.toTrueFalseQuestionUiState(isEntryValid = true,
+                    topicName =
+                        if (result.topic == "null") ""
+                        else ExamAppApi.retrofitService.getTopic(result.topic).topic,
+                    pointName =
+                        if (result.point == "null") ""
+                        else ExamAppApi.retrofitService.getPoint(result.point).type,
+                    isAnswerChosen = true
+                )
+                originalQuestion = trueFalseQuestionUiState.trueFalseQuestionDetails.question
+                TrueFalseQuestionEditScreenUiState.Success(result)
+            } catch (e: IOException) {
+                TrueFalseQuestionEditScreenUiState.Error
+            } catch (e: HttpException) {
+                when(e.code()){
+                    400 -> TrueFalseQuestionEditScreenUiState.Error.errorMessage = "Bad request"
+                    401 -> TrueFalseQuestionEditScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                    404 -> TrueFalseQuestionEditScreenUiState.Error.errorMessage = "Content not found"
+                    500 -> TrueFalseQuestionEditScreenUiState.Error.errorMessage = "Server error"
+                    else -> TrueFalseQuestionEditScreenUiState.Error
+                }
+                TrueFalseQuestionEditScreenUiState.Error
+            }
         }
     }
 

@@ -9,20 +9,23 @@ import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.NameDto
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.MultipleChoiceQuestionRepository
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
+import hu.bme.aut.android.examapp.ui.viewmodel.point.PointDetailsScreenUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.point.PointListScreenUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionListScreenUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionListUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionRowUiState
+import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
 sealed interface MultipleChoiceQuestionListScreenUiState {
     data class Success(val questions: List<NameDto>) : MultipleChoiceQuestionListScreenUiState
-    object Error : MultipleChoiceQuestionListScreenUiState
+    object Error : MultipleChoiceQuestionListScreenUiState{var errorMessage: String = ""}
     object Loading : MultipleChoiceQuestionListScreenUiState
 }
 
@@ -45,22 +48,29 @@ class MultipleChoiceQuestionListViewModel(
     fun getAllMultipleChoiceQuestionList(){
         multipleChoiceQuestionListScreenUiState = MultipleChoiceQuestionListScreenUiState.Loading
         viewModelScope.launch {
-            //try{
-            val result = ExamAppApi.retrofitService.getAllMultipleChoiceName()
-            multipleChoiceQuestionListScreenUiState =  MultipleChoiceQuestionListScreenUiState.Success(result)
-            multipleChoiceQuestionListUiState = MultipleChoiceQuestionListUiState(
-                multipleChoiceQuestionList = result.map { nameDto ->
-                    MultipleChoiceQuestionRowUiState(
-                        id = nameDto.uuid,
-                        question = nameDto.name,
-                    )
+            multipleChoiceQuestionListScreenUiState = try{
+                val result = ExamAppApi.retrofitService.getAllMultipleChoiceName()
+                multipleChoiceQuestionListUiState = MultipleChoiceQuestionListUiState(
+                    multipleChoiceQuestionList = result.map { nameDto ->
+                        MultipleChoiceQuestionRowUiState(
+                            id = nameDto.uuid,
+                            question = nameDto.name,
+                        )
+                    }
+                )
+                MultipleChoiceQuestionListScreenUiState.Success(result)
+            } catch (e: IOException) {
+                MultipleChoiceQuestionListScreenUiState.Error
+            } catch (e: HttpException) {
+                when(e.code()){
+                    400 -> MultipleChoiceQuestionListScreenUiState.Error.errorMessage = "Bad request"
+                    401 -> MultipleChoiceQuestionListScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                    404 -> MultipleChoiceQuestionListScreenUiState.Error.errorMessage = "Content not found"
+                    500 -> MultipleChoiceQuestionListScreenUiState.Error.errorMessage = "Server error"
+                    else -> MultipleChoiceQuestionListScreenUiState.Error
                 }
-            )
-            //} catch (e: IOException) {
-            //    MultipleChoiceQuestionListScreenUiState.Error
-            //} /*catch (e: HttpException) {
-            MultipleChoiceQuestionListScreenUiState.Error
-            //}
+                MultipleChoiceQuestionListScreenUiState.Error
+            }
         }
     }
 

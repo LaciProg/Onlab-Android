@@ -10,6 +10,7 @@ import hu.bme.aut.android.examapp.api.dto.NameDto
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TrueFalseQuestionRepository
 import hu.bme.aut.android.examapp.ui.viewmodel.point.PointListScreenUiState
+import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicEditScreenUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicListScreenUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicListUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicRowUiState
@@ -19,10 +20,12 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
 
 sealed interface TrueFalseQuestionListScreenUiState {
     data class Success(val questions: List<NameDto>) : TrueFalseQuestionListScreenUiState
-    object Error : TrueFalseQuestionListScreenUiState
+    object Error : TrueFalseQuestionListScreenUiState{var errorMessage: String = ""}
     object Loading : TrueFalseQuestionListScreenUiState
 }
 
@@ -42,22 +45,29 @@ class TrueFalseQuestionListViewModel(
     fun getAllTrueFalseQuestionList(){
         trueFalseQuestionListScreenUiState = TrueFalseQuestionListScreenUiState.Loading
         viewModelScope.launch {
-            //try{
-            val result = ExamAppApi.retrofitService.getAllTrueFalseName()
-            trueFalseQuestionListScreenUiState =  TrueFalseQuestionListScreenUiState.Success(result)
-            trueFalseQuestionListUiState = TrueFalseQuestionListUiState(
-                trueFalseQuestionList = result.map { nameDto ->
-                    TrueFalseQuestionRowUiState(
-                        id = nameDto.uuid,
-                        question = nameDto.name,
-                    )
+            trueFalseQuestionListScreenUiState = try{
+                val result = ExamAppApi.retrofitService.getAllTrueFalseName()
+                trueFalseQuestionListUiState = TrueFalseQuestionListUiState(
+                    trueFalseQuestionList = result.map { nameDto ->
+                        TrueFalseQuestionRowUiState(
+                            id = nameDto.uuid,
+                            question = nameDto.name,
+                        )
+                    }
+                )
+                TrueFalseQuestionListScreenUiState.Success(result)
+            } catch (e: IOException) {
+                TrueFalseQuestionListScreenUiState.Error
+            } catch (e: HttpException) {
+                when(e.code()){
+                    400 -> TrueFalseQuestionListScreenUiState.Error.errorMessage = "Bad request"
+                    401 -> TrueFalseQuestionListScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                    404 -> TrueFalseQuestionListScreenUiState.Error.errorMessage = "Content not found"
+                    500 -> TrueFalseQuestionListScreenUiState.Error.errorMessage = "Server error"
+                    else -> TrueFalseQuestionListScreenUiState.Error
                 }
-            )
-            //} catch (e: IOException) {
-            //    TopicListScreenUiState.Error
-            //} /*catch (e: HttpException) {
-            TrueFalseQuestionListScreenUiState.Error
-            //}
+                TrueFalseQuestionListScreenUiState.Error
+            }
         }
     }
 
