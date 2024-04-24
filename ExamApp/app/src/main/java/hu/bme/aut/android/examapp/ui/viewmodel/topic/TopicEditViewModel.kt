@@ -10,6 +10,7 @@ import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.TopicDto
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
 import hu.bme.aut.android.examapp.ui.TopicDetailsDestination
+import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionEditScreenUiState
 import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -52,6 +53,7 @@ class TopicEditViewModel(
                 originalTopic = topicUiState.topicDetails.topic
                 TopicEditScreenUiState.Success(result)
             } catch (e: IOException) {
+                TopicEditScreenUiState.Error.errorMessage = "Network error"
                 TopicEditScreenUiState.Error
             } catch (e: HttpException) {
                 when(e.code()){
@@ -68,10 +70,26 @@ class TopicEditViewModel(
 
     suspend fun updateTopic() : Boolean{
         return if (validateInput(topicUiState.topicDetails) && validateUniqueTopic(topicUiState.topicDetails)) {
-            viewModelScope.launch {
-                ExamAppApi.retrofitService.updateTopic(topicUiState.topicDetails.toTopic())
+            try{
+                viewModelScope.launch {
+                    ExamAppApi.retrofitService.updateTopic(topicUiState.topicDetails.toTopic())
+                }
+                return true
+            } catch (e: IOException) {
+                TopicEditScreenUiState.Error.errorMessage = "Network error"
+                topicEditScreenUiState = TopicEditScreenUiState.Error
+                return false
+            } catch (e: HttpException) {
+                when(e.code()){
+                    400 -> TopicEditScreenUiState.Error.errorMessage = "Bad request"
+                    401 -> TopicEditScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                    404 -> TopicEditScreenUiState.Error.errorMessage = "Content not found"
+                    500 -> TopicEditScreenUiState.Error.errorMessage = "Server error"
+                    else -> TopicEditScreenUiState.Error
+                }
+                topicEditScreenUiState = TopicEditScreenUiState.Error
+                return false
             }
-            true
         }
         else {
             topicUiState = topicUiState.copy(isEntryValid = false)
@@ -91,7 +109,23 @@ class TopicEditViewModel(
     }
 
     private suspend fun validateUniqueTopic(uiState: TopicDetails = topicUiState.topicDetails): Boolean {
-        return !ExamAppApi.retrofitService.getAllTopicName().map{it.name}.contains(uiState.topic) || originalTopic == uiState.topic
+        return try {
+            !ExamAppApi.retrofitService.getAllTopicName().map{it.name}.contains(uiState.topic) || originalTopic == uiState.topic
+        } catch (e: IOException) {
+            TopicEditScreenUiState.Error.errorMessage = "Network error"
+            topicEditScreenUiState = TopicEditScreenUiState.Error
+            false
+        } catch (e: HttpException) {
+            when(e.code()){
+                400 -> TrueFalseQuestionEditScreenUiState.Error.errorMessage = "Bad request"
+                401 -> TrueFalseQuestionEditScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                404 -> TrueFalseQuestionEditScreenUiState.Error.errorMessage = "Content not found"
+                500 -> TrueFalseQuestionEditScreenUiState.Error.errorMessage = "Server error"
+                else -> TrueFalseQuestionEditScreenUiState.Error
+            }
+            topicEditScreenUiState = TopicEditScreenUiState.Error
+            false
+        }
     }
 }
 

@@ -64,10 +64,26 @@ class PointEditViewModel(
 
     suspend fun updatePoint() : Boolean{
         return if (validateInput(pointUiState.pointDetails) && validateUniquePoint(pointUiState.pointDetails)) {
-            viewModelScope.launch {
-                ExamAppApi.retrofitService.updatePoint(pointUiState.pointDetails.toPoint())
+            try {
+                viewModelScope.launch {
+                    ExamAppApi.retrofitService.updatePoint(pointUiState.pointDetails.toPoint())
+                }
+                return true
+            } catch (e: IOException) {
+                PointEditScreenUiState.Error.errorMessage = "Network error"
+                pointEditScreenUiState = PointEditScreenUiState.Error
+                return false
+            } catch (e: HttpException) {
+                when(e.code()){
+                    400 -> PointEditScreenUiState.Error.errorMessage = "Bad request"
+                    401 -> PointEditScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                    404 -> PointEditScreenUiState.Error.errorMessage = "Content not found"
+                    500 -> PointEditScreenUiState.Error.errorMessage = "Server error"
+                    else -> PointEditScreenUiState.Error
+                }
+                pointEditScreenUiState = PointEditScreenUiState.Error
+                return false
             }
-            true
         }
         else{
             pointUiState = pointUiState.copy(isEntryValid = false)
@@ -88,7 +104,23 @@ class PointEditViewModel(
     }
 
     private suspend fun validateUniquePoint(uiState: PointDetails = pointUiState.pointDetails): Boolean {
-        return !pointRepository.getAllPointType().filterNotNull().first().contains(uiState.type) || originalPoint == uiState.type
+        return try {
+            !ExamAppApi.retrofitService.getAllPointName().map { it.name }.contains(uiState.type) || originalPoint == uiState.type
+        } catch (e: IOException) {
+            PointEditScreenUiState.Error.errorMessage = "Network error"
+            pointEditScreenUiState = PointEditScreenUiState.Error
+            false
+        } catch (e: HttpException) {
+            when(e.code()){
+                400 -> PointEditScreenUiState.Error.errorMessage = "Bad request"
+                401 -> PointEditScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                404 -> PointEditScreenUiState.Error.errorMessage = "Content not found"
+                500 -> PointEditScreenUiState.Error.errorMessage = "Server error"
+                else -> PointEditScreenUiState.Error
+            }
+            pointEditScreenUiState = PointEditScreenUiState.Error
+            false
+        }
     }
 }
 

@@ -70,14 +70,33 @@ class ExamEditViewModel(
                     else -> ExamEditScreenUiState.Error
                 }
                 ExamEditScreenUiState.Error
+            } catch (e: IllegalArgumentException){
+                ExamEditScreenUiState.Error.errorMessage = "Server or connection error"
+                ExamEditScreenUiState.Error
             }
         }
     }
 
     suspend fun updateExam() : Boolean{
         return if (validateInput(examUiState.examDetails) && validateUniqueExam(examUiState.examDetails)) {
-            ExamAppApi.retrofitService.updateExam(examUiState.examDetails.toExam())
-            true
+            try {
+                ExamAppApi.retrofitService.updateExam(examUiState.examDetails.toExam())
+                true
+            } catch (e: IOException) {
+                ExamEditScreenUiState.Error.errorMessage = "Network error"
+                examEditScreenUiState = ExamEditScreenUiState.Error
+                false
+            } catch (e: HttpException) {
+                when(e.code()){
+                    400 -> ExamEditScreenUiState.Error.errorMessage = "Bad request"
+                    401 -> ExamEditScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                    404 -> ExamEditScreenUiState.Error.errorMessage = "Content not found"
+                    500 -> ExamEditScreenUiState.Error.errorMessage = "Server error"
+                    else -> ExamEditScreenUiState.Error
+                }
+                examEditScreenUiState = ExamEditScreenUiState.Error
+                false
+            }
         }
         else {
             examUiState = examUiState.copy(isEntryValid = false)
@@ -97,7 +116,23 @@ class ExamEditViewModel(
     }
 
     private suspend fun validateUniqueExam(uiState: ExamDetails = examUiState.examDetails): Boolean {
-        return !ExamAppApi.retrofitService.getAllExamName().map{ it.name }.contains(uiState.name) || originalExam == uiState.name
+        return try{
+            !ExamAppApi.retrofitService.getAllExamName().map{ it.name }.contains(uiState.name) || originalExam == uiState.name
+        } catch (e: IOException) {
+            ExamEditScreenUiState.Error.errorMessage = "Network error"
+            examEditScreenUiState = ExamEditScreenUiState.Error
+            false
+        } catch (e: HttpException) {
+            when(e.code()){
+                400 -> ExamEditScreenUiState.Error.errorMessage = "Bad request"
+                401 -> ExamEditScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                404 -> ExamEditScreenUiState.Error.errorMessage = "Content not found"
+                500 -> ExamEditScreenUiState.Error.errorMessage = "Server error"
+                else -> ExamEditScreenUiState.Error
+            }
+            examEditScreenUiState = ExamEditScreenUiState.Error
+            false
+        }
     }
 }
 

@@ -67,7 +67,21 @@ class MultipleChoiceQuestionDetailsViewModel(
     }
 
     suspend fun deleteMultipleChoiceQuestion() {
-        ExamAppApi.retrofitService.deleteMultipleChoice(multipleChoiceQuestionId)
+        try{
+            ExamAppApi.retrofitService.deleteMultipleChoice(multipleChoiceQuestionId)
+        } catch (e: IOException) {
+            MultipleChoiceQuestionDetailsScreenUiState.Error.errorMessage = "Network error"
+            multipleChoiceDetailsScreenUiState = MultipleChoiceQuestionDetailsScreenUiState.Error
+        } catch (e: HttpException) {
+            when(e.code()){
+                400 -> MultipleChoiceQuestionDetailsScreenUiState.Error.errorMessage = "You can't delete this question because it is used in a test."
+                401 -> MultipleChoiceQuestionDetailsScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                404 -> MultipleChoiceQuestionDetailsScreenUiState.Error.errorMessage = "Content not found"
+                500 -> MultipleChoiceQuestionDetailsScreenUiState.Error.errorMessage = "Server error"
+                else -> MultipleChoiceQuestionDetailsScreenUiState.Error
+            }
+            multipleChoiceDetailsScreenUiState = MultipleChoiceQuestionDetailsScreenUiState.Error
+        }
     }
 
 }

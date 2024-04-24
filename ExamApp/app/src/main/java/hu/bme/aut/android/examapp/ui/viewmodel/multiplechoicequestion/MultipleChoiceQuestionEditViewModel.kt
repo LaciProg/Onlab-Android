@@ -76,11 +76,28 @@ class MultipleChoiceQuestionEditViewModel(
 
     suspend fun updateMultipleChoiceQuestion() : Boolean {
         return if (validateInput(multipleChoiceQuestionUiState.multipleChoiceQuestionDetails) && validateUniqueMultipleChoiceQuestion(multipleChoiceQuestionUiState.multipleChoiceQuestionDetails)) {
-            viewModelScope.launch {
-                multipleChoiceQuestionUiState.multipleChoiceQuestionDetails.correctAnswersList.removeIf(String::isBlank)
-                ExamAppApi.retrofitService.updateMultipleChoice(multipleChoiceQuestionUiState.multipleChoiceQuestionDetails.toMultipleChoiceQuestion())
+            try {
+                viewModelScope.launch {
+                    multipleChoiceQuestionUiState.multipleChoiceQuestionDetails.correctAnswersList.removeIf(
+                        String::isBlank
+                    )
+                    ExamAppApi.retrofitService.updateMultipleChoice(multipleChoiceQuestionUiState.multipleChoiceQuestionDetails.toMultipleChoiceQuestion())
+                }
+                return true
+            } catch (e: IOException) {
+                MultipleChoiceQuestionEditScreenUiState.Error.errorMessage = "Network error"
+                multipleChoiceEditScreenUiState = MultipleChoiceQuestionEditScreenUiState.Error
+                return false
+            } catch (e: HttpException) {
+                when(e.code()){
+                    400 -> MultipleChoiceQuestionEditScreenUiState.Error.errorMessage = "Bad request"
+                    401 -> MultipleChoiceQuestionEditScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                    404 -> MultipleChoiceQuestionEditScreenUiState.Error.errorMessage = "Content not found"
+                    500 -> MultipleChoiceQuestionEditScreenUiState.Error.errorMessage = "Server error"
+                    else -> MultipleChoiceQuestionEditScreenUiState.Error
+                }
+                return false
             }
-            true
         }
         else {
             multipleChoiceQuestionUiState = multipleChoiceQuestionUiState.copy(isEntryValid = false)

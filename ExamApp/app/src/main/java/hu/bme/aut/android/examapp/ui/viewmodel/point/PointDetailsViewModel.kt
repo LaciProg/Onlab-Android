@@ -55,9 +55,24 @@ class PointDetailsViewModel(
     }
 
     suspend fun deletePoint() {
-        viewModelScope.launch {
-            ExamAppApi.retrofitService.deletePoint(pointId)
+        try{
+            viewModelScope.launch {
+                ExamAppApi.retrofitService.deletePoint(pointId)
+            }
+        } catch (e: IOException) {
+            PointDetailsScreenUiState.Error.errorMessage = "Network error"
+            pointDetailsScreenUiState = PointDetailsScreenUiState.Error
+        } catch (e: HttpException) {
+            when(e.code()){
+                400 -> PointDetailsScreenUiState.Error.errorMessage = "You can't delete this point because it is used in a question"
+                401 -> PointDetailsScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                404 -> PointDetailsScreenUiState.Error.errorMessage = "Content not found"
+                500 -> PointDetailsScreenUiState.Error.errorMessage = "Server error"
+                else -> PointDetailsScreenUiState.Error
+            }
+            pointDetailsScreenUiState = PointDetailsScreenUiState.Error
         }
+
     }
 
 }

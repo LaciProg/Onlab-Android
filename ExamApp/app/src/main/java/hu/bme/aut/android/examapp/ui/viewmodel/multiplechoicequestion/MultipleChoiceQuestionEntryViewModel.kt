@@ -7,14 +7,26 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.MultipleChoiceQuestionDto
+import hu.bme.aut.android.examapp.api.dto.TrueFalseQuestionDto
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.MultipleChoiceQuestionRepository
+import hu.bme.aut.android.examapp.ui.viewmodel.point.PointEntryScreenUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.type.Type
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
+
+sealed interface MultipleChoiceQuestionEntryScreenUiState {
+    data class Success(val question: TrueFalseQuestionDto) : MultipleChoiceQuestionEntryScreenUiState
+    data object Error : MultipleChoiceQuestionEntryScreenUiState{var errorMessage: String = ""}
+    data object Loading : MultipleChoiceQuestionEntryScreenUiState
+}
 
 class MultipleChoiceQuestionEntryViewModel(private val multipleChoiceQuestionRepository: MultipleChoiceQuestionRepository) : ViewModel(){
 
     var multipleChoiceQuestionUiState by mutableStateOf(MultipleChoiceQuestionUiState())
         private set
+
+    var multipleChoiceQuestionScreenUiState: MultipleChoiceQuestionEntryScreenUiState by mutableStateOf(MultipleChoiceQuestionEntryScreenUiState.Loading)
 
     fun updateUiState(multipleChoiceQuestionDetails: MultipleChoiceQuestionDetails) {
         multipleChoiceQuestionUiState =
@@ -27,11 +39,26 @@ class MultipleChoiceQuestionEntryViewModel(private val multipleChoiceQuestionRep
 
     suspend fun saveMultipleChoiceQuestion() : Boolean {
         return if (validateInput() && validateUniqueMultipleChoiceQuestion()) {
-            viewModelScope.launch {
-                multipleChoiceQuestionUiState.multipleChoiceQuestionDetails.correctAnswersList.removeIf(String::isBlank)
-                ExamAppApi.retrofitService.postMultipleChoice(multipleChoiceQuestionUiState.multipleChoiceQuestionDetails.toMultipleChoiceQuestion())
+            try{
+                viewModelScope.launch {
+                    ExamAppApi.retrofitService.postMultipleChoice(multipleChoiceQuestionUiState.multipleChoiceQuestionDetails.toMultipleChoiceQuestion())
+                }
+                true
+            } catch (e: IOException){
+                MultipleChoiceQuestionEntryScreenUiState.Error.errorMessage = "Network error"
+                multipleChoiceQuestionScreenUiState = MultipleChoiceQuestionEntryScreenUiState.Error
+                false
+            } catch (e: HttpException){
+                when(e.code()){
+                    400 -> MultipleChoiceQuestionEntryScreenUiState.Error.errorMessage = "Bad request"
+                    401 -> MultipleChoiceQuestionEntryScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                    404 -> MultipleChoiceQuestionEntryScreenUiState.Error.errorMessage = "Content not found"
+                    500 -> MultipleChoiceQuestionEntryScreenUiState.Error.errorMessage = "Server error"
+                    else -> MultipleChoiceQuestionEntryScreenUiState.Error
+                }
+                multipleChoiceQuestionScreenUiState = MultipleChoiceQuestionEntryScreenUiState.Error
+                false
             }
-            true
         } else {
             multipleChoiceQuestionUiState = multipleChoiceQuestionUiState.copy(isEntryValid = false)
             false
@@ -46,7 +73,23 @@ class MultipleChoiceQuestionEntryViewModel(private val multipleChoiceQuestionRep
     }
 
     private suspend fun validateUniqueMultipleChoiceQuestion(uiState: MultipleChoiceQuestionDetails = multipleChoiceQuestionUiState.multipleChoiceQuestionDetails): Boolean {
-        return !ExamAppApi.retrofitService.getAllMultipleChoiceName().map{it.name}.contains(uiState.question)
+        return try{
+            !ExamAppApi.retrofitService.getAllMultipleChoiceName().map{it.name}.contains(uiState.question)
+        } catch (e: IOException) {
+            MultipleChoiceQuestionEntryScreenUiState.Error.errorMessage = "Network error"
+            multipleChoiceQuestionScreenUiState = MultipleChoiceQuestionEntryScreenUiState.Error
+            false
+        } catch (e: HttpException){
+            when(e.code()){
+                400 -> MultipleChoiceQuestionEntryScreenUiState.Error.errorMessage = "Bad request"
+                401 -> MultipleChoiceQuestionEntryScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                404 -> MultipleChoiceQuestionEntryScreenUiState.Error.errorMessage = "Content not found"
+                500 -> MultipleChoiceQuestionEntryScreenUiState.Error.errorMessage = "Server error"
+                else -> MultipleChoiceQuestionEntryScreenUiState.Error
+            }
+            multipleChoiceQuestionScreenUiState = MultipleChoiceQuestionEntryScreenUiState.Error
+            false
+        }
     }
 
 }

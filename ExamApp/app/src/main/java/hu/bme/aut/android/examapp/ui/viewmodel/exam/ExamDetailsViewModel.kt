@@ -51,11 +51,25 @@ class ExamDetailsViewModel(
     var multipleChoiceList: List<MultipleChoiceQuestionDto> = listOf()
     init {
         getExam(examId)
-        viewModelScope.launch {
-            trueFalseList = ExamAppApi.retrofitService.getAllTrueFalse()
-            multipleChoiceList = ExamAppApi.retrofitService.getAllMultipleChoice()
-            pointList = ExamAppApi.retrofitService.getAllPoint()
-            topicList = ExamAppApi.retrofitService.getAllTopic()
+        try {
+            viewModelScope.launch {
+                trueFalseList = ExamAppApi.retrofitService.getAllTrueFalse()
+                multipleChoiceList = ExamAppApi.retrofitService.getAllMultipleChoice()
+                pointList = ExamAppApi.retrofitService.getAllPoint()
+                topicList = ExamAppApi.retrofitService.getAllTopic()
+            }
+        } catch (e: IOException) {
+            ExamDetailsScreenUiState.Error.errorMessage = "Network error"
+            examDetailsScreenUiState = ExamDetailsScreenUiState.Error
+        } catch (e: HttpException) {
+            when(e.code()){
+                400 -> ExamDetailsScreenUiState.Error.errorMessage = "Bad request"
+                401 -> ExamDetailsScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                404 -> ExamDetailsScreenUiState.Error.errorMessage = "Content not found"
+                500 -> ExamDetailsScreenUiState.Error.errorMessage = "Server error"
+                else -> ExamDetailsScreenUiState.Error
+            }
+            examDetailsScreenUiState = ExamDetailsScreenUiState.Error
         }
     }
 
@@ -69,7 +83,7 @@ class ExamDetailsViewModel(
                     topicName =
                     if (result.topicId == "null") ""
                     else ExamAppApi.retrofitService.getTopic(result.topicId).topic,
-                    questionList = if(result.questionList == "") listOf() else result.questionList.split("#").map { it.toQuestion() }
+                    questionList = if(result.questionList == "") listOf() else result.questionList.split("#").map { if(it.toQuestion() != null) it.toQuestion()!! else throw IllegalArgumentException("Invalid type")}
                 ))
                 ExamDetailsScreenUiState.Success(result)
             } catch (e: IOException) {
@@ -83,11 +97,14 @@ class ExamDetailsViewModel(
                     else -> ExamDetailsScreenUiState.Error
                 }
                 ExamDetailsScreenUiState.Error
+            } catch (e: IllegalArgumentException){
+                ExamDetailsScreenUiState.Error.errorMessage = "Server type"
+                ExamDetailsScreenUiState.Error
             }
         }
     }
 
-    private suspend fun String.toQuestion(): Question {
+    private suspend fun String.toQuestion(): Question? {
         val question = this.split("~")
         val type = question[0].toInt()
         val questionId = question[1]
@@ -100,15 +117,61 @@ class ExamDetailsViewModel(
     }
 
     suspend fun saveQuestionOrdering(list: List<Question>) {
-        ExamAppApi.retrofitService.updateExam(uiState.examDetails.copy(questionList = list).toExam())
+        try{
+            ExamAppApi.retrofitService.updateExam(uiState.examDetails.copy(questionList = list).toExam())
+        } catch (e: IOException) {
+            ExamDetailsScreenUiState.Error.errorMessage = "Network error"
+            examDetailsScreenUiState = ExamDetailsScreenUiState.Error
+        } catch (e: HttpException) {
+            when(e.code()){
+                400 -> ExamDetailsScreenUiState.Error.errorMessage = "Bad request"
+                401 -> ExamDetailsScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                404 -> ExamDetailsScreenUiState.Error.errorMessage = "Content not found"
+                500 -> ExamDetailsScreenUiState.Error.errorMessage = "Server error"
+                else -> ExamDetailsScreenUiState.Error
+            }
+            examDetailsScreenUiState = ExamDetailsScreenUiState.Error
+        }
     }
 
-    private suspend fun toTrueFalseQuestion(id: String) : TrueFalseQuestionDto {
-        return ExamAppApi.retrofitService.getTrueFalse(id)
+    private suspend fun toTrueFalseQuestion(id: String) : TrueFalseQuestionDto? {
+        return try {
+            ExamAppApi.retrofitService.getTrueFalse(id)
+        } catch (e: IOException) {
+            ExamDetailsScreenUiState.Error.errorMessage = "Network error"
+            examDetailsScreenUiState = ExamDetailsScreenUiState.Error
+            null
+        } catch (e: HttpException) {
+            when(e.code()){
+                400 -> ExamDetailsScreenUiState.Error.errorMessage = "Bad request"
+                401 -> ExamDetailsScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                404 -> ExamDetailsScreenUiState.Error.errorMessage = "Content not found"
+                500 -> ExamDetailsScreenUiState.Error.errorMessage = "Server error"
+                else -> ExamDetailsScreenUiState.Error
+            }
+            examDetailsScreenUiState = ExamDetailsScreenUiState.Error
+            null
+        }
     }
 
-    private suspend fun toMultipleChoiceQuestion(id: String) : MultipleChoiceQuestionDto {
-        return ExamAppApi.retrofitService.getMultipleChoice(id)
+    private suspend fun toMultipleChoiceQuestion(id: String) : MultipleChoiceQuestionDto? {
+        return try {
+            ExamAppApi.retrofitService.getMultipleChoice(id)
+        } catch (e: IOException) {
+            ExamDetailsScreenUiState.Error.errorMessage = "Network error"
+            examDetailsScreenUiState = ExamDetailsScreenUiState.Error
+            null
+        } catch (e: HttpException) {
+            when(e.code()){
+                400 -> ExamDetailsScreenUiState.Error.errorMessage = "Bad request"
+                401 -> ExamDetailsScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                404 -> ExamDetailsScreenUiState.Error.errorMessage = "Content not found"
+                500 -> ExamDetailsScreenUiState.Error.errorMessage = "Server error"
+                else -> ExamDetailsScreenUiState.Error
+            }
+            examDetailsScreenUiState = ExamDetailsScreenUiState.Error
+            null
+        }
     }
 
     suspend fun saveQuestion(ordinal: Int, question: String) {
@@ -122,11 +185,26 @@ class ExamDetailsViewModel(
 
         val newList =  uiState.examDetails.questionList.toMutableList()
         newList.add(questionDto)
-        viewModelScope.launch{
-            ExamAppApi.retrofitService.updateExam(uiState.examDetails.copy(questionList = newList).toExam())
-            getExam(examId)
-            examDetailsScreenUiState = ExamDetailsScreenUiState.Success(ExamAppApi.retrofitService.getExam(examId))
+        try{
+            viewModelScope.launch{
+                ExamAppApi.retrofitService.updateExam(uiState.examDetails.copy(questionList = newList).toExam())
+                getExam(examId)
+                examDetailsScreenUiState = ExamDetailsScreenUiState.Success(ExamAppApi.retrofitService.getExam(examId))
+            }
+        } catch (e: IOException) {
+            ExamDetailsScreenUiState.Error.errorMessage = "Network error"
+            examDetailsScreenUiState = ExamDetailsScreenUiState.Error
+        } catch (e: HttpException) {
+            when(e.code()){
+                400 -> ExamDetailsScreenUiState.Error.errorMessage = "Bad request"
+                401 -> ExamDetailsScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                404 -> ExamDetailsScreenUiState.Error.errorMessage = "Content not found"
+                500 -> ExamDetailsScreenUiState.Error.errorMessage = "Server error"
+                else -> ExamDetailsScreenUiState.Error
+            }
+            examDetailsScreenUiState = ExamDetailsScreenUiState.Error
         }
+
     }
 
     suspend fun removeQuestion(question: Question) {
@@ -143,16 +221,45 @@ class ExamDetailsViewModel(
                 newList.remove(remove)
             }
         }
-        viewModelScope.launch {
-            ExamAppApi.retrofitService.updateExam(uiState.examDetails.copy(questionList = newList).toExam())
-            getExam(examId)
-            examDetailsScreenUiState = ExamDetailsScreenUiState.Success(ExamAppApi.retrofitService.getExam(examId))
+        try {
+            viewModelScope.launch {
+                ExamAppApi.retrofitService.updateExam(uiState.examDetails.copy(questionList = newList).toExam())
+                getExam(examId)
+                examDetailsScreenUiState = ExamDetailsScreenUiState.Success(ExamAppApi.retrofitService.getExam(examId))
+            }
+        } catch (e: IOException) {
+            ExamDetailsScreenUiState.Error.errorMessage = "Network error"
+            examDetailsScreenUiState = ExamDetailsScreenUiState.Error
+        } catch (e: HttpException) {
+            when(e.code()){
+                400 -> ExamDetailsScreenUiState.Error.errorMessage = "Bad request"
+                401 -> ExamDetailsScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                404 -> ExamDetailsScreenUiState.Error.errorMessage = "Content not found"
+                500 -> ExamDetailsScreenUiState.Error.errorMessage = "Server error"
+                else -> ExamDetailsScreenUiState.Error
+            }
+            examDetailsScreenUiState = ExamDetailsScreenUiState.Error
         }
+
 
     }
 
     suspend fun deleteExam() {
-        ExamAppApi.retrofitService.deleteExam(examId)
+        try{
+            ExamAppApi.retrofitService.deleteExam(examId)
+        } catch (e: IOException) {
+            ExamDetailsScreenUiState.Error.errorMessage = "Network error"
+            examDetailsScreenUiState = ExamDetailsScreenUiState.Error
+        } catch (e: HttpException) {
+            when(e.code()){
+                400 -> ExamDetailsScreenUiState.Error.errorMessage = "Bad request"
+                401 -> ExamDetailsScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                404 -> ExamDetailsScreenUiState.Error.errorMessage = "Content not found"
+                500 -> ExamDetailsScreenUiState.Error.errorMessage = "Server error"
+                else -> ExamDetailsScreenUiState.Error
+            }
+            examDetailsScreenUiState = ExamDetailsScreenUiState.Error
+        }
     }
 
 }

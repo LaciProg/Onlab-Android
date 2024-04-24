@@ -9,12 +9,22 @@ import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.TrueFalseQuestionDto
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TrueFalseQuestionRepository
 import hu.bme.aut.android.examapp.ui.viewmodel.type.Type
+import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+
+sealed interface TrueFalseQuestionEntryScreenUiState {
+    data class Success(val question: TrueFalseQuestionDto) : TrueFalseQuestionEntryScreenUiState
+    data object Error : TrueFalseQuestionEntryScreenUiState{var errorMessage: String = ""}
+    data object Loading : TrueFalseQuestionEntryScreenUiState
+}
 
 class TrueFalseQuestionEntryViewModel(private val trueFalseQuestionRepository: TrueFalseQuestionRepository) : ViewModel(){
 
     var trueFalseQuestionUiState by mutableStateOf(TrueFalseQuestionUiState())
         private set
+
+    var trueFalseEntryScreenUiState: TrueFalseQuestionEntryScreenUiState by mutableStateOf(TrueFalseQuestionEntryScreenUiState.Loading)
 
     fun updateUiState(trueFalseQuestionDetails: TrueFalseQuestionDetails) {
         trueFalseQuestionUiState =
@@ -27,10 +37,26 @@ class TrueFalseQuestionEntryViewModel(private val trueFalseQuestionRepository: T
 
     suspend fun saveTrueFalseQuestion() : Boolean {
         return if (validateInput() && validateUniqueTrueFalseQuestion()) {
-            viewModelScope.launch {
-                ExamAppApi.retrofitService.postTrueFalse(trueFalseQuestionUiState.trueFalseQuestionDetails.toTrueFalseQuestion())
+            try {
+                viewModelScope.launch {
+                    ExamAppApi.retrofitService.postTrueFalse(trueFalseQuestionUiState.trueFalseQuestionDetails.toTrueFalseQuestion())
+                }
+                true
+            } catch (e: IOException){
+                TrueFalseQuestionEditScreenUiState.Error.errorMessage = "Network error"
+                trueFalseEntryScreenUiState = TrueFalseQuestionEntryScreenUiState.Error
+                false
+            } catch (e: HttpException){
+                when(e.code()){
+                    400 -> TrueFalseQuestionEntryScreenUiState.Error.errorMessage = "Bad request"
+                    401 -> TrueFalseQuestionEntryScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                    404 -> TrueFalseQuestionEntryScreenUiState.Error.errorMessage = "Content not found"
+                    500 -> TrueFalseQuestionEntryScreenUiState.Error.errorMessage = "Server error"
+                    else -> TrueFalseQuestionEntryScreenUiState.Error
+                }
+                trueFalseEntryScreenUiState = TrueFalseQuestionEntryScreenUiState.Error
+                false
             }
-            true
         }
         else{
             trueFalseQuestionUiState = trueFalseQuestionUiState.copy(isEntryValid = false)
@@ -45,7 +71,23 @@ class TrueFalseQuestionEntryViewModel(private val trueFalseQuestionRepository: T
     }
 
     private suspend fun validateUniqueTrueFalseQuestion(uiState: TrueFalseQuestionDetails = trueFalseQuestionUiState.trueFalseQuestionDetails): Boolean {
-        return !ExamAppApi.retrofitService.getAllTrueFalseName().map{it.name}.contains(uiState.question)
+        return try{
+            !ExamAppApi.retrofitService.getAllTrueFalseName().map{it.name}.contains(uiState.question)
+        } catch (e: IOException) {
+            TrueFalseQuestionEditScreenUiState.Error.errorMessage = "Network error"
+            trueFalseEntryScreenUiState = TrueFalseQuestionEntryScreenUiState.Error
+            false
+        } catch (e: HttpException) {
+            when(e.code()){
+                400 -> TrueFalseQuestionEntryScreenUiState.Error.errorMessage = "Bad request"
+                401 -> TrueFalseQuestionEntryScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                404 -> TrueFalseQuestionEntryScreenUiState.Error.errorMessage = "Content not found"
+                500 -> TrueFalseQuestionEntryScreenUiState.Error.errorMessage = "Server error"
+                else -> TrueFalseQuestionEntryScreenUiState.Error
+            }
+            trueFalseEntryScreenUiState = TrueFalseQuestionEntryScreenUiState.Error
+            false
+        }
     }
 
 }

@@ -7,13 +7,24 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.PointDto
+import hu.bme.aut.android.examapp.api.dto.TrueFalseQuestionDto
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.PointRepository
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
+
+sealed interface PointEntryScreenUiState {
+    data class Success(val question: TrueFalseQuestionDto) : PointEntryScreenUiState
+    data object Error : PointEntryScreenUiState{var errorMessage: String = ""}
+    data object Loading : PointEntryScreenUiState
+}
 
 class PointEntryViewModel(private val pointRepository: PointRepository) : ViewModel(){
 
     var pointUiState by mutableStateOf(PointUiState())
         private set
+
+    var pointScreenUiState: PointEntryScreenUiState by mutableStateOf(PointEntryScreenUiState.Loading)
 
     fun updateUiState(pointDetails: PointDetails) {
         pointUiState =
@@ -22,10 +33,26 @@ class PointEntryViewModel(private val pointRepository: PointRepository) : ViewMo
 
     suspend fun savePoint() : Boolean {
         return if (validateInput() && validateUniqueTopic()) {
-            viewModelScope.launch {
-                ExamAppApi.retrofitService.postPoint(pointUiState.pointDetails.toPoint())
+            try{
+                viewModelScope.launch {
+                    ExamAppApi.retrofitService.postPoint(pointUiState.pointDetails.toPoint())
+                }
+                true
+            } catch (e: IOException){
+                PointEntryScreenUiState.Error.errorMessage = "Network error"
+                pointScreenUiState = PointEntryScreenUiState.Error
+                false
+            } catch (e: HttpException){
+                when(e.code()){
+                    400 -> PointEntryScreenUiState.Error.errorMessage = "Bad request"
+                    401 -> PointEntryScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                    404 -> PointEntryScreenUiState.Error.errorMessage = "Content not found"
+                    500 -> PointEntryScreenUiState.Error.errorMessage = "Server error"
+                    else -> PointEntryScreenUiState.Error
+                }
+                pointScreenUiState = PointEntryScreenUiState.Error
+                false
             }
-            true
         }
         else{
             pointUiState = pointUiState.copy(isEntryValid = false)
@@ -40,7 +67,23 @@ class PointEntryViewModel(private val pointRepository: PointRepository) : ViewMo
     }
 
     private suspend fun validateUniqueTopic(uiState: PointDetails = pointUiState.pointDetails): Boolean {
-        return !ExamAppApi.retrofitService.getAllPointName().map{it.name}.contains(uiState.type)
+        return try{
+            !ExamAppApi.retrofitService.getAllPointName().map{it.name}.contains(uiState.type)
+        } catch (e: IOException) {
+            PointEntryScreenUiState.Error.errorMessage = "Network error"
+            pointScreenUiState = PointEntryScreenUiState.Error
+            false
+        } catch (e: HttpException){
+            when(e.code()){
+                400 -> PointEntryScreenUiState.Error.errorMessage = "Bad request"
+                401 -> PointEntryScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                404 -> PointEntryScreenUiState.Error.errorMessage = "Content not found"
+                500 -> PointEntryScreenUiState.Error.errorMessage = "Server error"
+                else -> PointEntryScreenUiState.Error
+            }
+            pointScreenUiState = PointEntryScreenUiState.Error
+            false
+        }
     }
 
 }

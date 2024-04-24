@@ -46,10 +46,11 @@ class TopicDetailsViewModel(
                 ))
             TopicDetailsScreenUiState.Success(result)
             } catch (e: IOException) {
+                TopicDetailsScreenUiState.Error.errorMessage = "Network error"
                 TopicDetailsScreenUiState.Error
             } catch (e: HttpException) {
                 when(e.code()){
-                    400 -> TopicDetailsScreenUiState.Error.errorMessage = "Bad request"
+                    400 -> TopicDetailsScreenUiState.Error.errorMessage = "You can't delete a topic because it is used in a question, exam or topic."
                     401 -> TopicDetailsScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
                     404 -> TopicDetailsScreenUiState.Error.errorMessage = "Content not found"
                     500 -> TopicDetailsScreenUiState.Error.errorMessage = "Server error"
@@ -61,8 +62,20 @@ class TopicDetailsViewModel(
     }
 
     suspend fun deleteTopic() {
-        viewModelScope.launch {
+        try {
             ExamAppApi.retrofitService.deleteTopic(topicId)
+        } catch (e: IOException){
+            TopicDetailsScreenUiState.Error.errorMessage = "Network error"
+            topicDetailsScreenUiState = TopicDetailsScreenUiState.Error
+        } catch (e: HttpException){
+            when(e.code()){
+                400 -> TopicDetailsScreenUiState.Error.errorMessage = "Bad request"
+                401 -> TopicDetailsScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                404 -> TopicDetailsScreenUiState.Error.errorMessage = "Content not found"
+                500 -> TopicDetailsScreenUiState.Error.errorMessage = "Server error"
+                else -> TopicDetailsScreenUiState.Error
+            }
+            topicDetailsScreenUiState = TopicDetailsScreenUiState.Error
         }
     }
 

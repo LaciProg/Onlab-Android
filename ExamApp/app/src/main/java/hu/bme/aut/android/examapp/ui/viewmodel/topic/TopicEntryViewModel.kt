@@ -7,13 +7,25 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.TopicDto
+import hu.bme.aut.android.examapp.api.dto.TrueFalseQuestionDto
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
+import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionEntryScreenUiState
+import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+
+sealed interface TopicEntryScreenUiState {
+    data class Success(val question: TrueFalseQuestionDto) : TopicEntryScreenUiState
+    data object Error : TopicEntryScreenUiState{var errorMessage: String = ""}
+    data object Loading : TopicEntryScreenUiState
+}
 
 class TopicEntryViewModel(private val topicRepository: TopicRepository) : ViewModel(){
 
     var topicUiState by mutableStateOf(TopicUiState())
         private set
+
+    var topicScreenUiState: TopicEntryScreenUiState by mutableStateOf(TopicEntryScreenUiState.Loading)
 
     fun updateUiState(topicDetails: TopicDetails) {
         topicUiState =
@@ -22,10 +34,26 @@ class TopicEntryViewModel(private val topicRepository: TopicRepository) : ViewMo
 
     suspend fun saveTopic() : Boolean {
         return if (validateInput() && validateUniqueTopic()) {
-            viewModelScope.launch {
-                ExamAppApi.retrofitService.postTopic(topicUiState.topicDetails.toTopic())
+            try{
+                viewModelScope.launch {
+                    ExamAppApi.retrofitService.postTopic(topicUiState.topicDetails.toTopic())
+                }
+                true
+            } catch (e: IOException){
+                TopicEntryScreenUiState.Error.errorMessage = "Network error"
+                topicScreenUiState = TopicEntryScreenUiState.Error
+                false
+            } catch (e: HttpException){
+                when(e.code()){
+                    400 -> TopicEntryScreenUiState.Error.errorMessage = "Bad request"
+                    401 -> TopicEntryScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                    404 -> TopicEntryScreenUiState.Error.errorMessage = "Content not found"
+                    500 -> TopicEntryScreenUiState.Error.errorMessage = "Server error"
+                    else -> TopicEntryScreenUiState.Error
+                }
+                TopicEntryScreenUiState.Error
+                false
             }
-            true
         } else {
             topicUiState = topicUiState.copy(isEntryValid = false)
             false
@@ -34,7 +62,24 @@ class TopicEntryViewModel(private val topicRepository: TopicRepository) : ViewMo
 
 
     suspend fun getTopicIdByTopic(topic: String): String {
-        return ExamAppApi.retrofitService.getTopicByTopic(topic)?.uuid ?: ""
+        return try{
+            ExamAppApi.retrofitService.getTopicByTopic(topic)?.uuid ?: ""
+        } catch (e: IOException) {
+            TopicEntryScreenUiState.Error.errorMessage = "Network error"
+            topicScreenUiState = TopicEntryScreenUiState.Error
+            ""
+        } catch (e: HttpException){
+            when(e.code()){
+                400 -> TopicEntryScreenUiState.Error.errorMessage = "Bad request"
+                401 -> TopicEntryScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                404 -> TopicEntryScreenUiState.Error.errorMessage = "Content not found"
+                500 -> TopicEntryScreenUiState.Error.errorMessage = "Server error"
+                else -> TopicEntryScreenUiState.Error
+            }
+            topicScreenUiState = TopicEntryScreenUiState.Error
+            ""
+        }
+
     }
 
     private fun validateInput(uiState: TopicDetails = topicUiState.topicDetails): Boolean {
@@ -44,7 +89,23 @@ class TopicEntryViewModel(private val topicRepository: TopicRepository) : ViewMo
     }
 
     private suspend fun validateUniqueTopic(uiState: TopicDetails = topicUiState.topicDetails): Boolean {
-        return !ExamAppApi.retrofitService.getAllTopicName().map{it.name}.contains(uiState.topic)
+        return try{
+            !ExamAppApi.retrofitService.getAllTopicName().map{it.name}.contains(uiState.topic)
+        } catch (e: IOException) {
+            TopicEntryScreenUiState.Error.errorMessage = "Network error"
+            topicScreenUiState = TopicEntryScreenUiState.Error
+            false
+        } catch (e: HttpException) {
+            when(e.code()){
+                400 -> TopicEntryScreenUiState.Error.errorMessage = "Bad request"
+                401 -> TopicEntryScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                404 -> TopicEntryScreenUiState.Error.errorMessage = "Content not found"
+                500 -> TopicEntryScreenUiState.Error.errorMessage = "Server error"
+                else -> TopicEntryScreenUiState.Error
+            }
+            topicScreenUiState = TopicEntryScreenUiState.Error
+            false
+        }
     }
 
 }

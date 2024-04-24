@@ -75,8 +75,26 @@ class TrueFalseQuestionEditViewModel(
 
     suspend fun updateTrueFalseQuestion() : Boolean{
         return if (validateInput(trueFalseQuestionUiState.trueFalseQuestionDetails) && validateUniqueTrueFalseQuestion(trueFalseQuestionUiState.trueFalseQuestionDetails)) {
-            ExamAppApi.retrofitService.updateTrueFalse(trueFalseQuestionUiState.trueFalseQuestionDetails.toTrueFalseQuestion())
-            true
+            try{
+                viewModelScope.launch {
+                    ExamAppApi.retrofitService.updateTrueFalse(trueFalseQuestionUiState.trueFalseQuestionDetails.toTrueFalseQuestion())
+                }
+                return true
+            } catch (e: IOException) {
+                TrueFalseQuestionEditScreenUiState.Error.errorMessage = "Network error"
+                trueFalseEditScreenUiState = TrueFalseQuestionEditScreenUiState.Error
+                return false
+            } catch (e: HttpException) {
+                when(e.code()){
+                    400 -> TrueFalseQuestionEditScreenUiState.Error.errorMessage = "Bad request"
+                    401 -> TrueFalseQuestionEditScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                    404 -> TrueFalseQuestionEditScreenUiState.Error.errorMessage = "Content not found"
+                    500 -> TrueFalseQuestionEditScreenUiState.Error.errorMessage = "Server error"
+                    else -> TrueFalseQuestionEditScreenUiState.Error
+                }
+                trueFalseEditScreenUiState = TrueFalseQuestionEditScreenUiState.Error
+                return false
+            }
         }
         else {
             trueFalseQuestionUiState = trueFalseQuestionUiState.copy(isEntryValid = false)
@@ -97,7 +115,23 @@ class TrueFalseQuestionEditViewModel(
     }
 
     private suspend fun validateUniqueTrueFalseQuestion(uiState: TrueFalseQuestionDetails = trueFalseQuestionUiState.trueFalseQuestionDetails): Boolean {
-        return !ExamAppApi.retrofitService.getAllTrueFalse().map{it.question}.contains(uiState.question) || originalQuestion == uiState.question
+        return try{
+            !ExamAppApi.retrofitService.getAllTrueFalse().map{it.question}.contains(uiState.question) || originalQuestion == uiState.question
+        } catch (e: IOException) {
+            TrueFalseQuestionEditScreenUiState.Error.errorMessage = "Network error"
+            trueFalseEditScreenUiState = TrueFalseQuestionEditScreenUiState.Error
+            false
+        } catch (e: HttpException) {
+            when(e.code()){
+                400 -> TrueFalseQuestionEditScreenUiState.Error.errorMessage = "Bad request"
+                401 -> TrueFalseQuestionEditScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                404 -> TrueFalseQuestionEditScreenUiState.Error.errorMessage = "Content not found"
+                500 -> TrueFalseQuestionEditScreenUiState.Error.errorMessage = "Server error"
+                else -> TrueFalseQuestionEditScreenUiState.Error
+            }
+            trueFalseEditScreenUiState = TrueFalseQuestionEditScreenUiState.Error
+            false
+        }
     }
 }
 
