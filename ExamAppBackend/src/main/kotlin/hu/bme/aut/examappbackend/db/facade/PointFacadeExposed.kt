@@ -1,7 +1,7 @@
 package hu.bme.aut.examappbackend.db.facade
 
 import hu.bme.aut.examappbackend.db.DatabaseFactory.dbQuery
-import hu.bme.aut.examappbackend.db.model.PointDB
+import hu.bme.aut.examappbackend.db.model.*
 import hu.bme.aut.examappbackend.dto.PointDto
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -42,7 +42,15 @@ class PointFacadeExposed : PointFacade {
     }
 
     override suspend fun deletePoint(uuid: String): Boolean = dbQuery {
-        PointDB.deleteWhere {PointDB.id eq UUID.fromString(uuid)} > 0
+        if(
+            TrueFalseQuestionDB.selectAll().where(TrueFalseQuestionDB.point eq UUID.fromString(uuid))
+                .map { it[TrueFalseQuestionDB.id] }.isEmpty()
+            &&
+            MultipleChoiceQuestionDB.selectAll().where(MultipleChoiceQuestionDB.point eq UUID.fromString(uuid))
+                .map { it[MultipleChoiceQuestionDB.id] }.isEmpty()
+        ) {
+            PointDB.deleteWhere { PointDB.id eq UUID.fromString(uuid) } > 0
+        } else false
     }
 
     override suspend fun updatePoint(pointDto: PointDto): Boolean = dbQuery {

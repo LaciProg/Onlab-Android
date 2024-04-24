@@ -35,6 +35,52 @@ class ExamFacadeExposed : ExamFacade{
             .singleOrNull()
     }
 
+    override suspend fun getAllQuestion(): List<Question> {
+        val questions: MutableList<Question> = mutableListOf()
+        val examIds = FacadeExposed.examDao.getAllExam().map { it.uuid }
+        val questionStrings: HashSet<String> = hashSetOf()
+        examIds.forEach { FacadeExposed.examDao.getAllQuestionString(it)?.let { it1 -> questionStrings.add(it1) } }
+        val usedQuestions: MutableList<String> = mutableListOf()
+        questionStrings.forEach { usedQuestions.addAll(it.split("#")) }
+
+        usedQuestions.forEach {
+            when(it.substringBefore("~").toInt()){
+                Type.trueFalseQuestion.ordinal -> {
+                    val q = FacadeExposed.trueFalseQuestionDao.getTrueFalseQuestionById(it.substringAfter("~"))
+                    if(q != null){ questions.add(q) }
+                }
+                Type.multipleChoiceQuestion.ordinal -> {
+                    val q = FacadeExposed.multipleChoiceQuestionDao.getMultipleChoiceQuestionById(it.substringAfter("~"))
+                    if(q != null){ questions.add(q) }
+                }
+            }
+        }
+        return questions
+    }
+
+    override suspend fun getAllQuestionId(): List<String> {
+        val questions: MutableList<String> = mutableListOf()
+        val examIds = FacadeExposed.examDao.getAllExam().map { it.uuid }
+        val questionStrings: HashSet<String> = hashSetOf()
+        examIds.forEach { FacadeExposed.examDao.getAllQuestionString(it)?.let { it1 -> questionStrings.add(it1) } }
+        val usedQuestions: MutableList<String> = mutableListOf()
+        questionStrings.forEach { usedQuestions.addAll(it.split("#")) }
+
+        usedQuestions.forEach {
+            when(it.substringBefore("~").toInt()){
+                Type.trueFalseQuestion.ordinal -> {
+                    val q = FacadeExposed.trueFalseQuestionDao.getTrueFalseQuestionById(it.substringAfter("~"))
+                    if(q != null){ questions.add(q.uuid) }
+                }
+                Type.multipleChoiceQuestion.ordinal -> {
+                    val q = FacadeExposed.multipleChoiceQuestionDao.getMultipleChoiceQuestionById(it.substringAfter("~"))
+                    if(q != null){ questions.add(q.uuid) }
+                }
+            }
+        }
+        return questions
+    }
+
     override suspend fun getExamById(uuid: String): ExamDto? = dbQuery {
         ExamDB.selectAll().where { ExamDB.id eq UUID.fromString(uuid) }
             .map(::resultRowToExam)

@@ -1,5 +1,6 @@
 package hu.bme.aut.examappbackend.routes
 
+import enums.Type
 import hu.bme.aut.examappbackend.db.facade.FacadeExposed
 import hu.bme.aut.examappbackend.dto.ExamDto
 import hu.bme.aut.examappbackend.dto.Question
@@ -45,9 +46,28 @@ fun Route.examRoutes(){
     }
 
     get<ExamRoutes.ExamUUID.QuestionList> {
-        val questions: MutableList<Question> = mutableListOf()
-        questions.addAll(FacadeExposed.multipleChoiceQuestionDao.getAllMultipleChoiceQuestion())
-        questions.addAll(FacadeExposed.trueFalseQuestionDao.getAllTrueFalseQuestion())
+        /*val questions: MutableList<Question> = mutableListOf()
+        val examIds = FacadeExposed.examDao.getAllExam().map { it.uuid }
+        val questionStrings: HashSet<String> = hashSetOf()
+        examIds.forEach { FacadeExposed.examDao.getAllQuestionString(it)?.let { it1 -> questionStrings.add(it1) } }
+        val usedQuestions: MutableList<String> = mutableListOf()
+        questionStrings.forEach { usedQuestions.addAll(it.split("#")) }
+
+        usedQuestions.forEach {
+            when(it.substringBefore("~").toInt()){
+                Type.trueFalseQuestion.ordinal -> {
+                    val q = FacadeExposed.trueFalseQuestionDao.getTrueFalseQuestionById(it.substringAfter("~"))
+                    if(q != null){ questions.add(q) }
+                }
+                Type.multipleChoiceQuestion.ordinal -> {
+                    val q = FacadeExposed.multipleChoiceQuestionDao.getMultipleChoiceQuestionById(it.substringAfter("~"))
+                    if(q != null){ questions.add(q) }
+                }
+            }
+        }*/
+        val questions = FacadeExposed.examDao.getAllQuestion()
+        //questions.addAll(FacadeExposed.multipleChoiceQuestionDao.getAllMultipleChoiceQuestion())
+        //questions.addAll(FacadeExposed.trueFalseQuestionDao.getAllTrueFalseQuestion())
         call.respond(status = HttpStatusCode.OK, message = questions)
     }
 

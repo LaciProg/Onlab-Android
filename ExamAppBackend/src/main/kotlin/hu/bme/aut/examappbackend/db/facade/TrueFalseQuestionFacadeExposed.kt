@@ -33,7 +33,11 @@ class TrueFalseQuestionFacadeExposed : TrueFalseQuestionFacade {
     }
 
     override suspend fun deleteTrueFalseQuestion(uuid: String): Boolean = dbQuery {
-        TrueFalseQuestionDB.deleteWhere { TrueFalseQuestionDB.id eq UUID.fromString(uuid) } > 0
+        if(
+            !FacadeExposed.examDao.getAllQuestionId().contains(uuid)
+        ) {
+            TrueFalseQuestionDB.deleteWhere { TrueFalseQuestionDB.id eq UUID.fromString(uuid) } > 0
+        } else false
     }
 
     override suspend fun insertTrueFalseQuestion(trueFalseQuestion: TrueFalseQuestionDto): TrueFalseQuestionDto? = dbQuery {

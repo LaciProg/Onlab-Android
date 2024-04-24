@@ -33,7 +33,11 @@ class MultipleChoiceQuestionFacadeExposed : MultipleChoiceQuestionFacade {
     }
 
     override suspend fun deleteMultipleChoiceQuestion(uuid: String): Boolean = dbQuery {
-        MultipleChoiceQuestionDB.deleteWhere { MultipleChoiceQuestionDB.id eq UUID.fromString(uuid) } > 0
+        if(
+            !FacadeExposed.examDao.getAllQuestionId().contains(uuid)
+        ) {
+            MultipleChoiceQuestionDB.deleteWhere { MultipleChoiceQuestionDB.id eq UUID.fromString(uuid) } > 0
+        } else false
     }
 
     override suspend fun insertMultipleChoiceQuestion(multipleChoiceQuestion: MultipleChoiceQuestionDto): MultipleChoiceQuestionDto? = dbQuery {

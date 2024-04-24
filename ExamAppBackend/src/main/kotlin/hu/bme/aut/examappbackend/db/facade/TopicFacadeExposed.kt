@@ -1,7 +1,10 @@
 package hu.bme.aut.examappbackend.db.facade
 
 import hu.bme.aut.examappbackend.db.DatabaseFactory.dbQuery
+import hu.bme.aut.examappbackend.db.model.ExamDB
+import hu.bme.aut.examappbackend.db.model.MultipleChoiceQuestionDB
 import hu.bme.aut.examappbackend.db.model.TopicDB
+import hu.bme.aut.examappbackend.db.model.TrueFalseQuestionDB
 import hu.bme.aut.examappbackend.dto.TopicDto
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -55,7 +58,21 @@ class TopicFacadeExposed : TopicFacade {
     }
 
     override suspend fun deleteTopic(uuid: String): Boolean = dbQuery {
-        TopicDB.deleteWhere { TopicDB.id eq UUID.fromString(uuid) } > 0
+        if(
+            TopicDB.selectAll().where( TopicDB.parentTopic eq UUID.fromString(uuid))
+                .map { it[TopicDB.id] }.isEmpty()
+            &&
+            TrueFalseQuestionDB.selectAll().where(TrueFalseQuestionDB.topic eq UUID.fromString(uuid))
+                .map { it[TrueFalseQuestionDB.id] }.isEmpty()
+            &&
+            MultipleChoiceQuestionDB.selectAll().where(MultipleChoiceQuestionDB.topic eq UUID.fromString(uuid))
+                .map { it[MultipleChoiceQuestionDB.id] }.isEmpty()
+            &&
+            ExamDB.selectAll().where(ExamDB.topicId eq UUID.fromString(uuid))
+                .map { it[ExamDB.id] }.isEmpty()
+        ) {
+            TopicDB.deleteWhere { TopicDB.id eq UUID.fromString(uuid) } > 0
+        } else false
     }
 
 }
