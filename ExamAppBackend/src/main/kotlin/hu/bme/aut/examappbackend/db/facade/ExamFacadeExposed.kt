@@ -35,23 +35,30 @@ class ExamFacadeExposed : ExamFacade{
             .singleOrNull()
     }
 
+    override suspend fun getAllQuestionStringById(uuid: String): String? = dbQuery {
+        ExamDB.selectAll().where { ExamDB.id eq UUID.fromString(uuid) }
+            .map { it[ExamDB.questionList] }
+            .singleOrNull()
+    }
+
     override suspend fun getAllQuestion(): List<Question> {
         val questions: MutableList<Question> = mutableListOf()
         val examIds = FacadeExposed.examDao.getAllExam().map { it.uuid }
         val questionStrings: HashSet<String> = hashSetOf()
-        examIds.forEach { FacadeExposed.examDao.getAllQuestionString(it)?.let { it1 -> questionStrings.add(it1) } }
-        val usedQuestions: MutableList<String> = mutableListOf()
+        examIds.forEach { FacadeExposed.examDao.getAllQuestionStringById(it)?.let { it1 -> questionStrings.add(it1) } }
+        val usedQuestions: HashSet<String> = hashSetOf()
         questionStrings.forEach { usedQuestions.addAll(it.split("#")) }
-
         usedQuestions.forEach {
             when(it.substringBefore("~").toInt()){
                 Type.trueFalseQuestion.ordinal -> {
                     val q = FacadeExposed.trueFalseQuestionDao.getTrueFalseQuestionById(it.substringAfter("~"))
                     if(q != null){ questions.add(q) }
+                    println(q)
                 }
                 Type.multipleChoiceQuestion.ordinal -> {
                     val q = FacadeExposed.multipleChoiceQuestionDao.getMultipleChoiceQuestionById(it.substringAfter("~"))
                     if(q != null){ questions.add(q) }
+                    println(q)
                 }
             }
         }
@@ -62,7 +69,7 @@ class ExamFacadeExposed : ExamFacade{
         val questions: MutableList<String> = mutableListOf()
         val examIds = FacadeExposed.examDao.getAllExam().map { it.uuid }
         val questionStrings: HashSet<String> = hashSetOf()
-        examIds.forEach { FacadeExposed.examDao.getAllQuestionString(it)?.let { it1 -> questionStrings.add(it1) } }
+        examIds.forEach { FacadeExposed.examDao.getAllQuestionStringById(it)?.let { it1 -> questionStrings.add(it1) } }
         val usedQuestions: MutableList<String> = mutableListOf()
         questionStrings.forEach { usedQuestions.addAll(it.split("#")) }
 

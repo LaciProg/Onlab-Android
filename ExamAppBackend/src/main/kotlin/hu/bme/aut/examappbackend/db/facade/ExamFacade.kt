@@ -8,6 +8,7 @@ interface ExamFacade {
     suspend fun getAllExam() : List<ExamDto>
     suspend fun getAllExamNames() : List<NameDto>
     suspend fun getAllQuestionString(exam: String): String?
+    suspend fun getAllQuestionStringById(uuid: String): String?
     suspend fun getAllQuestion(): List<Question>
     suspend fun getAllQuestionId(): List<String>
 
