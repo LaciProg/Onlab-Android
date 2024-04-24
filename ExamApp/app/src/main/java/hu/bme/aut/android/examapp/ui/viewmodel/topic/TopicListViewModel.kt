@@ -8,19 +8,14 @@ import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.NameDto
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
-import hu.bme.aut.android.examapp.ui.viewmodel.point.PointListScreenUiState
 import io.ktor.utils.io.errors.IOException
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
 sealed interface TopicListScreenUiState {
     data class Success(val topics: List<NameDto>) : TopicListScreenUiState
-    object Error : TopicListScreenUiState{var errorMessage: String = ""}
-    object Loading : TopicListScreenUiState
+    data object Error : TopicListScreenUiState{var errorMessage: String = ""}
+    data object Loading : TopicListScreenUiState
 }
 
 class TopicListViewModel(topicRepository: TopicRepository) : ViewModel() {
@@ -61,35 +56,8 @@ class TopicListViewModel(topicRepository: TopicRepository) : ViewModel() {
         }
     }
 
-
-    /**
-     * Holds home ui state. The list of items are retrieved from [TopicRepository] and mapped to
-     * [TopicListUiState]
-     */
-    //val topicListUiState: StateFlow<TopicListUiState> =
-    //    topicRepository.getAllTopics().map { TopicListUiState(
-    //        topicList = it.map { topicDto ->
-    //            TopicRowUiState(
-    //                topic = topicDto.topic,
-    //                id = topicDto.id
-    //            )
-    //        }
-    //    ) }
-    //        .stateIn(
-    //            scope = viewModelScope,
-    //            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-    //            initialValue = TopicListUiState()
-    //        )
-
-    companion object {
-        //var topicListScreenEffected = false
-        private const val TIMEOUT_MILLIS = 5_000L
-    }
 }
 
-/**
- * UI state for TopicListScreen
- */
 data class TopicListUiState(val topicList: List<TopicRowUiState> = listOf(TopicRowUiState()))
 
 data class TopicRowUiState(

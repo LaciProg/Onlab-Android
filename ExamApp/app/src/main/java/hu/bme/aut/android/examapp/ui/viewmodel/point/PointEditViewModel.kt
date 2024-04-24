@@ -17,8 +17,8 @@ import retrofit2.HttpException
 
 sealed interface PointEditScreenUiState {
     data class Success(val point: PointDto) : PointEditScreenUiState
-    object Error : PointEditScreenUiState{var errorMessage: String = ""}
-    object Loading : PointEditScreenUiState
+    data object Error : PointEditScreenUiState{var errorMessage: String = ""}
+    data object Loading : PointEditScreenUiState
 }
 
 class PointEditViewModel(
@@ -34,17 +34,6 @@ class PointEditViewModel(
     private lateinit var originalPoint: String
 
     var pointEditScreenUiState: PointEditScreenUiState by mutableStateOf(PointEditScreenUiState.Loading)
-
-
-    init {
-        //viewModelScope.launch {
-        //    pointUiState = pointRepository.getPointById(pointId.toInt())
-        //        .filterNotNull()
-        //        .first()
-        //        .toPointUiState(true)
-        //    originalPoint = pointUiState.pointDetails.type
-        //}
-    }
 
     init {
         getPoint(pointId)
@@ -78,7 +67,6 @@ class PointEditViewModel(
             viewModelScope.launch {
                 ExamAppApi.retrofitService.updatePoint(pointUiState.pointDetails.toPoint())
             }
-            //pointRepository.updatePoint(pointUiState.pointDetails.toPoint())
             true
         }
         else{

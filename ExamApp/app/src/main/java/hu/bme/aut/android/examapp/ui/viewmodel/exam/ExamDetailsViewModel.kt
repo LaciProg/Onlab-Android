@@ -1,6 +1,5 @@
 package hu.bme.aut.android.examapp.ui.viewmodel.exam
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -19,30 +18,16 @@ import hu.bme.aut.android.examapp.data.repositories.inrefaces.MultipleChoiceQues
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.PointRepository
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TrueFalseQuestionRepository
-//import hu.bme.aut.android.examapp.data.room.dto.MultipleChoiceQuestionDto
-//import hu.bme.aut.android.examapp.data.room.dto.PointDto
-//import hu.bme.aut.android.examapp.data.room.dto.Question
-//import hu.bme.aut.android.examapp.data.room.dto.TopicDto
-//import hu.bme.aut.android.examapp.data.room.dto.TrueFalseQuestionDto
 import hu.bme.aut.android.examapp.ui.ExamDetailsDestination
-import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionDetailsScreenUiState
-import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionDetailsUiState
-import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.toMultipleChoiceQuestionDetails
 import hu.bme.aut.android.examapp.ui.viewmodel.type.Type
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 
 sealed interface ExamDetailsScreenUiState {
     data class Success(val exam: ExamDto) : ExamDetailsScreenUiState
-    object Error : ExamDetailsScreenUiState{var errorMessage: String = ""}
-    object Loading : ExamDetailsScreenUiState
+    data object Error : ExamDetailsScreenUiState{var errorMessage: String = ""}
+    data object Loading : ExamDetailsScreenUiState
 }
 
 class ExamDetailsViewModel(
@@ -102,50 +87,6 @@ class ExamDetailsViewModel(
         }
     }
 
-
-    /**
-     * Holds the item details ui state. The data is retrieved from [ExamRepository] and mapped to
-     * the UI state.
-     */
-    //val uiState: StateFlow<ExamDetailsUiState> =
-    //    examRepository.getExamById(examId.toInt())
-    //        .filterNotNull()
-    //        .map { examDto ->
-    //            ExamDetailsUiState(examDetails =  examDto.toExamDetails(
-    //                topicName = topicRepository.getTopicById(examDto.topicId).filterNotNull().map { it.topic }.first(),
-    //                questionList = if(examDto.questionList != "") examDto.questionList.split("¤").map { it.toQuestion() } else listOf()
-    //            ))
-    //        }.stateIn(
-    //            scope = viewModelScope,
-    //            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-    //            initialValue = ExamDetailsUiState()
-    //        )
-
-
-    /*val topicList: StateFlow<List<TopicDto>> = topicRepository.getAllTopics().filterNotNull().stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-        initialValue = listOf()
-    )
-
-    val pointList: StateFlow<List<PointDto>> = pointRepository.getAllPoints().filterNotNull().stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-        initialValue = listOf()
-    )
-
-    val trueFalseList: StateFlow<List<TrueFalseQuestionDto>> = trueFalseQuestionRepository.getAllTrueFalseQuestions().filterNotNull().stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-        initialValue = listOf()
-    )
-
-    val multipleChoiceList: StateFlow<List<MultipleChoiceQuestionDto>> = multipleChoiceQuestionRepository.getAllMultipleChoiceQuestions().filterNotNull().stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-        initialValue = listOf()
-    )*/
-
     private suspend fun String.toQuestion(): Question {
         val question = this.split("~")
         val type = question[0].toInt()
@@ -160,17 +101,14 @@ class ExamDetailsViewModel(
 
     suspend fun saveQuestionOrdering(list: List<Question>) {
         ExamAppApi.retrofitService.updateExam(uiState.examDetails.copy(questionList = list).toExam())
-        //examRepository.updateExam(uiState.value.examDetails.copy(questionList = list).toExam())
     }
 
     private suspend fun toTrueFalseQuestion(id: String) : TrueFalseQuestionDto {
-        return ExamAppApi.retrofitService.getTrueFalse(id.toString())
-        //return trueFalseQuestionRepository.getTrueFalseQuestionById(id).filterNotNull().first()
+        return ExamAppApi.retrofitService.getTrueFalse(id)
     }
 
     private suspend fun toMultipleChoiceQuestion(id: String) : MultipleChoiceQuestionDto {
-        return ExamAppApi.retrofitService.getMultipleChoice(id.toString())
-        //return multipleChoiceQuestionRepository.getMultipleChoiceQuestionById(id).filterNotNull().first()
+        return ExamAppApi.retrofitService.getMultipleChoice(id)
     }
 
     suspend fun saveQuestion(ordinal: Int, question: String) {
@@ -189,8 +127,6 @@ class ExamDetailsViewModel(
             getExam(examId)
             examDetailsScreenUiState = ExamDetailsScreenUiState.Success(ExamAppApi.retrofitService.getExam(examId))
         }
-        //ExamAppApi.retrofitService.updateExam(uiState.examDetails.copy(questionList = newList).toExam())
-        //examRepository.updateExam(uiState.value.examDetails.copy(questionList = newList).toExam())
     }
 
     suspend fun removeQuestion(question: Question) {
@@ -200,74 +136,27 @@ class ExamDetailsViewModel(
         when(question){
             is TrueFalseQuestionDto -> {
                 val remove = trueFalseList.first { it.uuid == question.uuid }
-                Log.d("ExamDetailsViewModel", "true: $remove")
                 newList.remove(remove)
             }
             is MultipleChoiceQuestionDto -> {
                 val remove = multipleChoiceList.first { it.uuid == question.uuid }
-                Log.d("ExamDetailsViewModel", "multi: $remove")
                 newList.remove(remove)
             }
-            else -> throw IllegalArgumentException("Invalid type")
         }
         viewModelScope.launch {
             ExamAppApi.retrofitService.updateExam(uiState.examDetails.copy(questionList = newList).toExam())
             getExam(examId)
             examDetailsScreenUiState = ExamDetailsScreenUiState.Success(ExamAppApi.retrofitService.getExam(examId))
         }
-        //examRepository.updateExam(uiState.value.examDetails.copy(questionList = newList).toExam())
 
     }
 
-    /**
-     * Deletes the item from the [ExamRepository]'s data source.
-     */
     suspend fun deleteExam() {
         ExamAppApi.retrofitService.deleteExam(examId)
-        //examRepository.deleteExam(uiState.value.examDetails.toExam())
     }
 
-    /*suspend fun getExamById(id: Int): String {
-        return examRepository.getExamById(id).filterNotNull().map { it.name }.first()
-    }
-
-    private suspend fun getPointByPointId(id: Int): PointDto {
-        return pointRepository.getPointById(id).filterNotNull().first()
-    }
-
-    suspend fun getPoints(examId: Int): ExamDetails {
-        val examDto = examRepository.getExamById(examId).filterNotNull().first()
-        val examDetails =examDto.toExamDetails(
-            topicRepository.getTopicById(examRepository.getExamById(examId).map { it.topicId }.first())
-                .map{it.topic}.first(),
-            examDto.questionList.split("¤").map { it.toQuestion() }
-            )
-        return examDetails
-        /*
-        return examDetails.questionList.map {
-            when (it) {
-                is TrueFalseQuestionDto -> {
-                    getPointByPointId(it.point)
-                }
-
-                is MultipleChoiceQuestionDto -> {
-                    getPointByPointId(it.point)
-                }
-                else -> throw IllegalArgumentException("Unknown question type")
-            }
-        }.toList()*/
-    }*/
-
-
-
-    companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
-    }
 }
 
-/**
- * UI state for ExamDetailsScreen
- */
 data class ExamDetailsUiState(
     val examDetails: ExamDetails = ExamDetails()
 )

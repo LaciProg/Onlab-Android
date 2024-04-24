@@ -7,23 +7,17 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.examapp.api.ExamAppApi
-import hu.bme.aut.android.examapp.api.dto.PointDto
 import hu.bme.aut.android.examapp.api.dto.TopicDto
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
 import hu.bme.aut.android.examapp.ui.TopicDetailsDestination
-import hu.bme.aut.android.examapp.ui.viewmodel.point.PointEditScreenUiState
-import hu.bme.aut.android.examapp.ui.viewmodel.point.toPointUiState
 import io.ktor.utils.io.errors.IOException
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
 sealed interface TopicEditScreenUiState {
     data class Success(val topic: TopicDto) : TopicEditScreenUiState
-    object Error : TopicEditScreenUiState{var errorMessage: String = ""}
-    object Loading : TopicEditScreenUiState
+    data object Error : TopicEditScreenUiState{var errorMessage: String = ""}
+    data object Loading : TopicEditScreenUiState
 }
 
 class TopicEditViewModel(
@@ -40,22 +34,6 @@ class TopicEditViewModel(
 
     var topicEditScreenUiState: TopicEditScreenUiState by mutableStateOf(TopicEditScreenUiState.Loading)
 
-    //init {
-    //    viewModelScope.launch {
-    //        topicUiState = topicRepository.getTopicById(topicId.toInt())
-    //            .filterNotNull()
-    //            .first()
-    //            .toTopicUiState(true,
-    //                parentName =
-    //                if (topicRepository.getTopicById(topicId.toInt()).map { it.parentTopic }.first() == -1) ""
-    //                else
-    //                topicRepository.getTopicById(
-    //                    topicRepository.getTopicById(topicId.toInt()).map { it.parentTopic }.first())
-    //                    .map{it.topic}.first())
-    //        originalTopic = topicUiState.topicDetails.topic
-    //    }
-    //}
-
     init {
         getTopic(topicId)
     }
@@ -67,7 +45,7 @@ class TopicEditViewModel(
                 val result = ExamAppApi.retrofitService.getTopic(topicId)
                 topicUiState = result.toTopicUiState(true,
                     parentName =
-                    if (result.parentTopic == "null") "" //TODO check this
+                    if (result.parentTopic == "null") ""
                     else
                         ExamAppApi.retrofitService.getTopic(result.parentTopic).topic
                 )
@@ -88,18 +66,11 @@ class TopicEditViewModel(
         }
     }
 
-    /**
-     * Update the topic in the [TopicRepository]'s data source
-     */
     suspend fun updateTopic() : Boolean{
         return if (validateInput(topicUiState.topicDetails) && validateUniqueTopic(topicUiState.topicDetails)) {
             viewModelScope.launch {
                 ExamAppApi.retrofitService.updateTopic(topicUiState.topicDetails.toTopic())
-                //topicDetailsScreenEffected = true
-                //topicListScreenEffected = topicUiState.topicDetails.topic != originalTopic
             }
-            //ExamAppApi.retrofitService.updateTopic(topicUiState.topicDetails.toTopic())
-            //topicRepository.updateTopic(topicUiState.topicDetails.toTopic())
             true
         }
         else {
@@ -108,10 +79,6 @@ class TopicEditViewModel(
         }
     }
 
-    /**
-     * Updates the [topicUiState] with the value provided in the argument. This method also triggers
-     * a validation for input values.
-     */
     fun updateUiState(topicDetails: TopicDetails) {
         topicUiState =
             TopicUiState(topicDetails = topicDetails, isEntryValid = validateInput(topicDetails))
@@ -125,7 +92,6 @@ class TopicEditViewModel(
 
     private suspend fun validateUniqueTopic(uiState: TopicDetails = topicUiState.topicDetails): Boolean {
         return !ExamAppApi.retrofitService.getAllTopicName().map{it.name}.contains(uiState.topic) || originalTopic == uiState.topic
-        //return !topicRepository.getAllTopicName().filterNotNull().first().contains(uiState.topic) || originalTopic == uiState.topic
     }
 }
 

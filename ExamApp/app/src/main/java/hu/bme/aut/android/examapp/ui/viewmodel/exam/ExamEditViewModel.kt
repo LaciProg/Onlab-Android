@@ -8,25 +8,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.ExamDto
-import hu.bme.aut.android.examapp.api.dto.MultipleChoiceQuestionDto
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.ExamRepository
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.MultipleChoiceQuestionRepository
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TrueFalseQuestionRepository
 import hu.bme.aut.android.examapp.ui.ExamDetailsDestination
-import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionEditScreenUiState
-import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.toMultipleChoiceQuestionUiState
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 
 sealed interface ExamEditScreenUiState {
     data class Success(val question: ExamDto) : ExamEditScreenUiState
-    object Error : ExamEditScreenUiState{var errorMessage: String = ""}
-    object Loading : ExamEditScreenUiState
+    data object Error : ExamEditScreenUiState{var errorMessage: String = ""}
+    data object Loading : ExamEditScreenUiState
 }
 
 
@@ -39,9 +33,7 @@ class ExamEditViewModel(
 ) : ViewModel() {
 
     private lateinit var originalExam: String
-    /**
-     * Holds current exam ui state
-     */
+
     var examUiState by mutableStateOf(ExamUiState())
         private set
 
@@ -82,30 +74,9 @@ class ExamEditViewModel(
         }
     }
 
-    //init {
-    //    viewModelScope.launch {
-    //        examUiState = examRepository.getExamById(examId.toInt())
-    //            .filterNotNull()
-    //            .first()
-    //            .toExamUiState(true,
-    //                topicName = topicRepository.getTopicById(
-    //                    examRepository.getExamById(examId.toInt()).map { it.topicId }.first())
-    //                    .map{it.topic}.first(),
-    //                questionList = examRepository.getExamById(examId.toInt()).map { it.questionList }.first(),
-    //                trueFalseQuestionRepository = trueFalseQuestionRepository,
-    //                multipleChoiceQuestionRepository = multipleChoiceQuestionRepository
-    //            )
-    //        originalExam = examUiState.examDetails.name
-    //    }
-    //}
-
-    /**
-     * Update the exam in the [ExamRepository]'s data source
-     */
     suspend fun updateExam() : Boolean{
         return if (validateInput(examUiState.examDetails) && validateUniqueExam(examUiState.examDetails)) {
             ExamAppApi.retrofitService.updateExam(examUiState.examDetails.toExam())
-            //examRepository.updateExam(examUiState.examDetails.toExam())
             true
         }
         else {
@@ -114,10 +85,6 @@ class ExamEditViewModel(
         }
     }
 
-    /**
-     * Updates the [examUiState] with the value provided in the argument. This method also triggers
-     * a validation for input values.
-     */
     fun updateUiState(examDetails: ExamDetails) {
         examUiState =
             ExamUiState(examDetails = examDetails, isEntryValid = validateInput(examDetails))
@@ -130,7 +97,7 @@ class ExamEditViewModel(
     }
 
     private suspend fun validateUniqueExam(uiState: ExamDetails = examUiState.examDetails): Boolean {
-        return !examRepository.getAllExamName().filterNotNull().first().contains(uiState.name) || originalExam == uiState.name
+        return !ExamAppApi.retrofitService.getAllExamName().map{ it.name }.contains(uiState.name) || originalExam == uiState.name
     }
 }
 

@@ -8,8 +8,6 @@ import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.TopicDto
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class TopicEntryViewModel(private val topicRepository: TopicRepository) : ViewModel(){
@@ -27,7 +25,6 @@ class TopicEntryViewModel(private val topicRepository: TopicRepository) : ViewMo
             viewModelScope.launch {
                 ExamAppApi.retrofitService.postTopic(topicUiState.topicDetails.toTopic())
             }
-            //topicRepository.insertTopic(topicUiState.topicDetails.toTopic())
             true
         } else {
             topicUiState = topicUiState.copy(isEntryValid = false)
@@ -35,13 +32,9 @@ class TopicEntryViewModel(private val topicRepository: TopicRepository) : ViewMo
         }
     }
 
-    //suspend fun getTopicById(id: Int): String {
-    //    return topicRepository.getTopicById(id).filterNotNull().first().topic
-    //}
 
     suspend fun getTopicIdByTopic(topic: String): String {
         return ExamAppApi.retrofitService.getTopicByTopic(topic)?.uuid ?: ""
-        //return topicRepository.getTopicByTopic(topic).filterNotNull().first().id
     }
 
     private fun validateInput(uiState: TopicDetails = topicUiState.topicDetails): Boolean {
@@ -52,7 +45,6 @@ class TopicEntryViewModel(private val topicRepository: TopicRepository) : ViewMo
 
     private suspend fun validateUniqueTopic(uiState: TopicDetails = topicUiState.topicDetails): Boolean {
         return !ExamAppApi.retrofitService.getAllTopicName().map{it.name}.contains(uiState.topic)
-        //return !topicRepository.getAllTopicName().filterNotNull().first().contains(uiState.topic)
     }
 
 }

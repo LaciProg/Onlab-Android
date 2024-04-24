@@ -8,10 +8,7 @@ import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.TrueFalseQuestionDto
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TrueFalseQuestionRepository
-//import hu.bme.aut.android.examapp.data.room.dto.TrueFalseQuestionDto
 import hu.bme.aut.android.examapp.ui.viewmodel.type.Type
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class TrueFalseQuestionEntryViewModel(private val trueFalseQuestionRepository: TrueFalseQuestionRepository) : ViewModel(){
@@ -33,7 +30,6 @@ class TrueFalseQuestionEntryViewModel(private val trueFalseQuestionRepository: T
             viewModelScope.launch {
                 ExamAppApi.retrofitService.postTrueFalse(trueFalseQuestionUiState.trueFalseQuestionDetails.toTrueFalseQuestion())
             }
-            //trueFalseQuestionRepository.insertTrueFalseQuestion(trueFalseQuestionUiState.trueFalseQuestionDetails.toTrueFalseQuestion())
             true
         }
         else{
@@ -50,7 +46,6 @@ class TrueFalseQuestionEntryViewModel(private val trueFalseQuestionRepository: T
 
     private suspend fun validateUniqueTrueFalseQuestion(uiState: TrueFalseQuestionDetails = trueFalseQuestionUiState.trueFalseQuestionDetails): Boolean {
         return !ExamAppApi.retrofitService.getAllTrueFalseName().map{it.name}.contains(uiState.question)
-        //return !trueFalseQuestionRepository.getAllTrueFalseQuestionQuestion().filterNotNull().first().contains(uiState.question)
     }
 
 }

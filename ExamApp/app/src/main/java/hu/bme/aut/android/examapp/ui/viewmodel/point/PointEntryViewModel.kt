@@ -7,11 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.PointDto
-
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.PointRepository
-//import hu.bme.aut.android.examapp.data.room.dto.PointDto
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class PointEntryViewModel(private val pointRepository: PointRepository) : ViewModel(){
@@ -29,7 +25,6 @@ class PointEntryViewModel(private val pointRepository: PointRepository) : ViewMo
             viewModelScope.launch {
                 ExamAppApi.retrofitService.postPoint(pointUiState.pointDetails.toPoint())
             }
-            //pointRepository.insertPoint(pointUiState.pointDetails.toPoint())
             true
         }
         else{
@@ -46,7 +41,6 @@ class PointEntryViewModel(private val pointRepository: PointRepository) : ViewMo
 
     private suspend fun validateUniqueTopic(uiState: PointDetails = pointUiState.pointDetails): Boolean {
         return !ExamAppApi.retrofitService.getAllPointName().map{it.name}.contains(uiState.type)
-        //return !pointRepository.getAllPointType().filterNotNull().first().contains(uiState.type)
     }
 
 }

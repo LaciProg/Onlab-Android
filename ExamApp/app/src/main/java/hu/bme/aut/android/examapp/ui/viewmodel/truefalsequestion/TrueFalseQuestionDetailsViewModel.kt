@@ -18,8 +18,8 @@ import java.io.IOException
 
 sealed interface TrueFalseQuestionDetailsScreenUiState {
     data class Success(val question: TrueFalseQuestionDto) : TrueFalseQuestionDetailsScreenUiState
-    object Error : TrueFalseQuestionDetailsScreenUiState{var errorMessage: String = ""}
-    object Loading : TrueFalseQuestionDetailsScreenUiState
+    data object Error : TrueFalseQuestionDetailsScreenUiState{var errorMessage: String = ""}
+    data object Loading : TrueFalseQuestionDetailsScreenUiState
 }
 
 class TrueFalseQuestionDetailsViewModel(
@@ -65,44 +65,14 @@ class TrueFalseQuestionDetailsViewModel(
             }
         }
     }
-    /**
-     * Holds the item details ui state. The data is retrieved from [TrueFalseQuestionRepository] and mapped to
-     * the UI state.
-     */
-    //val uiState: StateFlow<TrueFalseQuestionDetailsUiState> =
-    //    trueFalseQuestionRepository.getTrueFalseQuestionById(trueFalseQuestionId.toInt())
-    //        .filterNotNull()
-    //        .map { trueFalseQuestionDto ->
-    //            TrueFalseQuestionDetailsUiState(trueFalseQuestionDetails =  trueFalseQuestionDto.toTrueFalseQuestionDetails(
-    //                topicName = if(trueFalseQuestionDto.topic != -1)
-    //                    topicRepository.getTopicById(trueFalseQuestionDto.topic).map{it.topic}.first()
-    //                else "",
-    //                pointName = if(trueFalseQuestionDto.point != -1)
-    //                pointRepository.getPointById(trueFalseQuestionDto.point).map { it.type }.first()
-    //                else ""
-    //            ))
-    //        }.stateIn(
-    //            scope = viewModelScope,
-    //            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-    //            initialValue = TrueFalseQuestionDetailsUiState()
-    //        )
 
-    /**
-     * Deletes the item from the [TrueFalseQuestionRepository]'s data source.
-     */
     suspend fun deleteTrueFalseQuestion() {
         ExamAppApi.retrofitService.deleteTrueFalse(trueFalseQuestionId)
-        //trueFalseQuestionRepository.deleteTrueFalseQuestion(uiState.value.trueFalseQuestionDetails.toTrueFalseQuestion())
     }
 
-    companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
-    }
 }
 
-/**
- * UI state for TopicDetailsScreen
- */
+
 data class TrueFalseQuestionDetailsUiState(
     val trueFalseQuestionDetails: TrueFalseQuestionDetails = TrueFalseQuestionDetails()
 )

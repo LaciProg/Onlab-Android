@@ -16,8 +16,8 @@ import retrofit2.HttpException
 
 sealed interface PointDetailsScreenUiState {
     data class Success(val point: PointDto) : PointDetailsScreenUiState
-    object Error : PointDetailsScreenUiState{var errorMessage: String = ""}
-    object Loading : PointDetailsScreenUiState
+    data object Error : PointDetailsScreenUiState{var errorMessage: String = ""}
+    data object Loading : PointDetailsScreenUiState
 }
 
 class PointDetailsViewModel(
@@ -54,28 +54,12 @@ class PointDetailsViewModel(
         }
     }
 
-    //val uiState: StateFlow<PointDetailsUiState> =
-    //    pointRepository.getPointById(pointId.toInt())
-    //        .filterNotNull()
-    //        .map {
-    //            PointDetailsUiState(pointDetails =  it.toPointDetails())
-    //        }.stateIn(
-    //            scope = viewModelScope,
-    //            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-    //            initialValue = PointDetailsUiState()
-    //        )
-
     suspend fun deletePoint() {
         viewModelScope.launch {
             ExamAppApi.retrofitService.deletePoint(pointId)
         }
-        //pointRepository.deletePoint(uiState.value.pointDetails.toPoint())
     }
 
-    companion object {
-        var pointDetailsScreenEffected = false
-        private const val TIMEOUT_MILLIS = 5_000L
-    }
 }
 
 data class PointDetailsUiState(

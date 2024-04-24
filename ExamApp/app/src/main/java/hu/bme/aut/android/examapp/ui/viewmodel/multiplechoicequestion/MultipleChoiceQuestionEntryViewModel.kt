@@ -8,11 +8,7 @@ import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.MultipleChoiceQuestionDto
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.MultipleChoiceQuestionRepository
-//import hu.bme.aut.android.examapp.data.room.dto.MultipleChoiceQuestionDto
-import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.toTrueFalseQuestion
 import hu.bme.aut.android.examapp.ui.viewmodel.type.Type
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class MultipleChoiceQuestionEntryViewModel(private val multipleChoiceQuestionRepository: MultipleChoiceQuestionRepository) : ViewModel(){
@@ -34,7 +30,6 @@ class MultipleChoiceQuestionEntryViewModel(private val multipleChoiceQuestionRep
             viewModelScope.launch {
                 multipleChoiceQuestionUiState.multipleChoiceQuestionDetails.correctAnswersList.removeIf(String::isBlank)
                 ExamAppApi.retrofitService.postMultipleChoice(multipleChoiceQuestionUiState.multipleChoiceQuestionDetails.toMultipleChoiceQuestion())
-                //multipleChoiceQuestionRepository.insertMultipleChoiceQuestion(multipleChoiceQuestionUiState.multipleChoiceQuestionDetails.toMultipleChoiceQuestion())
             }
             true
         } else {
@@ -52,7 +47,6 @@ class MultipleChoiceQuestionEntryViewModel(private val multipleChoiceQuestionRep
 
     private suspend fun validateUniqueMultipleChoiceQuestion(uiState: MultipleChoiceQuestionDetails = multipleChoiceQuestionUiState.multipleChoiceQuestionDetails): Boolean {
         return !ExamAppApi.retrofitService.getAllMultipleChoiceName().map{it.name}.contains(uiState.question)
-        //return !multipleChoiceQuestionRepository.getAllMultipleChoiceQuestionQuestion().filterNotNull().first().contains(uiState.question)
     }
 
 }
@@ -74,29 +68,16 @@ data class MultipleChoiceQuestionDetails(
     val topicName: String = ""
 )
 
-fun MultipleChoiceQuestionDetails.toMultipleChoiceQuestion(): MultipleChoiceQuestionDto {
-    /*var answersConcat = ""
-    for (answer in answers){
-        answersConcat += answer
-        if(answer != answers.last())answersConcat += "¤"
-    }
+fun MultipleChoiceQuestionDetails.toMultipleChoiceQuestion() = MultipleChoiceQuestionDto(
+    uuid = id,
+    question = question,
+    answers = answers,
+    correctAnswersList = correctAnswersList,
+    point = point,
+    topic = topic,
+    type = Type.multipleChoiceQuestion.name,
+)
 
-    var correctAnswerConcat = ""
-    for (answer in correctAnswersList){
-        correctAnswerConcat += answer
-        if(answer != correctAnswersList.last())correctAnswerConcat += "¤"
-    }*/
-
-    return MultipleChoiceQuestionDto(
-        uuid = id,
-        question = question,
-        answers = answers,
-        correctAnswersList = correctAnswersList,
-        point = point,
-        topic = topic,
-        type = Type.multipleChoiceQuestion.name,
-        )
-}
 
 
 fun MultipleChoiceQuestionDto.toMultipleChoiceQuestionUiState(isEntryValid: Boolean = false, pointName: String, topicName: String, isAnswerChosen: Boolean = false): MultipleChoiceQuestionUiState = MultipleChoiceQuestionUiState(
@@ -107,8 +88,8 @@ fun MultipleChoiceQuestionDto.toMultipleChoiceQuestionUiState(isEntryValid: Bool
 fun MultipleChoiceQuestionDto.toMultipleChoiceQuestionDetails(pointName: String, topicName: String, isAnswerChosen: Boolean = false): MultipleChoiceQuestionDetails = MultipleChoiceQuestionDetails(
     id = uuid,
     question = question,
-    answers = answers.toMutableList(),//.split("¤").toMutableList(),
-    correctAnswersList = correctAnswersList.toMutableList(),//.split("¤").toMutableList(),
+    answers = answers.toMutableList(),
+    correctAnswersList = correctAnswersList.toMutableList(),
     point = point,
     topic = topic,
     pointName = pointName,
