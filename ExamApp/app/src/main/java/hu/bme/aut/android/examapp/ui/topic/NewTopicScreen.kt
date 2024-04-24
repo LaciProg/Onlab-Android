@@ -10,13 +10,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -28,6 +28,7 @@ import hu.bme.aut.android.examapp.R
 import hu.bme.aut.android.examapp.ui.AppViewModelProvider
 import hu.bme.aut.android.examapp.ui.components.DropDownList
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicDetails
+import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicEntryScreenUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicEntryViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicListViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicUiState
@@ -40,20 +41,32 @@ fun NewTopic(
     canNavigateBack: Boolean = true,
     viewModel: TopicEntryViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+    when(viewModel.topicScreenUiState){
+        TopicEntryScreenUiState.Loading -> CircularProgressIndicator(modifier = Modifier.fillMaxWidth())
+        TopicEntryScreenUiState.Success -> NewTopicScreenUiState(viewModel, navigateBack)
+        TopicEntryScreenUiState.Error -> Text(text = TopicEntryScreenUiState.Error.errorMessage.ifBlank { "Unexpected error " })
+    }
+
+}
+
+@Composable
+private fun NewTopicScreenUiState(
+    viewModel: TopicEntryViewModel,
+    navigateBack: () -> Unit
+) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     Scaffold(
-        topBar = {  }
+        topBar = { }
     ) { innerPadding ->
         TopicEntryBody(
             topicUiState = viewModel.topicUiState,
             onTopicValueChange = viewModel::updateUiState,
             onSaveClick = {
                 coroutineScope.launch {
-                    if(viewModel.saveTopic()){
+                    if (viewModel.saveTopic()) {
                         navigateBack()
-                    }
-                    else{
+                    } else {
                         Toast.makeText(
                             context,
                             "Topic with this name already exists",

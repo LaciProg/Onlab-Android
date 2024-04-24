@@ -3,6 +3,7 @@ package hu.bme.aut.android.examapp.ui.exam
 import android.widget.Toast
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -26,31 +27,8 @@ fun ExamEditScreen(
             viewModel = viewModel,
             modifier = modifier
         )
-        is ExamEditScreenUiState.Error -> androidx.compose.material3.Text(text = "Error...")
+        is ExamEditScreenUiState.Error -> Text(text = ExamEditScreenUiState.Error.errorMessage.ifBlank { "Unexpected error " })
     }
-
-    //val coroutineScope = rememberCoroutineScope()
-    //val context = LocalContext.current
-    //ExamEntryBody(
-    //    examUiState = viewModel.examUiState,
-    //    onExamValueChange = viewModel::updateUiState,
-    //    onSaveClick = {
-    //        coroutineScope.launch {
-    //            if(viewModel.updateExam()){
-    //                navigateBack()
-    //            }
-    //            else{
-    //                Toast.makeText(
-    //                    context,
-    //                    "Exam with this name already exists",
-    //                    Toast.LENGTH_LONG
-    //                ).show()
-    //            }
-    //        }
-    //    },
-    //    modifier = modifier
-    //)
-
 }
 
 @Composable

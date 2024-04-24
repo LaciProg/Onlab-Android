@@ -1,24 +1,5 @@
-/*
- * Copyright (C) 2023 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package hu.bme.aut.android.examapp.ui.exam
 
-import android.util.Log
-import android.widget.ExpandableListAdapter
-import hu.bme.aut.android.examapp.R
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
@@ -53,7 +34,6 @@ import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
@@ -66,7 +46,6 @@ import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -78,9 +57,7 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -96,58 +73,39 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import hu.bme.aut.android.examapp.R
 import hu.bme.aut.android.examapp.api.dto.ExamDto
 import hu.bme.aut.android.examapp.api.dto.MultipleChoiceQuestionDto
 import hu.bme.aut.android.examapp.api.dto.PointDto
 import hu.bme.aut.android.examapp.api.dto.Question
 import hu.bme.aut.android.examapp.api.dto.TopicDto
 import hu.bme.aut.android.examapp.api.dto.TrueFalseQuestionDto
-//import hu.bme.aut.android.examapp.data.room.dto.MultipleChoiceQuestionDto
-//import hu.bme.aut.android.examapp.data.room.dto.PointDto
-//import hu.bme.aut.android.examapp.data.room.dto.Question
-//import hu.bme.aut.android.examapp.data.room.dto.TopicDto
-//import hu.bme.aut.android.examapp.data.room.dto.TrueFalseQuestionDto
 import hu.bme.aut.android.examapp.ui.AppViewModelProvider
 import hu.bme.aut.android.examapp.ui.components.DropDownList
-import hu.bme.aut.android.examapp.ui.multiplechoicequestion.MultipleChoiceQuestionDetailsBody
-import hu.bme.aut.android.examapp.ui.theme.ExamAppTheme
+import hu.bme.aut.android.examapp.ui.multiplechoicequestion.MultipleChoiceQuestionDetails
 import hu.bme.aut.android.examapp.ui.theme.Green
 import hu.bme.aut.android.examapp.ui.theme.GreenLight
 import hu.bme.aut.android.examapp.ui.theme.PaleDogwood
-import hu.bme.aut.android.examapp.ui.theme.Seashell
-import hu.bme.aut.android.examapp.ui.truefalsequestion.TrueFalseQuestionDetails
-import hu.bme.aut.android.examapp.ui.multiplechoicequestion.MultipleChoiceQuestionDetails
 import hu.bme.aut.android.examapp.ui.theme.Purple40
+import hu.bme.aut.android.examapp.ui.theme.Seashell
 import hu.bme.aut.android.examapp.ui.truefalsequestion.DeleteConfirmationDialog
+import hu.bme.aut.android.examapp.ui.truefalsequestion.TrueFalseQuestionDetails
 import hu.bme.aut.android.examapp.ui.viewmodel.exam.ExamDetails
 import hu.bme.aut.android.examapp.ui.viewmodel.exam.ExamDetailsScreenUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.exam.ExamDetailsUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.exam.ExamDetailsViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionDetails
-import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionDetailsScreenUiState
-import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionDetailsUiState
-import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionDetailsViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.toMultipleChoiceQuestionDetails
-import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicDetails
-import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicDetailsViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicListViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionDetailsViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionEditViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.type.Type
-import kotlinx.coroutines.launch
 import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.toTrueFalseQuestionDetails
+import hu.bme.aut.android.examapp.ui.viewmodel.type.Type
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.detectReorderAfterLongPress
 import org.burnoutcrew.reorderable.rememberReorderableLazyListState
 import org.burnoutcrew.reorderable.reorderable
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExamDetailsScreen(
     navigateToEditMultipleChoiceQuestion: (String) -> Unit,
@@ -166,67 +124,12 @@ fun ExamDetailsScreen(
                 navigateBack = navigateBack
             )
         }
-        is ExamDetailsScreenUiState.Error -> Text(text = "Error...")
+        is ExamDetailsScreenUiState.Error -> Text(text = ExamDetailsScreenUiState.Error.errorMessage.ifBlank { "Unexpected error " })
     }
 
     LaunchedEffect(key1 = Unit) {
         examViewModel.getExam(examViewModel.examId)
     }
-
-
-
-    /*val  examUiState = examViewModel.uiState//.collectAsState()
-    var tabPage by remember { mutableStateOf(Type.trueFalseQuestion) }
-    val coroutineScope = rememberCoroutineScope()
-    val backgroundColor by animateColorAsState(
-        if (tabPage == Type.trueFalseQuestion) Seashell else GreenLight,
-        label = "background color"
-    )
-    Scaffold(
-        topBar = {
-            SearchBar(
-                backgroundColor = backgroundColor,
-                tabPage = tabPage,
-                onTabSelected = { tabPage = it },
-                topics = examViewModel.topicList,
-                trueFalse =  examViewModel.trueFalseList,
-                multipleChoice =  examViewModel.multipleChoiceList,
-                questions = examUiState.examDetails.questionList,
-                examTopic = examUiState.examDetails.topicId,
-            ){
-                coroutineScope.launch {
-                    when (tabPage) {
-                        Type.trueFalseQuestion -> examViewModel.saveQuestion(tabPage.ordinal, it)
-                        Type.multipleChoiceQuestion -> examViewModel.saveQuestion(tabPage.ordinal, it)
-                    }
-                }
-            }
-        },
-        //containerColor = backgroundColor,
-        floatingActionButton = {
-            SmallFloatingActionButton(
-                onClick = { navigateToEditMultipleChoiceQuestion(examUiState.examDetails.id) },
-                shape = MaterialTheme.shapes.medium,
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = stringResource(R.string.exam_info),
-                )
-            }
-        },
-        bottomBar = {
-            Spacer(modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium)))
-        },
-        modifier = modifier
-    ) { innerPadding ->
-        ExamDetailsBody(
-            questions = examUiState.examDetails.questionList,
-            topicList = examViewModel.topicList,
-            pointList = examViewModel.pointList,
-            modifier = Modifier.padding(innerPadding),
-            tabPage = tabPage
-        )
-    }*/
 }
 
 @Composable
@@ -265,7 +168,6 @@ fun ExamDetailsDetailsScreenUiState(
                 }
             }
         },
-        //containerColor = backgroundColor,
         floatingActionButton = {
             SmallFloatingActionButton(
                 onClick = { navigateToEditMultipleChoiceQuestion(examUiState.examDetails.id) },
@@ -393,12 +295,8 @@ private fun QuestionTabIndicator(
     val indicatorLeft by transition.animateDp(
         transitionSpec = {
             if (Type.trueFalseQuestion isTransitioningTo Type.multipleChoiceQuestion) {
-                // Indicator moves to the right.
-                // Low stiffness spring for the left edge so it moves slower than the right edge.
                 spring(stiffness = Spring.StiffnessVeryLow)
             } else {
-                // Indicator moves to the left.
-                // Medium stiffness spring for the left edge so it moves faster than the right edge.
                 spring(stiffness = Spring.StiffnessMedium)
             }
         },
@@ -409,12 +307,8 @@ private fun QuestionTabIndicator(
     val indicatorRight by transition.animateDp(
         transitionSpec = {
             if (Type.trueFalseQuestion isTransitioningTo Type.multipleChoiceQuestion) {
-                // Indicator moves to the right
-                // Medium stiffness spring for the right edge so it moves faster than the left edge.
                 spring(stiffness = Spring.StiffnessMedium)
             } else {
-                // Indicator moves to the left.
-                // Low stiffness spring for the right edge so it moves slower than the left edge.
                 spring(stiffness = Spring.StiffnessVeryLow)
             }
         },

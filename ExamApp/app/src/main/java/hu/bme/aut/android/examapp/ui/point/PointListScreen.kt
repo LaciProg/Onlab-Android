@@ -1,8 +1,5 @@
 package hu.bme.aut.android.examapp.ui.point
 
-import android.util.Log
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -16,13 +13,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import hu.bme.aut.android.examapp.api.dto.NameDto
 import hu.bme.aut.android.examapp.ui.AppViewModelProvider
-//import hu.bme.aut.android.examapp.ui.viewmodel.point.PointDetailsScreenUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.point.PointListScreenUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.point.PointListViewModel
 
@@ -41,33 +35,13 @@ fun PointListScreen(
             navigateToPointDetails = navigateToPointDetails,
             viewModel = viewModel
             )
-        is PointListScreenUiState.Error -> Text(text = "Error...")
+        is PointListScreenUiState.Error -> Text(text = PointListScreenUiState.Error.errorMessage.ifBlank { "Unexpected error " }, modifier = Modifier.fillMaxSize())
     }
 
     LaunchedEffect(key1 = Unit) {
         viewModel.getAllPointList()
     }
 
-    /*val pointUiState by viewModel.pointListUiState.collectAsState()
-    Scaffold(
-        topBar = { Text("Point list") },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { addNewPoint() }
-            ) {
-                Icon(Icons.Filled.Add, contentDescription = "Add")
-            }
-        }
-    ) { padding ->
-
-        LazyColumn(contentPadding = padding) {
-            items(pointUiState.pointList){
-                TextButton(onClick = { navigateToPointDetails(it.id) }) {
-                    Text(it.point)
-                }
-            }
-        }
-    }*/
 }
 
 @Composable

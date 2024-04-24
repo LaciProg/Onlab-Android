@@ -2,7 +2,6 @@ package hu.bme.aut.android.examapp.ui.exam
 
 import android.util.Log
 import androidx.annotation.StringRes
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -27,15 +25,11 @@ import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -51,18 +45,12 @@ import hu.bme.aut.android.examapp.api.dto.MultipleChoiceQuestionDto
 import hu.bme.aut.android.examapp.api.dto.PointDto
 import hu.bme.aut.android.examapp.api.dto.Question
 import hu.bme.aut.android.examapp.api.dto.TrueFalseQuestionDto
-//import hu.bme.aut.android.examapp.data.room.dto.MultipleChoiceQuestionDto
-//import hu.bme.aut.android.examapp.data.room.dto.PointDto
-//import hu.bme.aut.android.examapp.data.room.dto.Question
-//import hu.bme.aut.android.examapp.data.room.dto.TrueFalseQuestionDto
 import hu.bme.aut.android.examapp.pdf.PDFExamView
 import hu.bme.aut.android.examapp.ui.AppViewModelProvider
 import hu.bme.aut.android.examapp.ui.components.ExportedMultipleChoiceQuestion
 import hu.bme.aut.android.examapp.ui.components.ExportedTrueFalseQuestion
 import hu.bme.aut.android.examapp.ui.exam.JetCaptureView.jetCaptureView
 import hu.bme.aut.android.examapp.ui.viewmodel.exam.ExamDetailsViewModel
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 
 object JetCaptureView{
     var jetCaptureView: MutableState<PDFExamView>? = null
@@ -77,7 +65,6 @@ fun ExportExamDetailsScreen(
 ) {
     val  examUiState = examViewModel.uiState
     val pointList = examViewModel.pointList
-    //var jetCaptureView: MutableState<PDFExamView>? = null
     Scaffold(
         topBar = {
             TopBar(
@@ -200,7 +187,6 @@ fun ExportExamDetailsBody(
                             answers = question.answers,
                         )
                     }
-                    else -> throw IllegalArgumentException("Invalid type")
                 }
             }
         }

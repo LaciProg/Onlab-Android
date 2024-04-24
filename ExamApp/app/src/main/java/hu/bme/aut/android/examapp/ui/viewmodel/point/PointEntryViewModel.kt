@@ -7,14 +7,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.PointDto
-import hu.bme.aut.android.examapp.api.dto.TrueFalseQuestionDto
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.PointRepository
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 
 sealed interface PointEntryScreenUiState {
-    data class Success(val question: TrueFalseQuestionDto) : PointEntryScreenUiState
+    data object Success : PointEntryScreenUiState
     data object Error : PointEntryScreenUiState{var errorMessage: String = ""}
     data object Loading : PointEntryScreenUiState
 }

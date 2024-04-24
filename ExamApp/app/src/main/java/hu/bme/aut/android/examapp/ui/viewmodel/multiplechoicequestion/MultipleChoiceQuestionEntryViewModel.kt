@@ -7,16 +7,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.MultipleChoiceQuestionDto
-import hu.bme.aut.android.examapp.api.dto.TrueFalseQuestionDto
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.MultipleChoiceQuestionRepository
-import hu.bme.aut.android.examapp.ui.viewmodel.point.PointEntryScreenUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.type.Type
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 
 sealed interface MultipleChoiceQuestionEntryScreenUiState {
-    data class Success(val question: TrueFalseQuestionDto) : MultipleChoiceQuestionEntryScreenUiState
+    data object Success : MultipleChoiceQuestionEntryScreenUiState
     data object Error : MultipleChoiceQuestionEntryScreenUiState{var errorMessage: String = ""}
     data object Loading : MultipleChoiceQuestionEntryScreenUiState
 }

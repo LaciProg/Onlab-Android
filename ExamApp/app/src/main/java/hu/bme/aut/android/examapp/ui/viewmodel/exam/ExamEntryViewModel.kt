@@ -18,7 +18,7 @@ import retrofit2.HttpException
 import java.io.IOException
 
 sealed interface ExamEntryScreenUiState {
-    data class Success(val question: TrueFalseQuestionDto) : ExamEntryScreenUiState
+    data object Success : ExamEntryScreenUiState
     data object Error : ExamEntryScreenUiState{var errorMessage: String = ""}
     data object Loading : ExamEntryScreenUiState
 }
@@ -31,7 +31,7 @@ class ExamEntryViewModel(
     var examUiState by mutableStateOf(ExamUiState())
         private set
 
-    var examScreenUiState: ExamEntryScreenUiState by mutableStateOf(ExamEntryScreenUiState.Loading)
+    var examEntryScreenUiState: ExamEntryScreenUiState by mutableStateOf(ExamEntryScreenUiState.Loading)
 
     fun updateUiState(examDetails: ExamDetails) {
         examUiState =
@@ -47,7 +47,7 @@ class ExamEntryViewModel(
                 true
             } catch (e: IOException){
                 ExamEntryScreenUiState.Error.errorMessage = "Network error"
-                examScreenUiState = ExamEntryScreenUiState.Error
+                examEntryScreenUiState = ExamEntryScreenUiState.Error
                 false
             } catch (e: HttpException){
                 when(e.code()){
@@ -57,7 +57,7 @@ class ExamEntryViewModel(
                     500 -> ExamEntryScreenUiState.Error.errorMessage = "Server error"
                     else -> ExamEntryScreenUiState.Error
                 }
-                examScreenUiState = ExamEntryScreenUiState.Error
+                examEntryScreenUiState = ExamEntryScreenUiState.Error
                 false
             }
         } else {
@@ -71,7 +71,7 @@ class ExamEntryViewModel(
             ExamAppApi.retrofitService.getTopicByTopic(topic)?.uuid ?: ""
         } catch (e: IOException){
             ExamEntryScreenUiState.Error.errorMessage = "Network error"
-            examScreenUiState = ExamEntryScreenUiState.Error
+            examEntryScreenUiState = ExamEntryScreenUiState.Error
             ""
         } catch (e: HttpException){
             when(e.code()){
@@ -96,7 +96,7 @@ class ExamEntryViewModel(
             !ExamAppApi.retrofitService.getAllExamName().map{it.name}.contains(uiState.name)
         } catch (e: IOException) {
             ExamEntryScreenUiState.Error.errorMessage = "Network error"
-            examScreenUiState = ExamEntryScreenUiState.Error
+            examEntryScreenUiState = ExamEntryScreenUiState.Error
             false
         } catch (e: HttpException){
             when(e.code()){
@@ -106,7 +106,7 @@ class ExamEntryViewModel(
                 500 -> ExamEntryScreenUiState.Error.errorMessage = "Server error"
                 else -> ExamEntryScreenUiState.Error
             }
-            examScreenUiState = ExamEntryScreenUiState.Error
+            examEntryScreenUiState = ExamEntryScreenUiState.Error
             false
         }
     }

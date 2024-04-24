@@ -7,15 +7,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.TopicDto
-import hu.bme.aut.android.examapp.api.dto.TrueFalseQuestionDto
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
-import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionEntryScreenUiState
 import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
 sealed interface TopicEntryScreenUiState {
-    data class Success(val question: TrueFalseQuestionDto) : TopicEntryScreenUiState
+    data object Success : TopicEntryScreenUiState
     data object Error : TopicEntryScreenUiState{var errorMessage: String = ""}
     data object Loading : TopicEntryScreenUiState
 }

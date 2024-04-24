@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -15,7 +16,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -28,6 +28,7 @@ import hu.bme.aut.android.examapp.ui.components.DropDownList
 import hu.bme.aut.android.examapp.ui.viewmodel.point.PointListViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicListViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionDetails
+import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionEntryScreenUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionEntryViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionUiState
 import kotlinx.coroutines.launch
@@ -39,6 +40,18 @@ fun NewTrueFalseQuestionScreen(
     canNavigateBack: Boolean = true,
     viewModel: TrueFalseQuestionEntryViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+    when (viewModel.trueFalseEntryScreenUiState) {
+        TrueFalseQuestionEntryScreenUiState.Loading -> CircularProgressIndicator(modifier = Modifier.fillMaxWidth())
+        TrueFalseQuestionEntryScreenUiState.Success -> NewTrueFalseQuestionScreenUiState(viewModel, navigateBack)
+        TrueFalseQuestionEntryScreenUiState.Error -> Text(text = TrueFalseQuestionEntryScreenUiState.Error.errorMessage.ifBlank { "Unexpected error " })
+    }
+}
+
+@Composable
+private fun NewTrueFalseQuestionScreenUiState(
+    viewModel: TrueFalseQuestionEntryViewModel,
+    navigateBack: () -> Unit
+) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     Scaffold(
@@ -49,10 +62,9 @@ fun NewTrueFalseQuestionScreen(
             onTrueFalseQuestionValueChange = viewModel::updateUiState,
             onSaveClick = {
                 coroutineScope.launch {
-                    if(viewModel.saveTrueFalseQuestion()){
+                    if (viewModel.saveTrueFalseQuestion()) {
                         navigateBack()
-                    }
-                    else{
+                    } else {
                         Toast.makeText(
                             context,
                             "Question already exists",

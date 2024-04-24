@@ -9,13 +9,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -26,6 +26,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import hu.bme.aut.android.examapp.R
 import hu.bme.aut.android.examapp.ui.AppViewModelProvider
 import hu.bme.aut.android.examapp.ui.viewmodel.point.PointDetails
+import hu.bme.aut.android.examapp.ui.viewmodel.point.PointEntryScreenUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.point.PointEntryViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.point.PointUiState
 import kotlinx.coroutines.launch
@@ -37,6 +38,18 @@ fun NewPoint(
     canNavigateBack: Boolean = true,
     viewModel: PointEntryViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+    when(viewModel.pointScreenUiState){
+        PointEntryScreenUiState.Loading -> CircularProgressIndicator(modifier = Modifier.fillMaxWidth())
+        PointEntryScreenUiState.Success -> NewPointScreenUiState(viewModel, navigateBack)
+        PointEntryScreenUiState.Error -> Text(text = PointEntryScreenUiState.Error.errorMessage.ifBlank { "Unexpected error " })
+    }
+}
+
+@Composable
+private fun NewPointScreenUiState(
+    viewModel: PointEntryViewModel,
+    navigateBack: () -> Unit
+) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     Scaffold(
@@ -47,8 +60,9 @@ fun NewPoint(
             onPointValueChange = viewModel::updateUiState,
             onSaveClick = {
                 coroutineScope.launch {
-                    if(viewModel.savePoint()){ navigateBack() }
-                    else{
+                    if (viewModel.savePoint()) {
+                        navigateBack()
+                    } else {
                         Toast.makeText(
                             context,
                             "Point with this name already exists",

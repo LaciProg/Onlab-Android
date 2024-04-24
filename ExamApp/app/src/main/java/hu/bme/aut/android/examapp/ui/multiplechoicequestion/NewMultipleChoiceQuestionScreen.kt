@@ -12,6 +12,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -21,7 +22,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -37,6 +37,7 @@ import hu.bme.aut.android.examapp.R
 import hu.bme.aut.android.examapp.ui.AppViewModelProvider
 import hu.bme.aut.android.examapp.ui.components.DropDownList
 import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionDetails
+import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionEntryScreenUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionEntryViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.point.PointListViewModel
@@ -50,6 +51,18 @@ fun NewMultipleChoiceQuestionScreen(
     canNavigateBack: Boolean = true,
     viewModel: MultipleChoiceQuestionEntryViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+    when(viewModel.multipleChoiceQuestionScreenUiState) {
+        MultipleChoiceQuestionEntryScreenUiState.Loading -> CircularProgressIndicator(modifier = Modifier.fillMaxWidth())
+        MultipleChoiceQuestionEntryScreenUiState.Success -> NewMultipleChoiceQuestionScreenUiState(viewModel, navigateBack)
+        MultipleChoiceQuestionEntryScreenUiState.Error ->  Text(text = MultipleChoiceQuestionEntryScreenUiState.Error.errorMessage.ifBlank { "Unexpected error " })
+    }
+}
+
+@Composable
+private fun NewMultipleChoiceQuestionScreenUiState(
+    viewModel: MultipleChoiceQuestionEntryViewModel,
+    navigateBack: () -> Unit
+) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     Scaffold(
@@ -60,10 +73,9 @@ fun NewMultipleChoiceQuestionScreen(
             onMultipleChoiceQuestionValueChange = viewModel::updateUiState,
             onSaveClick = {
                 coroutineScope.launch {
-                    if(viewModel.saveMultipleChoiceQuestion()) {
+                    if (viewModel.saveMultipleChoiceQuestion()) {
                         navigateBack()
-                    }
-                    else{
+                    } else {
                         Toast.makeText(
                             context,
                             "Question already exists",
@@ -89,7 +101,9 @@ fun MultipleChoiceQuestionEntryBody(
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
-        modifier = modifier.verticalScroll(rememberScrollState()).padding(dimensionResource(id = R.dimen.padding_medium))
+        modifier = modifier
+            .verticalScroll(rememberScrollState())
+            .padding(dimensionResource(id = R.dimen.padding_medium))
     ) {
         MultipleChoiceQuestionInputForm(
             multipleChoiceQuestionDetails = multipleChoiceQuestionUiState.multipleChoiceQuestionDetails,

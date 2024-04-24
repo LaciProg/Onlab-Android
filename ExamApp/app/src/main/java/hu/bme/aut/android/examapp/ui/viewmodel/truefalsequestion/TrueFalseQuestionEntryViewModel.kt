@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
 sealed interface TrueFalseQuestionEntryScreenUiState {
-    data class Success(val question: TrueFalseQuestionDto) : TrueFalseQuestionEntryScreenUiState
+    data object Success : TrueFalseQuestionEntryScreenUiState
     data object Error : TrueFalseQuestionEntryScreenUiState{var errorMessage: String = ""}
     data object Loading : TrueFalseQuestionEntryScreenUiState
 }
