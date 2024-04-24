@@ -1,11 +1,12 @@
 package hu.bme.aut.examappbackend.db.facade
 
 import hu.bme.aut.examappbackend.dto.ExamDto
+import hu.bme.aut.examappbackend.dto.NameDto
 import hu.bme.aut.examappbackend.dto.Question
 
 interface ExamFacade {
     suspend fun getAllExam() : List<ExamDto>
-    suspend fun getAllExamNames() : List<String>
+    suspend fun getAllExamNames() : List<NameDto>
     suspend fun getAllQuestionString(exam: String): String?
     suspend fun getAllQuestion(): List<Question>
     suspend fun getAllQuestionId(): List<String>

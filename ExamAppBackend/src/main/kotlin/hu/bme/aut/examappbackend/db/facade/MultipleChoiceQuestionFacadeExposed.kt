@@ -3,6 +3,7 @@ package hu.bme.aut.examappbackend.db.facade
 import hu.bme.aut.examappbackend.db.DatabaseFactory.dbQuery
 import hu.bme.aut.examappbackend.db.model.MultipleChoiceQuestionDB
 import hu.bme.aut.examappbackend.dto.MultipleChoiceQuestionDto
+import hu.bme.aut.examappbackend.dto.NameDto
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import java.util.UUID
@@ -22,8 +23,11 @@ class MultipleChoiceQuestionFacadeExposed : MultipleChoiceQuestionFacade {
     override suspend fun getAllMultipleChoiceQuestion(): List<MultipleChoiceQuestionDto> = dbQuery  {
         MultipleChoiceQuestionDB.selectAll().map(::resultRowToMultipleChoiceQuestion)
     }
-    override suspend fun getAllMultipleChoiceQuestionQuestion(): List<String> = dbQuery {
-        MultipleChoiceQuestionDB.selectAll().map { it[MultipleChoiceQuestionDB.question] }
+    override suspend fun getAllMultipleChoiceQuestionQuestion(): List<NameDto> = dbQuery {
+        MultipleChoiceQuestionDB.selectAll().map { NameDto(
+            name = it[MultipleChoiceQuestionDB.question],
+            uuid = it[MultipleChoiceQuestionDB.id].toString()
+        ) }
     }
 
     override suspend fun getMultipleChoiceQuestionById(uuid: String): MultipleChoiceQuestionDto? = dbQuery {

@@ -1,5 +1,6 @@
 package hu.bme.aut.examappbackend.db.facade
 
+import hu.bme.aut.examappbackend.dto.NameDto
 import hu.bme.aut.examappbackend.dto.TrueFalseQuestionDto
 
 interface TrueFalseQuestionFacade {
@@ -8,5 +9,5 @@ interface TrueFalseQuestionFacade {
     suspend fun deleteTrueFalseQuestion(uuid: String) : Boolean
     suspend fun insertTrueFalseQuestion(trueFalseQuestion: TrueFalseQuestionDto) : TrueFalseQuestionDto?
     suspend fun updateTrueFalseQuestion(trueFalseQuestion: TrueFalseQuestionDto) : Boolean
-    suspend fun getAllTrueFalseQuestionQuestion() : List<String>
+    suspend fun getAllTrueFalseQuestionQuestion() : List<NameDto>
 }

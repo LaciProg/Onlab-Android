@@ -3,10 +3,7 @@ package hu.bme.aut.examappbackend.db.facade
 import enums.Type
 import hu.bme.aut.examappbackend.db.DatabaseFactory.dbQuery
 import hu.bme.aut.examappbackend.db.model.ExamDB
-import hu.bme.aut.examappbackend.dto.ExamDto
-import hu.bme.aut.examappbackend.dto.MultipleChoiceQuestionDto
-import hu.bme.aut.examappbackend.dto.Question
-import hu.bme.aut.examappbackend.dto.TrueFalseQuestionDto
+import hu.bme.aut.examappbackend.dto.*
 import kotlinx.coroutines.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -25,8 +22,11 @@ class ExamFacadeExposed : ExamFacade{
         ExamDB.selectAll().map(::resultRowToExam)
     }
 
-    override suspend fun getAllExamNames(): List<String> = dbQuery {
-        ExamDB.selectAll().map{it[ExamDB.name]}
+    override suspend fun getAllExamNames(): List<NameDto> = dbQuery {
+        ExamDB.selectAll().map{NameDto(
+            name = it[ExamDB.name],
+            uuid = it[ExamDB.id].toString()
+        ) }
     }
 
     override suspend fun getAllQuestionString(exam: String): String? = dbQuery {

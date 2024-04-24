@@ -44,7 +44,16 @@ fun Route.trueFalseRoutes(){
 
     put<TrueFalseRoutes> {
         val question = call.receive<TrueFalseQuestionDto>()
-        if(FacadeExposed.trueFalseQuestionDao.updateTrueFalseQuestion(question)){
+        val typeID = FacadeExposed.typeDao.getTypeByType(question.type)?.uuid ?: ""
+        val questionWithTypeID = TrueFalseQuestionDto(
+            uuid = question.uuid,
+            question = question.question,
+            correctAnswer = question.correctAnswer,
+            point = question.point,
+            topic = question.topic,
+            type = typeID
+        )
+        if(FacadeExposed.trueFalseQuestionDao.updateTrueFalseQuestion(questionWithTypeID)){
             call.respond(status = HttpStatusCode.OK, message = "")
         }
         else{
@@ -54,7 +63,16 @@ fun Route.trueFalseRoutes(){
 
     post<TrueFalseRoutes> {
         val question = call.receive<TrueFalseQuestionDto>()
-        val created = FacadeExposed.trueFalseQuestionDao.insertTrueFalseQuestion(question)
+        val typeID = FacadeExposed.typeDao.getTypeByType(question.type)?.uuid ?: ""
+        val questionWithTypeID = TrueFalseQuestionDto(
+            uuid = question.uuid,
+            question = question.question,
+            correctAnswer = question.correctAnswer,
+            point = question.point,
+            topic = question.topic,
+            type = typeID
+        )
+        val created = FacadeExposed.trueFalseQuestionDao.insertTrueFalseQuestion(questionWithTypeID)
             ?: return@post call.respond(status = HttpStatusCode.InternalServerError, message = "")
         call.respond(status = HttpStatusCode.Created, message = created)
     }

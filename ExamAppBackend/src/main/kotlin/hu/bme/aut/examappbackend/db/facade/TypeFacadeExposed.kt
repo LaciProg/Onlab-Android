@@ -2,6 +2,7 @@ package hu.bme.aut.examappbackend.db.facade
 
 import hu.bme.aut.examappbackend.db.DatabaseFactory.dbQuery
 import hu.bme.aut.examappbackend.db.model.TypeDB
+import hu.bme.aut.examappbackend.dto.NameDto
 import hu.bme.aut.examappbackend.dto.TypeDto
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -18,12 +19,21 @@ class TypeFacadeExposed : TypeFacade {
         TypeDB.selectAll().map(::resultRowToType)
     }
 
-    override suspend fun getAllTypeType(): List<String> = dbQuery {
-        TypeDB.selectAll().map { it[TypeDB.type] }
+    override suspend fun getAllTypeType(): List<NameDto> = dbQuery {
+        TypeDB.selectAll().map { NameDto(
+            name = it[TypeDB.type],
+            uuid = it[TypeDB.id].toString()
+        ) }
     }
 
     override suspend fun getTypeById(uuid: String): TypeDto? = dbQuery {
         TypeDB.selectAll().where { TypeDB.id eq UUID.fromString(uuid) }
+            .map(::resultRowToType)
+            .singleOrNull()
+    }
+
+    override suspend fun getTypeByType(type: String): TypeDto? = dbQuery {
+        TypeDB.selectAll().where { TypeDB.type eq type }
             .map(::resultRowToType)
             .singleOrNull()
     }

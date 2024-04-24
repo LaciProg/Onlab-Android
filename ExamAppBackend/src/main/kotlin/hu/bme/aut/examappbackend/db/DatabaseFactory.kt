@@ -88,6 +88,14 @@ object DatabaseFactory {
                         badAnswer = 0.0
                     )
                 )
+                val point3 = FacadeExposed.pointDao.insertPoint(
+                    PointDto(
+                        type = "IHKiller",
+                        point = 4.0,
+                        goodAnswer = 4.0,
+                        badAnswer = -10.0
+                    )
+                )
             }
             if(FacadeExposed.topicDao.getAllTopic().isEmpty()){
                 topic1 = FacadeExposed.topicDao.insertTopic(
