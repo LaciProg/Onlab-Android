@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.NameDto
-import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
 import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -18,7 +17,7 @@ sealed interface TopicListScreenUiState {
     data object Loading : TopicListScreenUiState
 }
 
-class TopicListViewModel(topicRepository: TopicRepository) : ViewModel() {
+class TopicListViewModel : ViewModel() {
 
     var topicListScreenUiState: TopicListScreenUiState by mutableStateOf(TopicListScreenUiState.Loading)
     var topicListUiState: TopicListUiState by mutableStateOf(TopicListUiState())

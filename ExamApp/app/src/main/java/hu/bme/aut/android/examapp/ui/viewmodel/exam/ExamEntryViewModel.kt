@@ -10,8 +10,6 @@ import hu.bme.aut.android.examapp.api.dto.ExamDto
 import hu.bme.aut.android.examapp.api.dto.MultipleChoiceQuestionDto
 import hu.bme.aut.android.examapp.api.dto.Question
 import hu.bme.aut.android.examapp.api.dto.TrueFalseQuestionDto
-import hu.bme.aut.android.examapp.data.repositories.inrefaces.ExamRepository
-import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
 import hu.bme.aut.android.examapp.ui.viewmodel.type.Type
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -23,10 +21,7 @@ sealed interface ExamEntryScreenUiState {
     data object Loading : ExamEntryScreenUiState
 }
 
-class ExamEntryViewModel(
-    private val examRepository: ExamRepository,
-    private val topicRepository: TopicRepository
-) : ViewModel(){
+class ExamEntryViewModel : ViewModel(){
 
     var examUiState by mutableStateOf(ExamUiState())
         private set

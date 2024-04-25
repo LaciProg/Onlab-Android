@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.NameDto
-import hu.bme.aut.android.examapp.data.repositories.inrefaces.ExamRepository
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -18,7 +17,7 @@ sealed interface ExamListScreenUiState {
     data object Loading : ExamListScreenUiState
 }
 
-class ExamListViewModel(examRepository: ExamRepository) : ViewModel() {
+class ExamListViewModel : ViewModel() {
 
     var examListScreenUiState: ExamListScreenUiState by mutableStateOf(
         ExamListScreenUiState.Loading)

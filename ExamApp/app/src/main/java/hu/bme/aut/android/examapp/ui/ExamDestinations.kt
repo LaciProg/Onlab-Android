@@ -1,143 +1,94 @@
 package hu.bme.aut.android.examapp.ui
 
-interface ExamDestination {
-    val route: String
-}
-
-object ScreenFirst : ExamDestination{
- override val route: String = "First"
-}
-
-object ScreenSecond : ExamDestination{
-    override val route: String = "Second"
-}
-object ScreenThird : ExamDestination{
-    override val route: String = "Third"
-}
-object ScreenFourth : ExamDestination{
-    override val route: String = "Exit"
-}
-object ScreenFive : ExamDestination{
-    override val route: String = "Fifth"
-}
-
-object MainScreenDestination : ExamDestination {
-    override val route = "MainScreen"
-}
-
-object TopicListDestination : ExamDestination {
-    override val route = "TopicList"
-}
-
-object TopicDetailsDestination : ExamDestination{
-    override val route: String = "TopicDetails"
-    const val topicIdArg = "0"
-    val routeWithArgs = "$route/{$topicIdArg}"
-}
-
-object TopicEditDestination : ExamDestination {
-    override val route = "TopicEdit"
-    const val topicIdArg = "0"
-    val routeWithArgs = "$route/{$topicIdArg}"
-}
-
-object NewTopicDestination : ExamDestination{
-    override val route: String = "NewTopic"
-}
-
-object PointListDestination : ExamDestination {
-    override val route = "PointList"
-}
-
-object PointDetailsDestination : ExamDestination{
-    override val route: String = "PointDetails"
-    const val pointIdArg = "0"
-    val routeWithArgs = "$route/{$pointIdArg}"
-}
-
-object PointEditDestination : ExamDestination {
-    override val route = "PointEdit"
-    const val pointIdArg = "0"
-    val routeWithArgs = "$route/{$pointIdArg}"
-}
-
-object NewPointDestination : ExamDestination{
-    override val route: String = "NewPoint"
-}
-
-object TrueFalseQuestionListDestination : ExamDestination {
-    override val route = "TrueFalseQuestionList"
-}
-
-object TrueFalseQuestionDetailsDestination : ExamDestination{
-    override val route: String = "TrueFalseQuestionDetails"
-    const val trueFalseQuestionIdArg = "0"
-    val routeWithArgs = "$route/{$trueFalseQuestionIdArg}"
-}
-
-object TrueFalseQuestionEditDestination : ExamDestination {
-    override val route = "TrueFalseQuestionEdit"
-    const val trueFalseQuestionIdArg = "0"
-    val routeWithArgs = "$route/{$trueFalseQuestionIdArg}"
-}
-
-object NewTrueFalseQuestionDestination : ExamDestination{
-    override val route: String = "NewTrueFalseQuestion"
-}
-
-object MultipleChoiceQuestionListDestination : ExamDestination {
-    override val route = "MultipleChoiceQuestionList"
-}
-
-object MultipleChoiceQuestionDetailsDestination : ExamDestination{
-    override val route: String = "MultipleChoiceQuestionDetails"
-    const val multipleChoiceQuestionIdArg = "0"
-    val routeWithArgs = "$route/{$multipleChoiceQuestionIdArg}"
-}
-
-object MultipleChoiceQuestionEditDestination : ExamDestination {
-    override val route = "MultipleChoiceQuestionEdit"
-    const val multipleChoiceQuestionIdArg = "0"
-    val routeWithArgs = "$route/{$multipleChoiceQuestionIdArg}"
-}
-
-object NewMultipleChoiceQuestionDestination : ExamDestination{
-    override val route: String = "MultipleChoiceQuestion"
-}
 
 
-object ExamListDestination : ExamDestination {
-    override val route = "ExamList"
+sealed class ExamDestination(val route: String) {
+    data object LoginScreenDestination : ExamDestination("LoginScreen")
+
+    data object RegisterScreenDestination : ExamDestination("RegisterScreen")
+
+    data object MainScreenDestination : ExamDestination("MainScreen")
+
+    data object TopicListDestination : ExamDestination("TopicList")
+
+    data object TopicDetailsDestination : ExamDestination("TopicDetails") {
+        const val topicIdArg = "0"
+        val routeWithArgs = "$route/{$topicIdArg}"
+    }
+
+    data object TopicEditDestination : ExamDestination("TopicEdit") {
+        const val topicIdArg = "0"
+        val routeWithArgs = "$route/{$topicIdArg}"
+    }
+
+    data object NewTopicDestination : ExamDestination("NewTopic")
+
+    data object PointListDestination : ExamDestination("PointList")
+
+    data object PointDetailsDestination : ExamDestination("PointDetails") {
+        const val pointIdArg = "0"
+        val routeWithArgs = "$route/{$pointIdArg}"
+    }
+
+    data object PointEditDestination : ExamDestination("PointEdit") {
+        const val pointIdArg = "0"
+        val routeWithArgs = "$route/{$pointIdArg}"
+    }
+
+    data object NewPointDestination : ExamDestination("NewPoint")
+
+    data object TrueFalseQuestionListDestination : ExamDestination("TrueFalseQuestionList")
+
+    data object TrueFalseQuestionDetailsDestination : ExamDestination("TrueFalseQuestionDetails") {
+        const val trueFalseQuestionIdArg = "0"
+        val routeWithArgs = "$route/{$trueFalseQuestionIdArg}"
+    }
+
+    data object TrueFalseQuestionEditDestination : ExamDestination("TrueFalseQuestionEdit") {
+        const val trueFalseQuestionIdArg = "0"
+        val routeWithArgs = "$route/{$trueFalseQuestionIdArg}"
+    }
+
+    data object NewTrueFalseQuestionDestination : ExamDestination("NewTrueFalseQuestion")
+
+    data object MultipleChoiceQuestionListDestination : ExamDestination("MultipleChoiceQuestionList")
+
+    data object MultipleChoiceQuestionDetailsDestination : ExamDestination("MultipleChoiceQuestionDetails") {
+        const val multipleChoiceQuestionIdArg = "0"
+        val routeWithArgs = "$route/{$multipleChoiceQuestionIdArg}"
+    }
+
+    data object MultipleChoiceQuestionEditDestination : ExamDestination("MultipleChoiceQuestionEdit") {
+        const val multipleChoiceQuestionIdArg = "0"
+        val routeWithArgs = "$route/{$multipleChoiceQuestionIdArg}"
+    }
+
+    data object NewMultipleChoiceQuestionDestination : ExamDestination("NewMultipleChoiceQuestion")
+
+
+    data object ExamListDestination : ExamDestination("ExamList")
+
+    data object ExamDetailsDestination : ExamDestination("ExamDetails") {
+        const val examIdArg = "0"
+        val routeWithArgs = "$route/{$examIdArg}"
+    }
+
+    data object ExamEditDestination : ExamDestination("ExamEdit") {
+        const val examIdArg = "0"
+        val routeWithArgs = "$route/{$examIdArg}"
+    }
+
+    data object NewExamDestination : ExamDestination("NewExam")
+
+
+    data object ExportExamListDestination : ExamDestination("ExportExamList")
+
+    data object ExportExamDetailsDestination : ExamDestination("ExportExamDetails") {
+        const val examIdArg = "0"
+        val routeWithArgs = "$route/{$examIdArg}"
+    }
 }
 
-object ExamDetailsDestination : ExamDestination{
-    override val route: String = "ExamDetails"
-    const val examIdArg = "0"
-    val routeWithArgs = "$route/{$examIdArg}"
-}
-
-object ExamEditDestination : ExamDestination {
-    override val route = "ExamEdit"
-    const val examIdArg = "0"
-    val routeWithArgs = "$route/{$examIdArg}"
-}
-
-object NewExamDestination : ExamDestination{
-    override val route: String = "ExamQuestion"
-}
-
-
-object ExportExamListDestination : ExamDestination {
-    override val route = "ExportExamList"
-}
-
-object ExportExamDetailsDestination : ExamDestination{
-    override val route: String = "ExportExamDetails"
-    const val examIdArg = "0"
-    val routeWithArgs = "$route/{$examIdArg}"
-}
-
-val examTabRowScreens = listOf(MainScreenDestination, ScreenSecond, ScreenThird, ScreenFourth, ScreenFive)
 
 /*
 open class ExamDestination(val route: String = "ScreenFirst") {

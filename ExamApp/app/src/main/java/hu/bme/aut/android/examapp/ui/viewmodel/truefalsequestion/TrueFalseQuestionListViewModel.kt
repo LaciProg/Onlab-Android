@@ -7,8 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.NameDto
-import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
-import hu.bme.aut.android.examapp.data.repositories.inrefaces.TrueFalseQuestionRepository
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -19,10 +17,7 @@ sealed interface TrueFalseQuestionListScreenUiState {
     data object Loading : TrueFalseQuestionListScreenUiState
 }
 
-class TrueFalseQuestionListViewModel(
-    trueFalseQuestionRepository: TrueFalseQuestionRepository,
-    topicRepository: TopicRepository
-) : ViewModel() {
+class TrueFalseQuestionListViewModel : ViewModel() {
 
     var trueFalseQuestionListScreenUiState: TrueFalseQuestionListScreenUiState by mutableStateOf(TrueFalseQuestionListScreenUiState.Loading)
     var trueFalseQuestionListUiState: TrueFalseQuestionListUiState by mutableStateOf(TrueFalseQuestionListUiState())

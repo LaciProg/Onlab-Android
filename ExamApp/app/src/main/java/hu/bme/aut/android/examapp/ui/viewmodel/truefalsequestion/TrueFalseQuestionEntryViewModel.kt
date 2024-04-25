@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.TrueFalseQuestionDto
-import hu.bme.aut.android.examapp.data.repositories.inrefaces.TrueFalseQuestionRepository
 import hu.bme.aut.android.examapp.ui.viewmodel.type.Type
 import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.launch
@@ -19,7 +18,7 @@ sealed interface TrueFalseQuestionEntryScreenUiState {
     data object Loading : TrueFalseQuestionEntryScreenUiState
 }
 
-class TrueFalseQuestionEntryViewModel(private val trueFalseQuestionRepository: TrueFalseQuestionRepository) : ViewModel(){
+class TrueFalseQuestionEntryViewModel : ViewModel(){
 
     var trueFalseQuestionUiState by mutableStateOf(TrueFalseQuestionUiState())
         private set

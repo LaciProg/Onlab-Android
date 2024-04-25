@@ -10,12 +10,14 @@ import hu.bme.aut.android.examapp.data.room.dao.PointDao
 import hu.bme.aut.android.examapp.data.room.dao.TopicDao
 import hu.bme.aut.android.examapp.data.room.dao.TrueFalseQuestionDao
 import hu.bme.aut.android.examapp.data.room.dao.TypeDao
+import hu.bme.aut.android.examapp.data.room.dao.UserDao
 import hu.bme.aut.android.examapp.data.room.dto.ExamDto
 import hu.bme.aut.android.examapp.data.room.dto.MultipleChoiceQuestionDto
 import hu.bme.aut.android.examapp.data.room.dto.PointDto
 import hu.bme.aut.android.examapp.data.room.dto.TopicDto
 import hu.bme.aut.android.examapp.data.room.dto.TrueFalseQuestionDto
 import hu.bme.aut.android.examapp.data.room.dto.TypeDto
+import hu.bme.aut.android.examapp.data.room.dto.UsersOnThisDevice
 
 @Database(entities = [
         ExamDto::class,
@@ -23,9 +25,10 @@ import hu.bme.aut.android.examapp.data.room.dto.TypeDto
         MultipleChoiceQuestionDto::class,
         TopicDto::class,
         TypeDto::class,
-        PointDto::class
+        PointDto::class,
+        UsersOnThisDevice::class
     ],
-    version = 9,
+    version = 10,
     exportSchema = false)
 abstract class ExamDatabase : RoomDatabase() {
     abstract fun examDao(): ExamDao
@@ -34,6 +37,8 @@ abstract class ExamDatabase : RoomDatabase() {
     abstract fun topicDao(): TopicDao
     abstract fun typeDao(): TypeDao
     abstract fun pointDao(): PointDao
+
+    abstract fun userDao(): UserDao
 
     companion object {
         @Volatile

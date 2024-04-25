@@ -8,8 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.TopicDto
-import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
-import hu.bme.aut.android.examapp.ui.TopicDetailsDestination
+import hu.bme.aut.android.examapp.ui.ExamDestination
 import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionEditScreenUiState
 import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.launch
@@ -21,17 +20,14 @@ sealed interface TopicEditScreenUiState {
     data object Loading : TopicEditScreenUiState
 }
 
-class TopicEditViewModel(
-    savedStateHandle: SavedStateHandle,
-    private val topicRepository: TopicRepository
-) : ViewModel() {
+class TopicEditViewModel(savedStateHandle: SavedStateHandle, ) : ViewModel() {
 
     private lateinit var originalTopic: String
 
     var topicUiState by mutableStateOf(TopicUiState())
         private set
 
-    private val topicId: String = checkNotNull(savedStateHandle[TopicDetailsDestination.topicIdArg])
+    private val topicId: String = checkNotNull(savedStateHandle[ExamDestination.TopicDetailsDestination.topicIdArg])
 
     var topicEditScreenUiState: TopicEditScreenUiState by mutableStateOf(TopicEditScreenUiState.Loading)
 

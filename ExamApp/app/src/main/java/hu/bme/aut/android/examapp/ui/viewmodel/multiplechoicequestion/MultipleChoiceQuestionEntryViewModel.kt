@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.MultipleChoiceQuestionDto
-import hu.bme.aut.android.examapp.data.repositories.inrefaces.MultipleChoiceQuestionRepository
 import hu.bme.aut.android.examapp.ui.viewmodel.type.Type
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -19,7 +18,7 @@ sealed interface MultipleChoiceQuestionEntryScreenUiState {
     data object Loading : MultipleChoiceQuestionEntryScreenUiState
 }
 
-class MultipleChoiceQuestionEntryViewModel(private val multipleChoiceQuestionRepository: MultipleChoiceQuestionRepository) : ViewModel(){
+class MultipleChoiceQuestionEntryViewModel : ViewModel(){
 
     var multipleChoiceQuestionUiState by mutableStateOf(MultipleChoiceQuestionUiState())
         private set

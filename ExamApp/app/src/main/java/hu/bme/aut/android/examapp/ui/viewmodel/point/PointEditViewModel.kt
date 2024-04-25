@@ -8,10 +8,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.PointDto
-import hu.bme.aut.android.examapp.data.repositories.inrefaces.PointRepository
+import hu.bme.aut.android.examapp.ui.ExamDestination
 import io.ktor.utils.io.errors.IOException
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
@@ -21,15 +19,12 @@ sealed interface PointEditScreenUiState {
     data object Loading : PointEditScreenUiState
 }
 
-class PointEditViewModel(
-    savedStateHandle: SavedStateHandle,
-    private val pointRepository: PointRepository
-) : ViewModel() {
+class PointEditViewModel(savedStateHandle: SavedStateHandle, ) : ViewModel() {
 
     var pointUiState by mutableStateOf(PointUiState())
         private set
 
-    private val pointId: String = checkNotNull(savedStateHandle[hu.bme.aut.android.examapp.ui.PointDetailsDestination.pointIdArg])
+    private val pointId: String = checkNotNull(savedStateHandle[ExamDestination.PointDetailsDestination.pointIdArg])
 
     private lateinit var originalPoint: String
 

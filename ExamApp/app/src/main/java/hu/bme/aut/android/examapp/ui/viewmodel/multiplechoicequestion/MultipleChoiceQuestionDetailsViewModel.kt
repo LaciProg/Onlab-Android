@@ -8,10 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.MultipleChoiceQuestionDto
-import hu.bme.aut.android.examapp.data.repositories.inrefaces.MultipleChoiceQuestionRepository
-import hu.bme.aut.android.examapp.data.repositories.inrefaces.PointRepository
-import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
-import hu.bme.aut.android.examapp.ui.MultipleChoiceQuestionDetailsDestination
+import hu.bme.aut.android.examapp.ui.ExamDestination
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -22,14 +19,9 @@ sealed interface MultipleChoiceQuestionDetailsScreenUiState {
     data object Loading : MultipleChoiceQuestionDetailsScreenUiState
 }
 
-class MultipleChoiceQuestionDetailsViewModel(
-    savedStateHandle: SavedStateHandle,
-    private val multipleChoiceQuestionRepository: MultipleChoiceQuestionRepository,
-    private val topicRepository: TopicRepository,
-    private val pointRepository: PointRepository
-) : ViewModel() {
+class MultipleChoiceQuestionDetailsViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
-    val multipleChoiceQuestionId: String = checkNotNull(savedStateHandle[MultipleChoiceQuestionDetailsDestination.multipleChoiceQuestionIdArg])
+    val multipleChoiceQuestionId: String = checkNotNull(savedStateHandle[ExamDestination.MultipleChoiceQuestionDetailsDestination.multipleChoiceQuestionIdArg])
     var multipleChoiceDetailsScreenUiState: MultipleChoiceQuestionDetailsScreenUiState by mutableStateOf(
         MultipleChoiceQuestionDetailsScreenUiState.Loading)
     var uiState by mutableStateOf(MultipleChoiceQuestionDetailsUiState())

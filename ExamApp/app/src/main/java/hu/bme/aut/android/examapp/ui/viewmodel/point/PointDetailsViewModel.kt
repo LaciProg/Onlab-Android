@@ -8,8 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.PointDto
-import hu.bme.aut.android.examapp.data.repositories.inrefaces.PointRepository
-import hu.bme.aut.android.examapp.ui.PointDetailsDestination
+import hu.bme.aut.android.examapp.ui.ExamDestination
 import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -20,12 +19,9 @@ sealed interface PointDetailsScreenUiState {
     data object Loading : PointDetailsScreenUiState
 }
 
-class PointDetailsViewModel(
-    savedStateHandle: SavedStateHandle,
-    private val pointRepository: PointRepository,
-) : ViewModel() {
+class PointDetailsViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
-    val pointId: String = checkNotNull(savedStateHandle[PointDetailsDestination.pointIdArg.toString()])
+    val pointId: String = checkNotNull(savedStateHandle[ExamDestination.PointDetailsDestination.pointIdArg])
 
     var pointDetailsScreenUiState: PointDetailsScreenUiState by mutableStateOf(PointDetailsScreenUiState.Loading)
 

@@ -5,6 +5,7 @@ import hu.bme.aut.android.examapp.api.dto.ExamDto
 import hu.bme.aut.android.examapp.api.dto.MultipleChoiceQuestionDto
 import hu.bme.aut.android.examapp.api.dto.NameDto
 import hu.bme.aut.android.examapp.api.dto.PointDto
+import hu.bme.aut.android.examapp.api.dto.Token
 import hu.bme.aut.android.examapp.api.dto.TopicDto
 import hu.bme.aut.android.examapp.api.dto.TrueFalseQuestionDto
 import hu.bme.aut.android.examapp.api.dto.UserDto
@@ -21,34 +22,85 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 
-private const val BASE_URL = "http://152.66.182.116:46258"
-private const val token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJodHRwOi8vMC4wLjAuMDo0NjI1OC8iLCJpc3MiOiJleGFtLWFwcC1iYWNrZW5kIiwidXNlcm5hbWUiOiJ1c2VyIiwiZXhwIjoxNzE0MDA0MTU3fQ.6cWK6mSudymc8K0ETUyBXUNvl8i11Rm-8dzrTW7edYI"
-
 //TODO Firebase login system + analytics
-//TODO Login screen + register screen + store users in Room
-@OptIn(ExperimentalSerializationApi::class)
-private val retrofit = Retrofit.Builder()
-    .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
-    .client(
-        OkHttpClient.Builder()
-            .addInterceptor(AuthenticationInterceptor(token))
-            .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
-            .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
-            .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
-            .build())
-    .baseUrl(BASE_URL)
-    .build()
 
 object ExamAppApi {
-    val retrofitService: ExamAppApiService by lazy {
+    private const val BASE_URL = "http://152.66.182.116:46258"
+    private var token: String = ""
+    private var userDto: UserDto? = null
+    @OptIn(ExperimentalSerializationApi::class)
+    private var retrofit = Retrofit.Builder()
+        .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
+        .client(
+            OkHttpClient.Builder()
+                .addInterceptor(AuthenticationInterceptor(token))
+                .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+                .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+                .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                .build())
+        .baseUrl(BASE_URL)
+        .build()
+
+
+    private fun retrofitServiceCreator(): ExamAppApiService  =
         retrofit.create(ExamAppApiService::class.java)
+
+    var retrofitService: ExamAppApiService
+    init{
+        retrofitService = retrofitServiceCreator()
+    }
+
+
+    @OptIn(ExperimentalSerializationApi::class)
+    private fun buildRetrofit() {
+        retrofit = Retrofit.Builder()
+            .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
+            .client(
+                OkHttpClient.Builder()
+                    .addInterceptor(AuthenticationInterceptor(token))
+                    .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+                    .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+                    .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                    .build())
+            .baseUrl(BASE_URL)
+            .build()
+
+        retrofitService = retrofitServiceCreator()
+    }
+
+    suspend fun authenticate(user: UserDto? = null) {
+        userDto = user ?: userDto
+        try{
+            token = retrofitService.authenticate(userDto!!).token
+        } catch (e: Exception) {
+            throw Exception("Authentication failed")
+        }
+        buildRetrofit()
     }
 }
 
 interface ExamAppApiService {
+    @POST("/auth")
+    suspend fun authenticate(@Body body: UserDto): Token
+
     @GET("/user")
     suspend fun getAllUser(): Response<List<UserDto>>
+
+    @GET("/user/{id}")
+    suspend fun getUser(@Path("id") string: String) : UserDto
+
+    @GET("/user/name/{userName}")
+    suspend fun getUserByName(@Path("userName") string: String) : UserDto?
+
+
+    @POST("/user")
+    suspend fun postUser(@Body body: UserDto): UserDto?
+
+    @PUT("/user")
+    suspend fun updateUser(@Body body: UserDto): Response<Unit>
+
+    @DELETE("/user/{id}")
+    suspend fun deleteUser(@Path("id") string: String): Response<Unit>
 
 
     @GET("/point")

@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.PointDto
-import hu.bme.aut.android.examapp.data.repositories.inrefaces.PointRepository
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -18,7 +17,7 @@ sealed interface PointEntryScreenUiState {
     data object Loading : PointEntryScreenUiState
 }
 
-class PointEntryViewModel(private val pointRepository: PointRepository) : ViewModel(){
+class PointEntryViewModel : ViewModel(){
 
     var pointUiState by mutableStateOf(PointUiState())
         private set

@@ -8,10 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.TrueFalseQuestionDto
-import hu.bme.aut.android.examapp.data.repositories.inrefaces.PointRepository
-import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
-import hu.bme.aut.android.examapp.data.repositories.inrefaces.TrueFalseQuestionRepository
-import hu.bme.aut.android.examapp.ui.TrueFalseQuestionDetailsDestination
+import hu.bme.aut.android.examapp.ui.ExamDestination
 import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -22,19 +19,14 @@ sealed interface TrueFalseQuestionEditScreenUiState {
     data object Loading : TrueFalseQuestionEditScreenUiState
 }
 
-class TrueFalseQuestionEditViewModel(
-    savedStateHandle: SavedStateHandle,
-    private val trueFalseQuestionRepository: TrueFalseQuestionRepository,
-    private val topicRepository: TopicRepository,
-    private val pointRepository: PointRepository
-) : ViewModel() {
+class TrueFalseQuestionEditViewModel(savedStateHandle: SavedStateHandle, ) : ViewModel() {
 
     private lateinit var originalQuestion: String
 
     var trueFalseQuestionUiState by mutableStateOf(TrueFalseQuestionUiState())
         private set
 
-    private val trueFalseQuestionId: String = checkNotNull(savedStateHandle[TrueFalseQuestionDetailsDestination.trueFalseQuestionIdArg])
+    private val trueFalseQuestionId: String = checkNotNull(savedStateHandle[ExamDestination.TrueFalseQuestionDetailsDestination.trueFalseQuestionIdArg])
 
     var trueFalseEditScreenUiState: TrueFalseQuestionEditScreenUiState by mutableStateOf(TrueFalseQuestionEditScreenUiState.Loading)
 

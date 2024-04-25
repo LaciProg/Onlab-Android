@@ -22,7 +22,7 @@ class UserRoutes{
         val userId: String
     )
 
-    @Resource("{userName}")
+    @Resource("name/{userName}")
     class UserName(
         val userParent: UserRoutes = UserRoutes(),
         val userName: String

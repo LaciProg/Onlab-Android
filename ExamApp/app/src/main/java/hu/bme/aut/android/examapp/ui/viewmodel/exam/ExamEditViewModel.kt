@@ -8,11 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.ExamDto
-import hu.bme.aut.android.examapp.data.repositories.inrefaces.ExamRepository
-import hu.bme.aut.android.examapp.data.repositories.inrefaces.MultipleChoiceQuestionRepository
-import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
-import hu.bme.aut.android.examapp.data.repositories.inrefaces.TrueFalseQuestionRepository
-import hu.bme.aut.android.examapp.ui.ExamDetailsDestination
+import hu.bme.aut.android.examapp.ui.ExamDestination
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -24,20 +20,14 @@ sealed interface ExamEditScreenUiState {
 }
 
 
-class ExamEditViewModel(
-    savedStateHandle: SavedStateHandle,
-    private val topicRepository: TopicRepository,
-    private val examRepository: ExamRepository,
-    private val trueFalseQuestionRepository: TrueFalseQuestionRepository,
-    private val multipleChoiceQuestionRepository: MultipleChoiceQuestionRepository
-) : ViewModel() {
+class ExamEditViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
     private lateinit var originalExam: String
 
     var examUiState by mutableStateOf(ExamUiState())
         private set
 
-    private val examId: String = checkNotNull(savedStateHandle[ExamDetailsDestination.examIdArg])
+    private val examId: String = checkNotNull(savedStateHandle[ExamDestination.ExamDetailsDestination.examIdArg])
 
     var examEditScreenUiState: ExamEditScreenUiState by mutableStateOf(
         ExamEditScreenUiState.Loading)

@@ -13,12 +13,7 @@ import hu.bme.aut.android.examapp.api.dto.PointDto
 import hu.bme.aut.android.examapp.api.dto.Question
 import hu.bme.aut.android.examapp.api.dto.TopicDto
 import hu.bme.aut.android.examapp.api.dto.TrueFalseQuestionDto
-import hu.bme.aut.android.examapp.data.repositories.inrefaces.ExamRepository
-import hu.bme.aut.android.examapp.data.repositories.inrefaces.MultipleChoiceQuestionRepository
-import hu.bme.aut.android.examapp.data.repositories.inrefaces.PointRepository
-import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
-import hu.bme.aut.android.examapp.data.repositories.inrefaces.TrueFalseQuestionRepository
-import hu.bme.aut.android.examapp.ui.ExamDetailsDestination
+import hu.bme.aut.android.examapp.ui.ExamDestination
 import hu.bme.aut.android.examapp.ui.viewmodel.type.Type
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -30,16 +25,9 @@ sealed interface ExamDetailsScreenUiState {
     data object Loading : ExamDetailsScreenUiState
 }
 
-class ExamDetailsViewModel(
-    savedStateHandle: SavedStateHandle,
-    private val examRepository: ExamRepository,
-    private val trueFalseQuestionRepository: TrueFalseQuestionRepository,
-    private val multipleChoiceQuestionRepository: MultipleChoiceQuestionRepository,
-    private val topicRepository: TopicRepository,
-    private val pointRepository: PointRepository
-) : ViewModel() {
+class ExamDetailsViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
-    val examId: String = checkNotNull(savedStateHandle[ExamDetailsDestination.examIdArg])
+    val examId: String = checkNotNull(savedStateHandle[ExamDestination.ExamDetailsDestination.examIdArg])
 
     var examDetailsScreenUiState: ExamDetailsScreenUiState by mutableStateOf(
         ExamDetailsScreenUiState.Loading)

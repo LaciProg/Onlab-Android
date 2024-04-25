@@ -1,18 +1,20 @@
 package hu.bme.aut.android.examapp.ui
 
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
+import androidx.lifecycle.viewmodel.InitializerViewModelFactoryBuilder
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import hu.bme.aut.android.examapp.ExamApplication
-import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicEditViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicEntryViewModel
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory
-import androidx.lifecycle.viewmodel.InitializerViewModelFactoryBuilder
-import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.PointRepository
-import hu.bme.aut.android.examapp.data.repositories.inrefaces.TypeRepository
+import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.TrueFalseQuestionRepository
+import hu.bme.aut.android.examapp.ui.viewmodel.MainScreenViewModel
+import hu.bme.aut.android.examapp.ui.viewmodel.auth.LoginUserViewModel
+import hu.bme.aut.android.examapp.ui.viewmodel.auth.RegisterUserViewModel
+import hu.bme.aut.android.examapp.ui.viewmodel.auth.usecases.IsEmailValidUseCase
+import hu.bme.aut.android.examapp.ui.viewmodel.auth.usecases.PasswordsMatchUseCase
 import hu.bme.aut.android.examapp.ui.viewmodel.exam.ExamDetailsViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.exam.ExamEditViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.exam.ExamEntryViewModel
@@ -26,17 +28,16 @@ import hu.bme.aut.android.examapp.ui.viewmodel.point.PointEditViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.point.PointEntryViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.point.PointListViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicDetailsViewModel
+import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicEditViewModel
+import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicEntryViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicListViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionDetailsViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionEditViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionEntryViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionListViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.type.TypeViewModel
 
 object AppViewModelProvider {
     val Factory = viewModelFactory {
-
-        typeViewModel()
 
         topicViewModel()
 
@@ -47,17 +48,12 @@ object AppViewModelProvider {
         multipleChoiceViewModel()
 
         examViewModel()
+
+        authViewModels()
+
+        initializer { MainScreenViewModel(ExamApplication.authService) }
     }
 
-
-    private fun InitializerViewModelFactoryBuilder.typeViewModel() {
-        /**
-         * Initializes the TypeViewModels with the [TypeRepository] from the [ExamApplication]'s container.
-         */
-        initializer {
-            TypeViewModel(examApplication().container.typeRepository)
-        }
-    }
 
     private fun InitializerViewModelFactoryBuilder.topicViewModel() {
 
@@ -65,24 +61,22 @@ object AppViewModelProvider {
          * Initializes the TopicViewModels with the [TopicRepository] from the [ExamApplication]'s container.
          */
         initializer {
-            TopicListViewModel(examApplication().container.topicRepository)
+            TopicListViewModel()
         }
 
         initializer {
-            TopicEntryViewModel(examApplication().container.topicRepository)
+            TopicEntryViewModel()
         }
 
         initializer {
             TopicDetailsViewModel(
-                this.createSavedStateHandle(),
-                examApplication().container.topicRepository
+                this.createSavedStateHandle()
             )
         }
 
         initializer {
             TopicEditViewModel(
-                this.createSavedStateHandle(),
-                examApplication().container.topicRepository
+                this.createSavedStateHandle()
             )
         }
     }
@@ -92,24 +86,22 @@ object AppViewModelProvider {
          * Initializes the PointViewModels with the [PointRepository] from the [ExamApplication]'s container.
          */
         initializer {
-            PointListViewModel(examApplication().container.pointRepository)
+            PointListViewModel()
         }
 
         initializer {
-            PointEntryViewModel(examApplication().container.pointRepository)
+            PointEntryViewModel()
         }
 
         initializer {
             PointDetailsViewModel(
-                this.createSavedStateHandle(),
-                examApplication().container.pointRepository
+                this.createSavedStateHandle()
             )
         }
 
         initializer {
             PointEditViewModel(
-                this.createSavedStateHandle(),
-                examApplication().container.pointRepository
+                this.createSavedStateHandle()
             )
         }
     }
@@ -119,102 +111,90 @@ object AppViewModelProvider {
          * Initializes the TrueFalseQuestionViewModels with the [TrueFalseQuestionRepository] from the [ExamApplication]'s container.
          */
         initializer {
-            TrueFalseQuestionListViewModel(
-                trueFalseQuestionRepository = examApplication().container.trueFalseQuestionRepository,
-                topicRepository = examApplication().container.topicRepository
-            )
+            TrueFalseQuestionListViewModel()
         }
 
         initializer {
             TrueFalseQuestionDetailsViewModel(
-                this.createSavedStateHandle(),
-                examApplication().container.trueFalseQuestionRepository,
-                examApplication().container.topicRepository,
-                examApplication().container.pointRepository
+                this.createSavedStateHandle()
             )
         }
 
         initializer {
             TrueFalseQuestionEditViewModel(
-                this.createSavedStateHandle(),
-                examApplication().container.trueFalseQuestionRepository,
-                examApplication().container.topicRepository,
-                examApplication().container.pointRepository
+                this.createSavedStateHandle()
             )
         }
 
         initializer {
-            TrueFalseQuestionEntryViewModel(
-                examApplication().container.trueFalseQuestionRepository
-            )
+            TrueFalseQuestionEntryViewModel()
         }
     }
 
     private fun InitializerViewModelFactoryBuilder.multipleChoiceViewModel() {
         initializer {
-            MultipleChoiceQuestionListViewModel(
-                examApplication().container.multipleChoiceQuestionRepository,
-                examApplication().container.topicRepository
-            )
+            MultipleChoiceQuestionListViewModel()
         }
 
         initializer {
             MultipleChoiceQuestionDetailsViewModel(
-                this.createSavedStateHandle(),
-                examApplication().container.multipleChoiceQuestionRepository,
-                examApplication().container.topicRepository,
-                examApplication().container.pointRepository
+                this.createSavedStateHandle()
             )
         }
 
         initializer {
             MultipleChoiceQuestionEditViewModel(
-                this.createSavedStateHandle(),
-                examApplication().container.multipleChoiceQuestionRepository,
-                examApplication().container.topicRepository,
-                examApplication().container.pointRepository
+                this.createSavedStateHandle()
             )
         }
 
         initializer {
-            MultipleChoiceQuestionEntryViewModel(
-                examApplication().container.multipleChoiceQuestionRepository
-            )
+            MultipleChoiceQuestionEntryViewModel()
         }
     }
 
     private fun InitializerViewModelFactoryBuilder.examViewModel() {
         initializer {
-            ExamListViewModel(
-                examApplication().container.examRepository
-            )
+            ExamListViewModel()
         }
 
         initializer {
             ExamDetailsViewModel(
-                this.createSavedStateHandle(),
-                examApplication().container.examRepository,
-                examApplication().container.trueFalseQuestionRepository,
-                examApplication().container.multipleChoiceQuestionRepository,
-                examApplication().container.topicRepository,
-                examApplication().container.pointRepository
+                this.createSavedStateHandle()
             )
         }
 
         initializer {
             ExamEditViewModel(
-                this.createSavedStateHandle(),
-                examApplication().container.topicRepository,
-                examApplication().container.examRepository,
-                examApplication().container.trueFalseQuestionRepository,
-                examApplication().container.multipleChoiceQuestionRepository
+                this.createSavedStateHandle()
             )
         }
 
         initializer {
-            ExamEntryViewModel(
-                examApplication().container.examRepository,
-                examApplication().container.topicRepository
+            ExamEntryViewModel()
+        }
+    }
+
+    private fun InitializerViewModelFactoryBuilder.authViewModels() {
+
+        initializer {
+            val authService = ExamApplication.authService
+            val isEmailValidUseCase = IsEmailValidUseCase()
+            LoginUserViewModel(
+                authService,
+                isEmailValidUseCase,
+                examApplication().container.userRepository
+            )
+        }
+
+        initializer {
+            val authService = ExamApplication.authService
+            val isEmailValidUseCase = IsEmailValidUseCase()
+            val passwordsMatchUseCase = PasswordsMatchUseCase()
+            RegisterUserViewModel(
+                authService,
+                isEmailValidUseCase,
+                passwordsMatchUseCase
             )
         }
     }
