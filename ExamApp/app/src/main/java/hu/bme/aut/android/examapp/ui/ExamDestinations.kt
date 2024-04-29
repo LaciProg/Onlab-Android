@@ -1,7 +1,5 @@
 package hu.bme.aut.android.examapp.ui
 
-
-
 sealed class ExamDestination(val route: String) {
     data object LoginScreenDestination : ExamDestination("LoginScreen")
 
@@ -88,20 +86,3 @@ sealed class ExamDestination(val route: String) {
         val routeWithArgs = "$route/{$examIdArg}"
     }
 }
-
-
-/*
-open class ExamDestination(val route: String = "ScreenFirst") {
-    object ScreenFirst : ExamDestination("ScreenFirst")
-    object ScreenSecond : ExamDestination("ScreenSecond")
-    object ScreenThird : ExamDestination("ScreenThird")
-    object ScreenFourth : ExamDestination("ScreenFourth")
-    object ScreenFive : ExamDestination("ScreenFive")
-    object NewTopic : ExamDestination("NewTopic")
-
-    companion object {
-        val examTabRowScreens = listOf(ScreenFirst, ScreenSecond, ScreenThird, ScreenFourth, ScreenFive)
-    }
-    //val examTabRowScreens = listOf(ScreenFirst, ScreenSecond, ScreenThird, ScreenFourth, ScreenFive)
-}*/
-

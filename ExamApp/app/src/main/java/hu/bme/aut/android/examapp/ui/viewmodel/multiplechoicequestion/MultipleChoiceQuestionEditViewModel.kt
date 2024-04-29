@@ -6,12 +6,14 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.MultipleChoiceQuestionDto
 import hu.bme.aut.android.examapp.ui.ExamDestination
 import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import javax.inject.Inject
 
 sealed interface MultipleChoiceQuestionEditScreenUiState {
     data class Success(val question: MultipleChoiceQuestionDto) : MultipleChoiceQuestionEditScreenUiState
@@ -19,7 +21,8 @@ sealed interface MultipleChoiceQuestionEditScreenUiState {
     data object Loading : MultipleChoiceQuestionEditScreenUiState
 }
 
-class MultipleChoiceQuestionEditViewModel(savedStateHandle: SavedStateHandle, ) : ViewModel() {
+@HiltViewModel
+class MultipleChoiceQuestionEditViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : ViewModel() {
 
     private lateinit var originalQuestion: String
 

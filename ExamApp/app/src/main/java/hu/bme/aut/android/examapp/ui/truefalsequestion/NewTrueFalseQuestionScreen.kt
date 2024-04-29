@@ -21,9 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import hu.bme.aut.android.examapp.R
-import hu.bme.aut.android.examapp.ui.AppViewModelProvider
 import hu.bme.aut.android.examapp.ui.components.DropDownList
 import hu.bme.aut.android.examapp.ui.viewmodel.point.PointListViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicListViewModel
@@ -38,7 +37,7 @@ fun NewTrueFalseQuestionScreen(
     navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
     canNavigateBack: Boolean = true,
-    viewModel: TrueFalseQuestionEntryViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: TrueFalseQuestionEntryViewModel = hiltViewModel()//viewModel(factory = AppViewModelProvider.Factory)
 ) {
     when (viewModel.trueFalseEntryScreenUiState) {
         TrueFalseQuestionEntryScreenUiState.Loading -> CircularProgressIndicator(modifier = Modifier.fillMaxWidth())
@@ -114,8 +113,8 @@ fun TrueFalseQuestionInputForm(
     modifier: Modifier = Modifier,
     onValueChange: (TrueFalseQuestionDetails) -> Unit = {},
     enabled: Boolean = true,
-    topicListViewModel: TopicListViewModel = viewModel(factory = AppViewModelProvider.Factory),
-    pointListViewModel: PointListViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    topicListViewModel: TopicListViewModel = hiltViewModel(),//viewModel(factory = AppViewModelProvider.Factory),
+    pointListViewModel: PointListViewModel = hiltViewModel()//viewModel(factory = AppViewModelProvider.Factory)
 ) {
     Column(
         modifier = modifier,

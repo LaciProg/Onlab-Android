@@ -5,11 +5,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.NameDto
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
+import javax.inject.Inject
 
 sealed interface PointListScreenUiState {
     data class Success(val points: List<NameDto>) : PointListScreenUiState
@@ -17,7 +19,8 @@ sealed interface PointListScreenUiState {
     data object Loading : PointListScreenUiState
 }
 
-class PointListViewModel : ViewModel() {
+@HiltViewModel
+class PointListViewModel @Inject constructor(): ViewModel() {
 
     var pointListScreenUiState: PointListScreenUiState by mutableStateOf(PointListScreenUiState.Loading)
     var pointListUiState: PointListUiState by mutableStateOf(PointListUiState())

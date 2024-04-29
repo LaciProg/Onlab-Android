@@ -5,11 +5,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.TopicDto
 import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import javax.inject.Inject
 
 sealed interface TopicEntryScreenUiState {
     data object Success : TopicEntryScreenUiState
@@ -17,7 +19,8 @@ sealed interface TopicEntryScreenUiState {
     data object Loading : TopicEntryScreenUiState
 }
 
-class TopicEntryViewModel : ViewModel(){
+@HiltViewModel
+class TopicEntryViewModel @Inject constructor(): ViewModel(){
 
     var topicUiState by mutableStateOf(TopicUiState())
         private set

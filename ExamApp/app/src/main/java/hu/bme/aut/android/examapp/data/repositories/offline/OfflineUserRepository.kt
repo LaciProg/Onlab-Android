@@ -5,8 +5,9 @@ import hu.bme.aut.android.examapp.data.repositories.inrefaces.UserRepository
 import hu.bme.aut.android.examapp.data.room.dao.UserDao
 import hu.bme.aut.android.examapp.data.room.dto.UsersOnThisDevice
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class OfflineUserRepository(private val userDao: UserDao) : UserRepository {
+class OfflineUserRepository @Inject constructor(private val userDao: UserDao) : UserRepository {
     override suspend fun insertUser(user: UserDto) = userDao.insertUser(user.toUsersOnThisDevice())
     override suspend fun updateUser(user: UserDto) = userDao.updateUser(user.toUsersOnThisDevice())
     override suspend fun deleteUser(user: UserDto) = userDao.deleteUser(user.toUsersOnThisDevice())

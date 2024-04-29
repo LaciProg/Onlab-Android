@@ -22,10 +22,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import hu.bme.aut.android.examapp.R
-import hu.bme.aut.android.examapp.ui.AppViewModelProvider
 import hu.bme.aut.android.examapp.ui.components.EmailTextField
 import hu.bme.aut.android.examapp.ui.components.ExamAppBar
 import hu.bme.aut.android.examapp.ui.components.PasswordTextField
@@ -39,7 +38,7 @@ import kotlinx.coroutines.launch
 fun RegisterScreen(
     onNavigateBack: () -> Unit,
     onSuccess: () -> Unit,
-    viewModel: RegisterUserViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: RegisterUserViewModel = hiltViewModel()//RegisterUserViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
 
     val state by viewModel.state.collectAsStateWithLifecycle()

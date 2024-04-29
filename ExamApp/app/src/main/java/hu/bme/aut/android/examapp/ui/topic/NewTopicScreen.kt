@@ -23,9 +23,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import hu.bme.aut.android.examapp.R
-import hu.bme.aut.android.examapp.ui.AppViewModelProvider
 import hu.bme.aut.android.examapp.ui.components.DropDownList
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicDetails
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicEntryScreenUiState
@@ -39,7 +38,7 @@ fun NewTopic(
     navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
     canNavigateBack: Boolean = true,
-    viewModel: TopicEntryViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: TopicEntryViewModel = hiltViewModel()//viewModel(factory = AppViewModelProvider.Factory)
 ) {
     when(viewModel.topicScreenUiState){
         TopicEntryScreenUiState.Loading -> CircularProgressIndicator(modifier = Modifier.fillMaxWidth())
@@ -117,8 +116,8 @@ fun TopicInputForm(
     onValueChange: (TopicDetails) -> Unit = {},
     default: String = "",
     enabled: Boolean = true,
-    listViewModel: TopicListViewModel = viewModel(factory = AppViewModelProvider.Factory),
-    entryViewModel: TopicEntryViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    listViewModel: TopicListViewModel = hiltViewModel(),//viewModel(factory = AppViewModelProvider.Factory),
+    entryViewModel: TopicEntryViewModel = hiltViewModel()//viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val coroutineScope = rememberCoroutineScope()
     Column(

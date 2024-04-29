@@ -2,13 +2,14 @@ package hu.bme.aut.android.examapp.ui.viewmodel.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.bme.aut.android.examapp.R
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.data.auth.AuthService
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.UserRepository
+import hu.bme.aut.android.examapp.domain.usecases.IsEmailValidUseCase
 import hu.bme.aut.android.examapp.ui.model.UiText
 import hu.bme.aut.android.examapp.ui.model.toUiText
-import hu.bme.aut.android.examapp.ui.viewmodel.auth.usecases.IsEmailValidUseCase
 import hu.bme.aut.android.examapp.util.UiEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -21,8 +22,10 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class LoginUserViewModel(
+@HiltViewModel
+class LoginUserViewModel @Inject constructor(
     private val authService: AuthService,
     private val isEmailValid: IsEmailValidUseCase,
     private val userRepository: UserRepository
@@ -73,15 +76,15 @@ class LoginUserViewModel(
     fun hasUser(){
         viewModelScope.launch {
             if(authService.hasUser){
-                val user = authService.getCurrentUser()
-                if (user != null) {
-                    try{
+                try{
+                    val user = authService.getCurrentUser()
+                    if (user != null) {
                         ExamAppApi.authenticate(user)
-                    } catch (e: Exception){
-                        _uiEvent.send(UiEvent.Failure(e.toUiText()))
+                        _uiEvent.send(UiEvent.Success)
                     }
+                } catch (e: Exception){
+                    _uiEvent.send(UiEvent.Failure(e.toUiText()))
                 }
-                _uiEvent.send(UiEvent.Success)
             }
         }
     }

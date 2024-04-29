@@ -6,12 +6,14 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.PointDto
 import hu.bme.aut.android.examapp.ui.ExamDestination
 import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import javax.inject.Inject
 
 sealed interface PointDetailsScreenUiState {
     data class Success(val point: PointDto) : PointDetailsScreenUiState
@@ -19,7 +21,8 @@ sealed interface PointDetailsScreenUiState {
     data object Loading : PointDetailsScreenUiState
 }
 
-class PointDetailsViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
+@HiltViewModel
+class PointDetailsViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : ViewModel() {
 
     val pointId: String = checkNotNull(savedStateHandle[ExamDestination.PointDetailsDestination.pointIdArg])
 

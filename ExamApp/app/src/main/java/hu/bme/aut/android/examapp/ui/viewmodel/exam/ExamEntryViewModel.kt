@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.ExamDto
 import hu.bme.aut.android.examapp.api.dto.MultipleChoiceQuestionDto
@@ -14,6 +15,7 @@ import hu.bme.aut.android.examapp.ui.viewmodel.type.Type
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
+import javax.inject.Inject
 
 sealed interface ExamEntryScreenUiState {
     data object Success : ExamEntryScreenUiState
@@ -21,7 +23,8 @@ sealed interface ExamEntryScreenUiState {
     data object Loading : ExamEntryScreenUiState
 }
 
-class ExamEntryViewModel : ViewModel(){
+@HiltViewModel
+class ExamEntryViewModel @Inject constructor(): ViewModel(){
 
     var examUiState by mutableStateOf(ExamUiState())
         private set

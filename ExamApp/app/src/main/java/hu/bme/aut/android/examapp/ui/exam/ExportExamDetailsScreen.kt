@@ -39,14 +39,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import hu.bme.aut.android.examapp.R
 import hu.bme.aut.android.examapp.api.dto.MultipleChoiceQuestionDto
 import hu.bme.aut.android.examapp.api.dto.PointDto
 import hu.bme.aut.android.examapp.api.dto.Question
 import hu.bme.aut.android.examapp.api.dto.TrueFalseQuestionDto
 import hu.bme.aut.android.examapp.pdf.PDFExamView
-import hu.bme.aut.android.examapp.ui.AppViewModelProvider
 import hu.bme.aut.android.examapp.ui.components.ExportedMultipleChoiceQuestion
 import hu.bme.aut.android.examapp.ui.components.ExportedTrueFalseQuestion
 import hu.bme.aut.android.examapp.ui.exam.JetCaptureView.jetCaptureView
@@ -61,7 +60,7 @@ object JetCaptureView{
 fun ExportExamDetailsScreen(
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
-    examViewModel: ExamDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    examViewModel: ExamDetailsViewModel = hiltViewModel()//viewModel(factory = AppViewModelProvider.Factory),
 ) {
     val  examUiState = examViewModel.uiState
     val pointList = examViewModel.pointList

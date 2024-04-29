@@ -1,57 +1,22 @@
 package hu.bme.aut.android.examapp.ui
 
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory
-import androidx.lifecycle.createSavedStateHandle
-import androidx.lifecycle.viewmodel.CreationExtras
-import androidx.lifecycle.viewmodel.InitializerViewModelFactoryBuilder
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import hu.bme.aut.android.examapp.ExamApplication
-import hu.bme.aut.android.examapp.data.repositories.inrefaces.PointRepository
-import hu.bme.aut.android.examapp.data.repositories.inrefaces.TopicRepository
-import hu.bme.aut.android.examapp.data.repositories.inrefaces.TrueFalseQuestionRepository
-import hu.bme.aut.android.examapp.ui.viewmodel.MainScreenViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.auth.LoginUserViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.auth.RegisterUserViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.auth.usecases.IsEmailValidUseCase
-import hu.bme.aut.android.examapp.ui.viewmodel.auth.usecases.PasswordsMatchUseCase
-import hu.bme.aut.android.examapp.ui.viewmodel.exam.ExamDetailsViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.exam.ExamEditViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.exam.ExamEntryViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.exam.ExamListViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionDetailsViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionEditViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionEntryViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionListViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.point.PointDetailsViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.point.PointEditViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.point.PointEntryViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.point.PointListViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicDetailsViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicEditViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicEntryViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicListViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionDetailsViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionEditViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionEntryViewModel
-import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionListViewModel
-
+/*
 object AppViewModelProvider {
     val Factory = viewModelFactory {
 
-        topicViewModel()
+        //topicViewModel()
 
-        pointViewModel()
+        //pointViewModel()
 
-        trueFalseViewModel()
+        //trueFalseViewModel()
 
-        multipleChoiceViewModel()
+        //multipleChoiceViewModel()
 
-        examViewModel()
+        //examViewModel()
 
-        authViewModels()
+        //authViewModels()
 
-        initializer { MainScreenViewModel(ExamApplication.authService) }
+        //initializer { MainScreenViewModel(ExamApplication.authService) }
     }
 
 
@@ -177,7 +142,7 @@ object AppViewModelProvider {
 
     private fun InitializerViewModelFactoryBuilder.authViewModels() {
 
-        initializer {
+        /*initializer {
             val authService = ExamApplication.authService
             val isEmailValidUseCase = IsEmailValidUseCase()
             LoginUserViewModel(
@@ -196,10 +161,10 @@ object AppViewModelProvider {
                 isEmailValidUseCase,
                 passwordsMatchUseCase
             )
-        }
+        }*/
     }
 
-}
-
+}*/
+/*
 fun CreationExtras.examApplication(): ExamApplication =
-    (this[AndroidViewModelFactory.APPLICATION_KEY] as ExamApplication)
+    (this[AndroidViewModelFactory.APPLICATION_KEY] as ExamApplication)*/

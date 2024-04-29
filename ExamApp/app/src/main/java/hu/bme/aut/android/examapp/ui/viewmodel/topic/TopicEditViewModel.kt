@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.TopicDto
 import hu.bme.aut.android.examapp.ui.ExamDestination
@@ -13,6 +14,7 @@ import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuesti
 import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import javax.inject.Inject
 
 sealed interface TopicEditScreenUiState {
     data class Success(val topic: TopicDto) : TopicEditScreenUiState
@@ -20,7 +22,8 @@ sealed interface TopicEditScreenUiState {
     data object Loading : TopicEditScreenUiState
 }
 
-class TopicEditViewModel(savedStateHandle: SavedStateHandle, ) : ViewModel() {
+@HiltViewModel
+class TopicEditViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : ViewModel() {
 
     private lateinit var originalTopic: String
 

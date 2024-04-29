@@ -1,8 +1,6 @@
 package hu.bme.aut.android.examapp.data.room
 
-import android.content.Context
 import androidx.room.Database
-import androidx.room.Room
 import androidx.room.RoomDatabase
 import hu.bme.aut.android.examapp.data.room.dao.ExamDao
 import hu.bme.aut.android.examapp.data.room.dao.MultipleChoiceQuestionDao
@@ -38,12 +36,27 @@ abstract class ExamDatabase : RoomDatabase() {
     abstract fun typeDao(): TypeDao
     abstract fun pointDao(): PointDao
 
-    abstract fun userDao(): UserDao
+    abstract val userDao: UserDao
 
-    companion object {
+
+    //abstract fun userDao(): UserDao
+
+     companion object  {
         @Volatile
         private var INSTANCE: ExamDatabase? = null
-        fun getInstance(context: Context): ExamDatabase {
+
+        //@Provides
+        //@Singleton
+        //fun getInstance(
+        //    @ApplicationContext context: Context
+        //): ExamDatabase = Room.databaseBuilder(
+        //    context,
+        //    ExamDatabase::class.java,
+        //    "ExamDatabase"
+        //).fallbackToDestructiveMigration().build()
+
+
+        /*fun getInstance(context: Context): ExamDatabase {
             return INSTANCE ?: synchronized(this) {
                 INSTANCE ?: Room.databaseBuilder(
                     context.applicationContext,
@@ -53,6 +66,6 @@ abstract class ExamDatabase : RoomDatabase() {
                     .build()
                     .also { INSTANCE = it }
             }
-        }
+        }*/
     }
 }

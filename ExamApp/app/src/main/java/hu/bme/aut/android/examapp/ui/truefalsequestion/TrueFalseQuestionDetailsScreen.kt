@@ -36,10 +36,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import hu.bme.aut.android.examapp.R
 import hu.bme.aut.android.examapp.api.dto.TrueFalseQuestionDto
-import hu.bme.aut.android.examapp.ui.AppViewModelProvider
 import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionDetails
 import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionDetailsScreenUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionDetailsUiState
@@ -51,7 +50,7 @@ fun TrueFalseQuestionDetailsScreen(
     navigateToEditTrueFalseQuestion: (String) -> Unit,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: TrueFalseQuestionDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: TrueFalseQuestionDetailsViewModel = hiltViewModel()//viewModel(factory = AppViewModelProvider.Factory)
 ) {
     when(viewModel.trueFalseDetailsScreenUiState){
         is TrueFalseQuestionDetailsScreenUiState.Loading -> CircularProgressIndicator(modifier = Modifier.fillMaxSize())

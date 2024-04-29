@@ -6,12 +6,14 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.MultipleChoiceQuestionDto
 import hu.bme.aut.android.examapp.ui.ExamDestination
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
+import javax.inject.Inject
 
 sealed interface MultipleChoiceQuestionDetailsScreenUiState {
     data class Success(val question: MultipleChoiceQuestionDto) : MultipleChoiceQuestionDetailsScreenUiState
@@ -19,7 +21,8 @@ sealed interface MultipleChoiceQuestionDetailsScreenUiState {
     data object Loading : MultipleChoiceQuestionDetailsScreenUiState
 }
 
-class MultipleChoiceQuestionDetailsViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
+@HiltViewModel
+class MultipleChoiceQuestionDetailsViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : ViewModel() {
 
     val multipleChoiceQuestionId: String = checkNotNull(savedStateHandle[ExamDestination.MultipleChoiceQuestionDetailsDestination.multipleChoiceQuestionIdArg])
     var multipleChoiceDetailsScreenUiState: MultipleChoiceQuestionDetailsScreenUiState by mutableStateOf(

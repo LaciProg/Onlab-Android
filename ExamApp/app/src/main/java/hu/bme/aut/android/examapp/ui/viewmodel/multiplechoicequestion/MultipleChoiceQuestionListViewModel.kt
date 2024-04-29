@@ -5,11 +5,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.NameDto
 import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import javax.inject.Inject
 
 sealed interface MultipleChoiceQuestionListScreenUiState {
     data class Success(val questions: List<NameDto>) : MultipleChoiceQuestionListScreenUiState
@@ -17,7 +19,8 @@ sealed interface MultipleChoiceQuestionListScreenUiState {
     data object Loading : MultipleChoiceQuestionListScreenUiState
 }
 
-class MultipleChoiceQuestionListViewModel : ViewModel() {
+@HiltViewModel
+class MultipleChoiceQuestionListViewModel @Inject constructor(): ViewModel() {
 
     var multipleChoiceQuestionListScreenUiState: MultipleChoiceQuestionListScreenUiState by mutableStateOf(
         MultipleChoiceQuestionListScreenUiState.Loading)

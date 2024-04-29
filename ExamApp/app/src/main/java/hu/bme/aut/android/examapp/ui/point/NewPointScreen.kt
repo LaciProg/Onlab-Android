@@ -22,9 +22,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import hu.bme.aut.android.examapp.R
-import hu.bme.aut.android.examapp.ui.AppViewModelProvider
 import hu.bme.aut.android.examapp.ui.viewmodel.point.PointDetails
 import hu.bme.aut.android.examapp.ui.viewmodel.point.PointEntryScreenUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.point.PointEntryViewModel
@@ -36,7 +35,7 @@ fun NewPoint(
     navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
     canNavigateBack: Boolean = true,
-    viewModel: PointEntryViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: PointEntryViewModel = hiltViewModel()//viewModel(factory = AppViewModelProvider.Factory)
 ) {
     when(viewModel.pointScreenUiState){
         PointEntryScreenUiState.Loading -> CircularProgressIndicator(modifier = Modifier.fillMaxWidth())

@@ -33,10 +33,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import hu.bme.aut.android.examapp.R
 import hu.bme.aut.android.examapp.api.dto.TopicDto
-import hu.bme.aut.android.examapp.ui.AppViewModelProvider
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicDetails
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicDetailsScreenUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicDetailsUiState
@@ -48,7 +47,7 @@ fun TopicDetailsScreen(
     navigateToEditTopic: (String) -> Unit,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: TopicDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: TopicDetailsViewModel = hiltViewModel()//viewModel(factory = AppViewModelProvider.Factory)
 ) {
     when(viewModel.topicDetailsScreenUiState){
         is TopicDetailsScreenUiState.Loading -> CircularProgressIndicator()

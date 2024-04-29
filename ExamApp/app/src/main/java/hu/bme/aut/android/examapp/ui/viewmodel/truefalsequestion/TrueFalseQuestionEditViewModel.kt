@@ -6,12 +6,14 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.TrueFalseQuestionDto
 import hu.bme.aut.android.examapp.ui.ExamDestination
 import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import javax.inject.Inject
 
 sealed interface TrueFalseQuestionEditScreenUiState {
     data class Success(val question: TrueFalseQuestionDto) : TrueFalseQuestionEditScreenUiState
@@ -19,7 +21,8 @@ sealed interface TrueFalseQuestionEditScreenUiState {
     data object Loading : TrueFalseQuestionEditScreenUiState
 }
 
-class TrueFalseQuestionEditViewModel(savedStateHandle: SavedStateHandle, ) : ViewModel() {
+@HiltViewModel
+class TrueFalseQuestionEditViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : ViewModel() {
 
     private lateinit var originalQuestion: String
 

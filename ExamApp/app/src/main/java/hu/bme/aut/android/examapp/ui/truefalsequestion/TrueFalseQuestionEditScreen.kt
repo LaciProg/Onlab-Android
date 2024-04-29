@@ -8,8 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
-import hu.bme.aut.android.examapp.ui.AppViewModelProvider
+import androidx.hilt.navigation.compose.hiltViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionEditScreenUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionEditViewModel
 import kotlinx.coroutines.launch
@@ -18,7 +17,7 @@ import kotlinx.coroutines.launch
 fun TrueFalseQuestionEditScreen(
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: TrueFalseQuestionEditViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: TrueFalseQuestionEditViewModel = hiltViewModel()//viewModel(factory = AppViewModelProvider.Factory)
 ) {
     when (viewModel.trueFalseEditScreenUiState) {
         is TrueFalseQuestionEditScreenUiState.Loading -> CircularProgressIndicator(modifier = Modifier.fillMaxSize())

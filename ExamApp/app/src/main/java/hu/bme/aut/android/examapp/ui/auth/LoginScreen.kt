@@ -22,10 +22,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import hu.bme.aut.android.examapp.R
-import hu.bme.aut.android.examapp.ui.AppViewModelProvider
 import hu.bme.aut.android.examapp.ui.components.EmailTextFieldWithDropdownUsage
 import hu.bme.aut.android.examapp.ui.components.PasswordTextField
 import hu.bme.aut.android.examapp.ui.viewmodel.auth.LoginUserEvent
@@ -39,7 +38,7 @@ import kotlinx.coroutines.launch
 fun LoginScreen(
     onSuccess: () -> Unit,
     onRegisterClick: () -> Unit,
-    viewModel: LoginUserViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: LoginUserViewModel = hiltViewModel()//LoginUserViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
 
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -52,8 +51,16 @@ fun LoginScreen(
     val context = LocalContext.current
 
     LaunchedEffect(key1 = true) {
+        try{
+            viewModel.hasUser()
+        } catch (e: Exception) {
+            scope.launch {
+                snackbarHostState.showSnackbar(
+                    message = e.localizedMessage ?: "An error occurred"
+                )
+            }
+        }
 
-        viewModel.hasUser()
 
         viewModel.uiEvent.collect { event ->
             when(event) {

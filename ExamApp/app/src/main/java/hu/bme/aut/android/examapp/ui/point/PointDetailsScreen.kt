@@ -34,10 +34,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import hu.bme.aut.android.examapp.R
 import hu.bme.aut.android.examapp.api.dto.PointDto
-import hu.bme.aut.android.examapp.ui.AppViewModelProvider
 import hu.bme.aut.android.examapp.ui.viewmodel.point.PointDetailsScreenUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.point.PointDetailsUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.point.PointDetailsViewModel
@@ -50,7 +49,7 @@ fun PointDetailsScreen(
     navigateToEditPoint: (String) -> Unit,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: PointDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: PointDetailsViewModel = hiltViewModel()//viewModel(factory = AppViewModelProvider.Factory)
 ) {
     when(viewModel.pointDetailsScreenUiState){
         is PointDetailsScreenUiState.Loading -> CircularProgressIndicator(modifier = Modifier.fillMaxSize())

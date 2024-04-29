@@ -8,8 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
-import hu.bme.aut.android.examapp.ui.AppViewModelProvider
+import androidx.hilt.navigation.compose.hiltViewModel
 import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionEditScreenUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionEditViewModel
 import kotlinx.coroutines.launch
@@ -18,7 +17,7 @@ import kotlinx.coroutines.launch
 fun MultipleChoiceQuestionEditScreen(
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: MultipleChoiceQuestionEditViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: MultipleChoiceQuestionEditViewModel = hiltViewModel()//viewModel(factory = AppViewModelProvider.Factory)
 ) {
     when (viewModel.multipleChoiceEditScreenUiState) {
         is MultipleChoiceQuestionEditScreenUiState.Loading -> CircularProgressIndicator(modifier = Modifier.fillMaxSize())

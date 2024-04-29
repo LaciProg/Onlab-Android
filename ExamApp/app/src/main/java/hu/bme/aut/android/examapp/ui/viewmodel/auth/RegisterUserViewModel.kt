@@ -2,12 +2,13 @@ package hu.bme.aut.android.examapp.ui.viewmodel.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.bme.aut.android.examapp.R
 import hu.bme.aut.android.examapp.data.auth.AuthService
+import hu.bme.aut.android.examapp.domain.usecases.IsEmailValidUseCase
+import hu.bme.aut.android.examapp.domain.usecases.PasswordsMatchUseCase
 import hu.bme.aut.android.examapp.ui.model.UiText
 import hu.bme.aut.android.examapp.ui.model.toUiText
-import hu.bme.aut.android.examapp.ui.viewmodel.auth.usecases.IsEmailValidUseCase
-import hu.bme.aut.android.examapp.ui.viewmodel.auth.usecases.PasswordsMatchUseCase
 import hu.bme.aut.android.examapp.util.UiEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -16,8 +17,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class RegisterUserViewModel(
+@HiltViewModel
+class RegisterUserViewModel @Inject constructor(
     private val authService: AuthService,
     private val isEmailValid: IsEmailValidUseCase,
     private val passwordsMatch: PasswordsMatchUseCase

@@ -1,4 +1,4 @@
-package hu.bme.aut.android.examapp.ui.viewmodel.auth.usecases
+package hu.bme.aut.android.examapp.domain.usecases
 
 class PasswordsMatchUseCase {
 

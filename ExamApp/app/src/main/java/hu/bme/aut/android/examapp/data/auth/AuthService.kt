@@ -1,8 +1,10 @@
 package hu.bme.aut.android.examapp.data.auth
 
+import dagger.Provides
 import hu.bme.aut.android.examapp.api.dto.UserDto
 import hu.bme.aut.android.examapp.api.dto.UserFireBase
 import kotlinx.coroutines.flow.Flow
+
 
 interface AuthService {
     val currentUserId: String?

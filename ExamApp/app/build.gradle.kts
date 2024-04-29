@@ -4,6 +4,8 @@ plugins {
     id("com.google.devtools.ksp")
     id("org.jetbrains.kotlin.plugin.serialization")
     id("com.google.gms.google-services")
+    kotlin("kapt") version "1.9.0"
+    id("com.google.dagger.hilt.android")
 }
 
 
@@ -109,4 +111,10 @@ dependencies {
     //implementation("com.google.firebase:firebase-messaging-ktx")
     //implementation("com.google.firebase:firebase-crashlytics-ktx")
     //implementation("com.google.firebase:firebase-analytics-ktx")
+
+    // Hilt
+    val hiltVersion = "2.51.1"
+    implementation("com.google.dagger:hilt-android:$hiltVersion")
+    kapt("com.google.dagger:hilt-compiler:$hiltVersion")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 }

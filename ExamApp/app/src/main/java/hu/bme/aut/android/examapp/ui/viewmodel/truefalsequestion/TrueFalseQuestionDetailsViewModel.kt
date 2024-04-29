@@ -6,12 +6,14 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.api.dto.TrueFalseQuestionDto
 import hu.bme.aut.android.examapp.ui.ExamDestination
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
+import javax.inject.Inject
 
 sealed interface TrueFalseQuestionDetailsScreenUiState {
     data class Success(val question: TrueFalseQuestionDto) : TrueFalseQuestionDetailsScreenUiState
@@ -19,7 +21,8 @@ sealed interface TrueFalseQuestionDetailsScreenUiState {
     data object Loading : TrueFalseQuestionDetailsScreenUiState
 }
 
-class TrueFalseQuestionDetailsViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
+@HiltViewModel
+class TrueFalseQuestionDetailsViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : ViewModel() {
 
     val trueFalseQuestionId: String = checkNotNull(savedStateHandle[ExamDestination.TrueFalseQuestionDetailsDestination.trueFalseQuestionIdArg])
 

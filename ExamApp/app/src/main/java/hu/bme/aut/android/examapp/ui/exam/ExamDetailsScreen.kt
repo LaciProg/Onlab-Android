@@ -74,7 +74,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import hu.bme.aut.android.examapp.R
 import hu.bme.aut.android.examapp.api.dto.ExamDto
 import hu.bme.aut.android.examapp.api.dto.MultipleChoiceQuestionDto
@@ -82,7 +82,6 @@ import hu.bme.aut.android.examapp.api.dto.PointDto
 import hu.bme.aut.android.examapp.api.dto.Question
 import hu.bme.aut.android.examapp.api.dto.TopicDto
 import hu.bme.aut.android.examapp.api.dto.TrueFalseQuestionDto
-import hu.bme.aut.android.examapp.ui.AppViewModelProvider
 import hu.bme.aut.android.examapp.ui.components.DropDownList
 import hu.bme.aut.android.examapp.ui.multiplechoicequestion.MultipleChoiceQuestionDetails
 import hu.bme.aut.android.examapp.ui.theme.Green
@@ -111,7 +110,7 @@ fun ExamDetailsScreen(
     navigateToEditMultipleChoiceQuestion: (String) -> Unit,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
-    examViewModel: ExamDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    examViewModel: ExamDetailsViewModel = hiltViewModel()//viewModel(factory = AppViewModelProvider.Factory),
 ) {
     when(examViewModel.examDetailsScreenUiState){
         is ExamDetailsScreenUiState.Loading -> CircularProgressIndicator(modifier = Modifier.fillMaxSize())
@@ -366,7 +365,7 @@ fun ExamDetailsBody(
     pointList: List<PointDto>,
     tabPage: Type,
     modifier: Modifier = Modifier,
-    examViewModel: ExamDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    examViewModel: ExamDetailsViewModel = hiltViewModel()//viewModel(factory = AppViewModelProvider.Factory),
 ){
     val coroutineScope = rememberCoroutineScope()
     var deleteConfirmationRequired by rememberSaveable { mutableStateOf(false) }

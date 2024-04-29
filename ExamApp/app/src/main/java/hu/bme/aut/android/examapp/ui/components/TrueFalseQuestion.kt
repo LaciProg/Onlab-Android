@@ -24,8 +24,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hu.bme.aut.android.examapp.data.TrueFalseData
-import hu.bme.aut.android.examapp.data.room.dto.PointDto
-import hu.bme.aut.android.examapp.ui.viewmodel.type.Type
 
 @Composable
 fun ExportedTrueFalseQuestion(number: Int, question: String, point: Double, color: Color = Color.Black)
@@ -142,15 +140,3 @@ fun TrueFalseQuestionRow(question: String = "Default question",
         }
     }
 }
-/*
-@Composable
-@Preview(showBackground = true)
-fun TrueFalseQuestionPreview() {
-    TrueFalseQuestion()
-}*/
-/*
-@Composable
-@Preview(showBackground = true)
-fun EditTrueFalseQuestionPreview() {
-    EditTrueFalseQuestion()
-}*/

@@ -20,9 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import hu.bme.aut.android.examapp.R
-import hu.bme.aut.android.examapp.ui.AppViewModelProvider
 import hu.bme.aut.android.examapp.ui.components.DropDownList
 import hu.bme.aut.android.examapp.ui.viewmodel.exam.ExamDetails
 import hu.bme.aut.android.examapp.ui.viewmodel.exam.ExamEntryScreenUiState
@@ -36,7 +35,7 @@ fun NewExamScreen(
     navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
     canNavigateBack: Boolean = true,
-    viewModel: ExamEntryViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: ExamEntryViewModel = hiltViewModel()//viewModel(factory = AppViewModelProvider.Factory)
 ) {
     when (viewModel.examEntryScreenUiState) {
         ExamEntryScreenUiState.Loading -> CircularProgressIndicator(modifier = Modifier.fillMaxWidth())
@@ -112,8 +111,8 @@ fun ExamInputForm(
     modifier: Modifier = Modifier,
     onValueChange: (ExamDetails) -> Unit = {},
     enabled: Boolean = true,
-    entryViewModel: ExamEntryViewModel = viewModel(factory = AppViewModelProvider.Factory),
-    topicListViewModel: TopicListViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    entryViewModel: ExamEntryViewModel = hiltViewModel(),//viewModel(factory = AppViewModelProvider.Factory),
+    topicListViewModel: TopicListViewModel = hiltViewModel(),//viewModel(factory = AppViewModelProvider.Factory),
 
     ) {
     val coroutineScope = rememberCoroutineScope()

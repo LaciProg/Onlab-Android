@@ -14,9 +14,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import hu.bme.aut.android.examapp.api.dto.NameDto
-import hu.bme.aut.android.examapp.ui.AppViewModelProvider
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicListScreenUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.topic.TopicListViewModel
 
@@ -25,7 +24,7 @@ fun TopicListScreen(
     modifier: Modifier = Modifier,
     addNewTopic: () -> Unit = {},
     navigateToTopicDetails: (String) -> Unit,
-    viewModel: TopicListViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: TopicListViewModel = hiltViewModel()//viewModel(factory = AppViewModelProvider.Factory)
   ){
     when(viewModel.topicListScreenUiState){
         is TopicListScreenUiState.Loading -> CircularProgressIndicator(modifier = Modifier.fillMaxSize())

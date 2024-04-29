@@ -24,14 +24,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
+import dagger.hilt.android.AndroidEntryPoint
 import hu.bme.aut.android.examapp.api.ExamAppApi
-import hu.bme.aut.android.examapp.ui.AppViewModelProvider
 import hu.bme.aut.android.examapp.ui.ExamNavHost
 import hu.bme.aut.android.examapp.ui.theme.ExamAppTheme
 import hu.bme.aut.android.examapp.ui.viewmodel.MainScreenViewModel
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,7 +66,7 @@ fun MainScreen(
     navigateToExamList: () -> Unit,
     navigateToExportExamList: () -> Unit,
     onSignOut: () -> Unit,
-    viewModel: MainScreenViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    viewModel: MainScreenViewModel = hiltViewModel()//viewModel(factory = AppViewModelProvider.Factory),
 ){
     val context = LocalContext.current
     LaunchedEffect(key1 = true) {

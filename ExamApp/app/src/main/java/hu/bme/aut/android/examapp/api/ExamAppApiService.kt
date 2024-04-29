@@ -58,9 +58,9 @@ object ExamAppApi {
             .client(
                 OkHttpClient.Builder()
                     .addInterceptor(AuthenticationInterceptor(token))
-                    .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
-                    .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
-                    .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                    .readTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                    .writeTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                    .connectTimeout(15, java.util.concurrent.TimeUnit.SECONDS)
                     .build())
             .baseUrl(BASE_URL)
             .build()

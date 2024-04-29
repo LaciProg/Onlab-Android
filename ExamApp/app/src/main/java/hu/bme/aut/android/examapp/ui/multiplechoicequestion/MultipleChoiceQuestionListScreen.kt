@@ -15,9 +15,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import hu.bme.aut.android.examapp.api.dto.NameDto
-import hu.bme.aut.android.examapp.ui.AppViewModelProvider
 import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionListScreenUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.multiplechoicequestion.MultipleChoiceQuestionListViewModel
 
@@ -26,7 +25,7 @@ fun MultipleChoiceQuestionListScreen(
     modifier: Modifier = Modifier,
     addNewMultipleChoiceQuestion: () -> Unit = {},
     navigateToMultipleChoiceQuestionDetails: (String) -> Unit,
-    viewModel: MultipleChoiceQuestionListViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: MultipleChoiceQuestionListViewModel = hiltViewModel()//viewModel(factory = AppViewModelProvider.Factory)
   ){
     when(viewModel.multipleChoiceQuestionListScreenUiState){
         is MultipleChoiceQuestionListScreenUiState.Loading -> CircularProgressIndicator(modifier = Modifier.fillMaxSize())

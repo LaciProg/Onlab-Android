@@ -14,9 +14,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import hu.bme.aut.android.examapp.api.dto.NameDto
-import hu.bme.aut.android.examapp.ui.AppViewModelProvider
 import hu.bme.aut.android.examapp.ui.viewmodel.point.PointListScreenUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.point.PointListViewModel
 
@@ -25,7 +24,7 @@ fun PointListScreen(
     modifier: Modifier = Modifier,
     addNewPoint: () -> Unit = {},
     navigateToPointDetails: (String) -> Unit,
-    viewModel: PointListViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: PointListViewModel = hiltViewModel()//viewModel(factory = AppViewModelProvider.Factory)
   ){
     when(viewModel.pointListScreenUiState){
         is PointListScreenUiState.Loading -> CircularProgressIndicator(modifier = Modifier.fillMaxSize())
