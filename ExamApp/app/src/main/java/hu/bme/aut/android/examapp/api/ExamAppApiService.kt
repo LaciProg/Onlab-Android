@@ -5,6 +5,7 @@ import hu.bme.aut.android.examapp.api.dto.ExamDto
 import hu.bme.aut.android.examapp.api.dto.MultipleChoiceQuestionDto
 import hu.bme.aut.android.examapp.api.dto.NameDto
 import hu.bme.aut.android.examapp.api.dto.PointDto
+import hu.bme.aut.android.examapp.api.dto.StatisticsDto
 import hu.bme.aut.android.examapp.api.dto.Token
 import hu.bme.aut.android.examapp.api.dto.TopicDto
 import hu.bme.aut.android.examapp.api.dto.TrueFalseQuestionDto
@@ -22,10 +23,10 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 
-//TODO Firebase login system + analytics
-
+//TODO Firebase analytics
+//TODO Send answers screen
 object ExamAppApi {
-    private const val BASE_URL = "http://152.66.182.116:46258"
+    private const val BASE_URL = /*"http://192.168.38.17:46258"*//*"http://10.66.21.253:46258"*/"http://152.66.182.116:46258"
     private var token: String = ""
     private var userDto: UserDto? = null
     @OptIn(ExperimentalSerializationApi::class)
@@ -34,13 +35,14 @@ object ExamAppApi {
         .client(
             OkHttpClient.Builder()
                 .addInterceptor(AuthenticationInterceptor(token))
-                .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
-                .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
-                .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                .readTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                .writeTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                .connectTimeout(15, java.util.concurrent.TimeUnit.SECONDS)
                 .build())
         .baseUrl(BASE_URL)
         .build()
 
+    //TODO token in companion object
 
     private fun retrofitServiceCreator(): ExamAppApiService  =
         retrofit.create(ExamAppApiService::class.java)
@@ -202,5 +204,8 @@ interface ExamAppApiService {
 
     @PUT("/exam")
     suspend fun updateExam(@Body body: ExamDto): Response<Unit>
+
+    @GET("/correction/{id}/{answers}")
+    suspend fun getCorrection(@Path("id") id: String, @Path("answers") answers: String) : StatisticsDto
 
 }

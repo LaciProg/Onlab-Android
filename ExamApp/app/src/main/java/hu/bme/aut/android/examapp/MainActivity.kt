@@ -65,6 +65,7 @@ fun MainScreen(
     navigateToMultipleChoiceQuestionList: () -> Unit,
     navigateToExamList: () -> Unit,
     navigateToExportExamList: () -> Unit,
+    navigateToSubmission: () -> Unit,
     onSignOut: () -> Unit,
     viewModel: MainScreenViewModel = hiltViewModel()//viewModel(factory = AppViewModelProvider.Factory),
 ){
@@ -139,6 +140,13 @@ fun MainScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.exams))
+            }
+            OutlinedButton(
+                onClick = { navigateToSubmission() },
+                shape = MaterialTheme.shapes.small,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.submission))
             }
             OutlinedButton(
                 onClick = { navigateToExportExamList() },

@@ -78,6 +78,12 @@ sealed class ExamDestination(val route: String) {
 
     data object NewExamDestination : ExamDestination("NewExam")
 
+    data object SubmissionListDestination : ExamDestination("SubmissionLis")
+
+    data object SubmissionDestination : ExamDestination("Submission") {
+        const val examIdArg = "0"
+        val routeWithArgs = "$route/{$examIdArg}"
+    }
 
     data object ExportExamListDestination : ExamDestination("ExportExamList")
 

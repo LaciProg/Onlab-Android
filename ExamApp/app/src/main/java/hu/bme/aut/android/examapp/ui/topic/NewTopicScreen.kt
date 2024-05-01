@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -22,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.hilt.navigation.compose.hiltViewModel
 import hu.bme.aut.android.examapp.R
 import hu.bme.aut.android.examapp.ui.components.DropDownList
@@ -87,7 +85,8 @@ fun TopicEntryBody(
     topicUiState: TopicUiState,
     onTopicValueChange: (TopicDetails) -> Unit,
     onSaveClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    originalTopic: String = "",
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
@@ -96,6 +95,7 @@ fun TopicEntryBody(
         TopicInputForm(
             topicDetails = topicUiState.topicDetails,
             onValueChange = onTopicValueChange,
+            originalTopic = originalTopic,
             modifier = Modifier.fillMaxWidth()
         )
         Button(
@@ -116,6 +116,7 @@ fun TopicInputForm(
     onValueChange: (TopicDetails) -> Unit = {},
     default: String = "",
     enabled: Boolean = true,
+    originalTopic: String = "",
     listViewModel: TopicListViewModel = hiltViewModel(),//viewModel(factory = AppViewModelProvider.Factory),
     entryViewModel: TopicEntryViewModel = hiltViewModel()//viewModel(factory = AppViewModelProvider.Factory)
 ) {
@@ -140,7 +141,6 @@ fun TopicInputForm(
         OutlinedTextField(
             value = topicDetails.description,
             onValueChange = { onValueChange(topicDetails.copy(description = it)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
             label = { Text(stringResource(R.string.topic_description_req)) },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -153,7 +153,7 @@ fun TopicInputForm(
         )
         DropDownList(
             name = stringResource(R.string.topic),
-            items = listViewModel.topicListUiState.topicList.map { it.topic } .filterNot{ it == topicDetails.topic },
+            items = listViewModel.topicListUiState.topicList.map { it.topic } .filterNot{ it == originalTopic },
             onChoose = {parent ->
                 coroutineScope.launch{
                     Log.d("NewTopicScreen", "parent: $parent")

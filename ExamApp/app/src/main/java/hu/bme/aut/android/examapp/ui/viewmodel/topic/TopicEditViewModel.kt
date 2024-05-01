@@ -27,6 +27,8 @@ class TopicEditViewModel @Inject constructor(savedStateHandle: SavedStateHandle)
 
     private lateinit var originalTopic: String
 
+    val originalTopicPublic get() = originalTopic
+
     var topicUiState by mutableStateOf(TopicUiState())
         private set
 

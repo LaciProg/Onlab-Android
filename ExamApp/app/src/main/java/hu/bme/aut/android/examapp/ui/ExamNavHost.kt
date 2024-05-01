@@ -24,6 +24,7 @@ import hu.bme.aut.android.examapp.ui.point.NewPoint
 import hu.bme.aut.android.examapp.ui.point.PointDetailsScreen
 import hu.bme.aut.android.examapp.ui.point.PointEditScreen
 import hu.bme.aut.android.examapp.ui.point.PointListScreen
+import hu.bme.aut.android.examapp.ui.submission.SubmissionScreen
 import hu.bme.aut.android.examapp.ui.topic.NewTopic
 import hu.bme.aut.android.examapp.ui.topic.TopicDetailsScreen
 import hu.bme.aut.android.examapp.ui.topic.TopicEditScreen
@@ -82,6 +83,7 @@ fun ExamNavHost(
                     ExamDestination.MultipleChoiceQuestionListDestination.route)},
                 navigateToExamList = {navController.navigateSingleTopTo(ExamDestination.ExamListDestination.route)},
                 navigateToExportExamList = {navController.navigateSingleTopTo(ExamDestination.ExportExamListDestination.route)},
+                navigateToSubmission = {navController.navigateSingleTopTo(ExamDestination.SubmissionListDestination.route)},
                 onSignOut = {
                     navController.popBackStack(
                         route = ExamDestination.LoginScreenDestination.route,
@@ -294,6 +296,22 @@ fun ExamNavHost(
             )
         }
 
+        composable(
+            route = ExamDestination.SubmissionListDestination.route
+        ) {
+            ExamListScreen(
+                addNewExam = { navController.navigate(ExamDestination.NewExamDestination.route) },
+                navigateToExamDetails = { navController.navigate("${ExamDestination.SubmissionDestination.route}/$it") }
+            )
+        }
+
+        composable(
+            route = ExamDestination.SubmissionDestination.routeWithArgs
+        ) {
+            SubmissionScreen(
+                navigateBack = { navController.popBackStack() }
+            )
+        }
 
 
         composable(
@@ -301,10 +319,9 @@ fun ExamNavHost(
         ) {
             ExamListScreen(
                 addNewExam = { navController.navigate(ExamDestination.NewExamDestination.route) },
-                navigateToExamDetails = { navController.navigate("${ ExamDestination.ExportExamDetailsDestination.route}/$it") }
+                navigateToExamDetails = { navController.navigate("${ExamDestination.ExportExamDetailsDestination.route}/$it") }
             )
         }
-
 
         composable(
             route = ExamDestination.ExportExamDetailsDestination.routeWithArgs

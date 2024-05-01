@@ -8,7 +8,7 @@ import kotlinx.coroutines.runBlocking
 class CorrectionService {
 
     suspend fun getQuestions(exam: String): List<Question>? {
-        val questionString = FacadeExposed.examDao.getAllQuestionString(exam)
+        val questionString = FacadeExposed.examDao.getAllQuestionStringById(exam)
         val questions = questionString?.split("#") ?: return null
         val questionList: MutableList<Question> = mutableListOf()
         for(question in questions){
@@ -47,7 +47,7 @@ class CorrectionService {
                 if(question.correctAnswer.toString() == answers[index][0]){
                     pointsGained += points.find { it.uuid == question.point }?.goodAnswer!!
                 } else {
-                    pointsGained -= points.find { it.uuid == question.point }?.badAnswer!!
+                    pointsGained += points.find { it.uuid == question.point }?.badAnswer!!
                 }
                 maxPoint += points.find { it.uuid == question.point }?.point!!
             }
@@ -55,10 +55,16 @@ class CorrectionService {
                 val badAnswers: MutableList<String> = mutableListOf()
                 question.answers.forEach { if(!question.correctAnswersList.contains(it)) badAnswers.add(it) }
                 for(answer in answers[index]){
-                    if(question.correctAnswersList.contains(answer)){
+                    val num = try{
+                        answer.toInt()
+                    } catch (e: Exception){
+                        -1
+                    }
+                    if(num < 0 || num >= question.answers.size) return null
+                    if(question.correctAnswersList.contains(question.answers[num])){
                         pointsGained += points.find { it.uuid == question.point }?.goodAnswer!!
-                    } else if(badAnswers.contains(answer)) {
-                        pointsGained -= points.find { it.uuid == question.point }?.badAnswer!!
+                    } else if(badAnswers.contains(question.answers[num])) {
+                        pointsGained += points.find { it.uuid == question.point }?.badAnswer!!
                     }
                 }
                 maxPoint += points.find { it.uuid == question.point }?.point!!

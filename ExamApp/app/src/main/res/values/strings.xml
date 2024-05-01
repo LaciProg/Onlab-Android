@@ -78,5 +78,13 @@
     <string name="app_bar_title_sign_up">Sign up</string>
     <string name="button_text_no_account">I don\'t have an account yet.</string>
     <string name="log_out">Log out</string>
+    <string name="submit">Submit</string>
+    <string name="true_or_false">true or false</string>
+    <string name="answer_numbers">e.g.: 1,2,4</string>
+    <string name="try_again">Try again</string>
+    <string name="nice">Nice</string>
+    <string name="correct_answers">Correct answers: %1$s</string>
+    <string name="percentage">Percentage: %1$s percent</string>
+    <string name="submission">Submission</string>
 
 </resources>

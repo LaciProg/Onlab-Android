@@ -56,6 +56,7 @@ fun TopicEditResultScreen(
                 }
             }
         },
+        originalTopic = viewModel.originalTopicPublic,
         modifier = modifier
     )
 }
