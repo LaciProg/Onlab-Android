@@ -63,8 +63,8 @@ fun SubmissionScreen (
 
     if(viewModel.statisticsDto != null){
         when(viewModel.statisticsDialogUiState){
-            is SubmissionResultScreenUiState.Loading ->  CircularProgressIndicator()
-            is SubmissionResultScreenUiState.Error -> Text(text = SubmissionResultScreenUiState.Error.errorMessage.ifBlank { "Unexpected error " })
+            is SubmissionResultScreenUiState.Loading ->  StatisticDialogContent(viewModel =  viewModel, navigateBack =  navigateBack, text = { CircularProgressIndicator(modifier = Modifier.fillMaxSize())})
+            is SubmissionResultScreenUiState.Error -> StatisticDialogContent(viewModel =  viewModel, navigateBack =  navigateBack, text = { Text(SubmissionResultScreenUiState.Error.errorMessage.ifBlank { "Unexpected error " })})
             is SubmissionResultScreenUiState.Success -> StatisticDialogContent(viewModel =  viewModel, navigateBack =  navigateBack)
         }
     }
@@ -111,18 +111,19 @@ fun SubmissionScreenContent(
 @Composable
 fun StatisticDialogContent(
     navigateBack: () -> Unit = {},
+    text: @Composable (() -> Unit)? = null,
     viewModel: SubmissionViewModel = hiltViewModel()
 ){
     StatisticsDialog(
         viewModel.statisticsDto!!,
         onDismiss = {
             viewModel.statisticsDto = null
-            viewModel.answers.answers.clear()
         },
         onDismissRequest = {
             viewModel.statisticsDto = null
         },
-        navigateBack = { navigateBack() }
+        navigateBack = { navigateBack() },
+        text = text
     )
 }
 
@@ -210,15 +211,16 @@ fun StatisticsDialog(
     statisticsDto: StatisticsDto,
     navigateBack: () -> Unit = {},
     onDismissRequest: () -> Unit,
+    text: @Composable (() -> Unit)? = null,
     onDismiss: () -> Unit
 ){
     AlertDialog(
         onDismissRequest = { onDismissRequest() },
         title = { Text("Statistics") },
-        text = {
+        text = { text?.let { it() } ?:
             Column(
                 modifier = Modifier.fillMaxWidth()
-            ){
+            ) {
                 Text(stringResource(R.string.correct_answers, statisticsDto.earnedPoints))
                 Text(stringResource(R.string.percentage, statisticsDto.percentage * 100))
             }
@@ -246,5 +248,5 @@ fun SubmissionScreenPreview(){
 @Preview(showBackground = true)
 @Composable
 fun QuestionCardPreview(){
-    StatisticsDialog(StatisticsDto(420.0, 0.69), {}, {}, {})
+    StatisticsDialog(StatisticsDto(420.0, 0.69), {}, {}, {}, {})
 }
