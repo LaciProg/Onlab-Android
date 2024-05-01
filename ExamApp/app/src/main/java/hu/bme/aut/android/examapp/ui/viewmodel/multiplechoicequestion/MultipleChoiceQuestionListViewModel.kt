@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hu.bme.aut.android.examapp.api.ExamAppApi
+import hu.bme.aut.android.examapp.api.ExamAppApiService
 import hu.bme.aut.android.examapp.api.dto.NameDto
 import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.launch
@@ -20,7 +20,7 @@ sealed interface MultipleChoiceQuestionListScreenUiState {
 }
 
 @HiltViewModel
-class MultipleChoiceQuestionListViewModel @Inject constructor(): ViewModel() {
+class MultipleChoiceQuestionListViewModel @Inject constructor(val retrofitService: ExamAppApiService): ViewModel() {
 
     var multipleChoiceQuestionListScreenUiState: MultipleChoiceQuestionListScreenUiState by mutableStateOf(
         MultipleChoiceQuestionListScreenUiState.Loading)
@@ -37,7 +37,7 @@ class MultipleChoiceQuestionListViewModel @Inject constructor(): ViewModel() {
         multipleChoiceQuestionListScreenUiState = MultipleChoiceQuestionListScreenUiState.Loading
         viewModelScope.launch {
             multipleChoiceQuestionListScreenUiState = try{
-                val result = ExamAppApi.retrofitService.getAllMultipleChoiceName()
+                val result = retrofitService.getAllMultipleChoiceName()
                 multipleChoiceQuestionListUiState = MultipleChoiceQuestionListUiState(
                     multipleChoiceQuestionList = result.map { nameDto ->
                         MultipleChoiceQuestionRowUiState(

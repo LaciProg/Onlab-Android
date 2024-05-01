@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hu.bme.aut.android.examapp.api.ExamAppApi
+import hu.bme.aut.android.examapp.api.ExamAppApiService
 import hu.bme.aut.android.examapp.api.dto.TrueFalseQuestionDto
 import hu.bme.aut.android.examapp.ui.viewmodel.type.Type
 import io.ktor.utils.io.errors.IOException
@@ -21,7 +21,7 @@ sealed interface TrueFalseQuestionEntryScreenUiState {
 }
 
 @HiltViewModel
-class TrueFalseQuestionEntryViewModel @Inject constructor() : ViewModel(){
+class TrueFalseQuestionEntryViewModel @Inject constructor(val retrofitService: ExamAppApiService) : ViewModel(){
 
     var trueFalseQuestionUiState by mutableStateOf(TrueFalseQuestionUiState())
         private set
@@ -41,7 +41,7 @@ class TrueFalseQuestionEntryViewModel @Inject constructor() : ViewModel(){
         return if (validateInput() && validateUniqueTrueFalseQuestion()) {
             try {
                 viewModelScope.launch {
-                    ExamAppApi.retrofitService.postTrueFalse(trueFalseQuestionUiState.trueFalseQuestionDetails.toTrueFalseQuestion())
+                    retrofitService.postTrueFalse(trueFalseQuestionUiState.trueFalseQuestionDetails.toTrueFalseQuestion())
                 }
                 true
             } catch (e: IOException){
@@ -74,7 +74,7 @@ class TrueFalseQuestionEntryViewModel @Inject constructor() : ViewModel(){
 
     private suspend fun validateUniqueTrueFalseQuestion(uiState: TrueFalseQuestionDetails = trueFalseQuestionUiState.trueFalseQuestionDetails): Boolean {
         return try{
-            !ExamAppApi.retrofitService.getAllTrueFalseName().map{it.name}.contains(uiState.question)
+            !retrofitService.getAllTrueFalseName().map{it.name}.contains(uiState.question)
         } catch (e: IOException) {
             TrueFalseQuestionEditScreenUiState.Error.errorMessage = "Network error"
             trueFalseEntryScreenUiState = TrueFalseQuestionEntryScreenUiState.Error

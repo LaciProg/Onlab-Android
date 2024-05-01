@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hu.bme.aut.android.examapp.api.ExamAppApi
+import hu.bme.aut.android.examapp.api.ExamAppApiService
 import hu.bme.aut.android.examapp.api.dto.NameDto
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -20,7 +20,7 @@ sealed interface TrueFalseQuestionListScreenUiState {
 }
 
 @HiltViewModel
-class TrueFalseQuestionListViewModel @Inject constructor() : ViewModel() {
+class TrueFalseQuestionListViewModel @Inject constructor(val retrofitService: ExamAppApiService) : ViewModel() {
 
     var trueFalseQuestionListScreenUiState: TrueFalseQuestionListScreenUiState by mutableStateOf(TrueFalseQuestionListScreenUiState.Loading)
     var trueFalseQuestionListUiState: TrueFalseQuestionListUiState by mutableStateOf(TrueFalseQuestionListUiState())
@@ -34,7 +34,7 @@ class TrueFalseQuestionListViewModel @Inject constructor() : ViewModel() {
         trueFalseQuestionListScreenUiState = TrueFalseQuestionListScreenUiState.Loading
         viewModelScope.launch {
             trueFalseQuestionListScreenUiState = try{
-                val result = ExamAppApi.retrofitService.getAllTrueFalseName()
+                val result = retrofitService.getAllTrueFalseName()
                 trueFalseQuestionListUiState = TrueFalseQuestionListUiState(
                     trueFalseQuestionList = result.map { nameDto ->
                         TrueFalseQuestionRowUiState(

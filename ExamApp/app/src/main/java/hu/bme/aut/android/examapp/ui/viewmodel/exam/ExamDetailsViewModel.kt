@@ -7,7 +7,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hu.bme.aut.android.examapp.api.ExamAppApi
+import hu.bme.aut.android.examapp.api.ExamAppApiService
 import hu.bme.aut.android.examapp.api.dto.ExamDto
 import hu.bme.aut.android.examapp.api.dto.MultipleChoiceQuestionDto
 import hu.bme.aut.android.examapp.api.dto.PointDto
@@ -28,7 +28,10 @@ sealed interface ExamDetailsScreenUiState {
 }
 
 @HiltViewModel
-class ExamDetailsViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : ViewModel() {
+class ExamDetailsViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
+    val retrofitService: ExamAppApiService
+) : ViewModel() {
 
     val examId: String = checkNotNull(savedStateHandle[ExamDestination.ExamDetailsDestination.examIdArg])
 
@@ -44,10 +47,10 @@ class ExamDetailsViewModel @Inject constructor(savedStateHandle: SavedStateHandl
         getExam(examId)
         try {
             viewModelScope.launch {
-                trueFalseList = ExamAppApi.retrofitService.getAllTrueFalse()
-                multipleChoiceList = ExamAppApi.retrofitService.getAllMultipleChoice()
-                pointList = ExamAppApi.retrofitService.getAllPoint()
-                topicList = ExamAppApi.retrofitService.getAllTopic()
+                trueFalseList = retrofitService.getAllTrueFalse()
+                multipleChoiceList = retrofitService.getAllMultipleChoice()
+                pointList = retrofitService.getAllPoint()
+                topicList = retrofitService.getAllTopic()
             }
         } catch (e: IOException) {
             ExamDetailsScreenUiState.Error.errorMessage = "Network error"
@@ -69,11 +72,11 @@ class ExamDetailsViewModel @Inject constructor(savedStateHandle: SavedStateHandl
         examDetailsScreenUiState = ExamDetailsScreenUiState.Loading
         viewModelScope.launch {
             examDetailsScreenUiState = try{
-                val result = ExamAppApi.retrofitService.getExam(topicId)
+                val result = retrofitService.getExam(topicId)
                 uiState = ExamDetailsUiState(result.toExamDetails(
                     topicName =
                     if (result.topicId == "null") ""
-                    else ExamAppApi.retrofitService.getTopic(result.topicId).topic,
+                    else retrofitService.getTopic(result.topicId).topic,
                     questionList = if(result.questionList == "") listOf() else result.questionList.split("#").map { if(it.toQuestion() != null) it.toQuestion()!! else throw IllegalArgumentException("Invalid type")}
                 ))
                 ExamDetailsScreenUiState.Success(result)
@@ -109,7 +112,7 @@ class ExamDetailsViewModel @Inject constructor(savedStateHandle: SavedStateHandl
 
     suspend fun saveQuestionOrdering(list: List<Question>) {
         try{
-            ExamAppApi.retrofitService.updateExam(uiState.examDetails.copy(questionList = list).toExam())
+            retrofitService.updateExam(uiState.examDetails.copy(questionList = list).toExam())
         } catch (e: IOException) {
             ExamDetailsScreenUiState.Error.errorMessage = "Network error"
             examDetailsScreenUiState = ExamDetailsScreenUiState.Error
@@ -127,7 +130,7 @@ class ExamDetailsViewModel @Inject constructor(savedStateHandle: SavedStateHandl
 
     private suspend fun toTrueFalseQuestion(id: String) : TrueFalseQuestionDto? {
         return try {
-            ExamAppApi.retrofitService.getTrueFalse(id)
+            retrofitService.getTrueFalse(id)
         } catch (e: IOException) {
             ExamDetailsScreenUiState.Error.errorMessage = "Network error"
             examDetailsScreenUiState = ExamDetailsScreenUiState.Error
@@ -147,7 +150,7 @@ class ExamDetailsViewModel @Inject constructor(savedStateHandle: SavedStateHandl
 
     private suspend fun toMultipleChoiceQuestion(id: String) : MultipleChoiceQuestionDto? {
         return try {
-            ExamAppApi.retrofitService.getMultipleChoice(id)
+            retrofitService.getMultipleChoice(id)
         } catch (e: IOException) {
             ExamDetailsScreenUiState.Error.errorMessage = "Network error"
             examDetailsScreenUiState = ExamDetailsScreenUiState.Error
@@ -178,9 +181,9 @@ class ExamDetailsViewModel @Inject constructor(savedStateHandle: SavedStateHandl
         newList.add(questionDto)
         try{
             viewModelScope.launch{
-                ExamAppApi.retrofitService.updateExam(uiState.examDetails.copy(questionList = newList).toExam())
+                retrofitService.updateExam(uiState.examDetails.copy(questionList = newList).toExam())
                 getExam(examId)
-                examDetailsScreenUiState = ExamDetailsScreenUiState.Success(ExamAppApi.retrofitService.getExam(examId))
+                examDetailsScreenUiState = ExamDetailsScreenUiState.Success(retrofitService.getExam(examId))
             }
         } catch (e: IOException) {
             ExamDetailsScreenUiState.Error.errorMessage = "Network error"
@@ -214,9 +217,9 @@ class ExamDetailsViewModel @Inject constructor(savedStateHandle: SavedStateHandl
         }
         try {
             viewModelScope.launch {
-                ExamAppApi.retrofitService.updateExam(uiState.examDetails.copy(questionList = newList).toExam())
+                retrofitService.updateExam(uiState.examDetails.copy(questionList = newList).toExam())
                 getExam(examId)
-                examDetailsScreenUiState = ExamDetailsScreenUiState.Success(ExamAppApi.retrofitService.getExam(examId))
+                examDetailsScreenUiState = ExamDetailsScreenUiState.Success(retrofitService.getExam(examId))
             }
         } catch (e: IOException) {
             ExamDetailsScreenUiState.Error.errorMessage = "Network error"
@@ -237,7 +240,7 @@ class ExamDetailsViewModel @Inject constructor(savedStateHandle: SavedStateHandl
 
     suspend fun deleteExam() {
         try{
-            ExamAppApi.retrofitService.deleteExam(examId)
+            retrofitService.deleteExam(examId)
         } catch (e: IOException) {
             ExamDetailsScreenUiState.Error.errorMessage = "Network error"
             examDetailsScreenUiState = ExamDetailsScreenUiState.Error

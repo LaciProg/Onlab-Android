@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.bme.aut.android.examapp.R
-import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.data.auth.AuthService
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.UserRepository
+import hu.bme.aut.android.examapp.domain.usecases.AuthenticateUseCase
 import hu.bme.aut.android.examapp.domain.usecases.IsEmailValidUseCase
 import hu.bme.aut.android.examapp.ui.model.UiText
 import hu.bme.aut.android.examapp.ui.model.toUiText
@@ -28,7 +28,8 @@ import javax.inject.Inject
 class LoginUserViewModel @Inject constructor(
     private val authService: AuthService,
     private val isEmailValid: IsEmailValidUseCase,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val authenticateUseCase: AuthenticateUseCase
 ): ViewModel() {
 
     private val _state = MutableStateFlow(LoginUserState())
@@ -79,7 +80,7 @@ class LoginUserViewModel @Inject constructor(
                 try{
                     val user = authService.getCurrentUser()
                     if (user != null) {
-                        ExamAppApi.authenticate(user)
+                        authenticateUseCase(user)
                         _uiEvent.send(UiEvent.Success)
                     }
                 } catch (e: Exception){

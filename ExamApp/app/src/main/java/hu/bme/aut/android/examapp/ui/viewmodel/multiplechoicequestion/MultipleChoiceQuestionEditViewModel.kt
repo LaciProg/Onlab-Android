@@ -7,7 +7,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hu.bme.aut.android.examapp.api.ExamAppApi
+import hu.bme.aut.android.examapp.api.ExamAppApiService
 import hu.bme.aut.android.examapp.api.dto.MultipleChoiceQuestionDto
 import hu.bme.aut.android.examapp.ui.ExamDestination
 import io.ktor.utils.io.errors.IOException
@@ -22,7 +22,10 @@ sealed interface MultipleChoiceQuestionEditScreenUiState {
 }
 
 @HiltViewModel
-class MultipleChoiceQuestionEditViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : ViewModel() {
+class MultipleChoiceQuestionEditViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
+    val retrofitService: ExamAppApiService
+) : ViewModel() {
 
     private lateinit var originalQuestion: String
 
@@ -42,14 +45,14 @@ class MultipleChoiceQuestionEditViewModel @Inject constructor(savedStateHandle: 
         multipleChoiceEditScreenUiState = MultipleChoiceQuestionEditScreenUiState.Loading
         viewModelScope.launch {
             multipleChoiceEditScreenUiState = try{
-                val result = ExamAppApi.retrofitService.getMultipleChoice(topicId)
+                val result = retrofitService.getMultipleChoice(topicId)
                 multipleChoiceQuestionUiState = result.toMultipleChoiceQuestionUiState(isEntryValid = true,
                     topicName =
                     if (result.topic == "null") ""
-                    else ExamAppApi.retrofitService.getTopic(result.topic).topic,
+                    else retrofitService.getTopic(result.topic).topic,
                     pointName =
                     if (result.point == "null") ""
-                    else ExamAppApi.retrofitService.getPoint(result.point).type,
+                    else retrofitService.getPoint(result.point).type,
                     isAnswerChosen = true
                 )
                 originalQuestion = multipleChoiceQuestionUiState.multipleChoiceQuestionDetails.question
@@ -76,7 +79,7 @@ class MultipleChoiceQuestionEditViewModel @Inject constructor(savedStateHandle: 
                     multipleChoiceQuestionUiState.multipleChoiceQuestionDetails.correctAnswersList.removeIf(
                         String::isBlank
                     )
-                    ExamAppApi.retrofitService.updateMultipleChoice(multipleChoiceQuestionUiState.multipleChoiceQuestionDetails.toMultipleChoiceQuestion())
+                    retrofitService.updateMultipleChoice(multipleChoiceQuestionUiState.multipleChoiceQuestionDetails.toMultipleChoiceQuestion())
                 }
                 return true
             } catch (e: IOException) {
@@ -112,6 +115,6 @@ class MultipleChoiceQuestionEditViewModel @Inject constructor(savedStateHandle: 
     }
 
     private suspend fun validateUniqueMultipleChoiceQuestion(uiState: MultipleChoiceQuestionDetails = multipleChoiceQuestionUiState.multipleChoiceQuestionDetails): Boolean {
-        return !ExamAppApi.retrofitService.getAllMultipleChoiceName().map{it.name}.contains(uiState.question) || originalQuestion == uiState.question
+        return !retrofitService.getAllMultipleChoiceName().map{it.name}.contains(uiState.question) || originalQuestion == uiState.question
     }
 }

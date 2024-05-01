@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hu.bme.aut.android.examapp.api.ExamAppApi
+import hu.bme.aut.android.examapp.api.ExamAppApiService
 import hu.bme.aut.android.examapp.api.dto.TopicDto
 import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.launch
@@ -20,7 +20,7 @@ sealed interface TopicEntryScreenUiState {
 }
 
 @HiltViewModel
-class TopicEntryViewModel @Inject constructor(): ViewModel(){
+class TopicEntryViewModel @Inject constructor(val retrofitService: ExamAppApiService): ViewModel(){
 
     var topicUiState by mutableStateOf(TopicUiState())
         private set
@@ -36,7 +36,7 @@ class TopicEntryViewModel @Inject constructor(): ViewModel(){
         return if (validateInput() && validateUniqueTopic()) {
             try{
                 viewModelScope.launch {
-                    ExamAppApi.retrofitService.postTopic(topicUiState.topicDetails.toTopic())
+                    retrofitService.postTopic(topicUiState.topicDetails.toTopic())
                 }
                 true
             } catch (e: IOException){
@@ -63,7 +63,7 @@ class TopicEntryViewModel @Inject constructor(): ViewModel(){
 
     suspend fun getTopicIdByTopic(topic: String): String {
         return try{
-            ExamAppApi.retrofitService.getTopicByTopic(topic)?.uuid ?: ""
+            retrofitService.getTopicByTopic(topic)?.uuid ?: ""
         } catch (e: IOException) {
             TopicEntryScreenUiState.Error.errorMessage = "Network error"
             topicScreenUiState = TopicEntryScreenUiState.Error
@@ -90,7 +90,7 @@ class TopicEntryViewModel @Inject constructor(): ViewModel(){
 
     private suspend fun validateUniqueTopic(uiState: TopicDetails = topicUiState.topicDetails): Boolean {
         return try{
-            !ExamAppApi.retrofitService.getAllTopicName().map{it.name}.contains(uiState.topic)
+            !retrofitService.getAllTopicName().map{it.name}.contains(uiState.topic)
         } catch (e: IOException) {
             TopicEntryScreenUiState.Error.errorMessage = "Network error"
             topicScreenUiState = TopicEntryScreenUiState.Error

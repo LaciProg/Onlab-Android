@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hu.bme.aut.android.examapp.api.ExamAppApi
+import hu.bme.aut.android.examapp.api.ExamAppApiService
 import hu.bme.aut.android.examapp.api.dto.MultipleChoiceQuestionDto
 import hu.bme.aut.android.examapp.ui.viewmodel.type.Type
 import kotlinx.coroutines.launch
@@ -21,7 +21,7 @@ sealed interface MultipleChoiceQuestionEntryScreenUiState {
 }
 
 @HiltViewModel
-class MultipleChoiceQuestionEntryViewModel @Inject constructor(): ViewModel(){
+class MultipleChoiceQuestionEntryViewModel @Inject constructor(val retrofitService: ExamAppApiService): ViewModel(){
 
     var multipleChoiceQuestionUiState by mutableStateOf(MultipleChoiceQuestionUiState())
         private set
@@ -41,7 +41,7 @@ class MultipleChoiceQuestionEntryViewModel @Inject constructor(): ViewModel(){
         return if (validateInput() && validateUniqueMultipleChoiceQuestion()) {
             try{
                 viewModelScope.launch {
-                    ExamAppApi.retrofitService.postMultipleChoice(multipleChoiceQuestionUiState.multipleChoiceQuestionDetails.toMultipleChoiceQuestion())
+                    retrofitService.postMultipleChoice(multipleChoiceQuestionUiState.multipleChoiceQuestionDetails.toMultipleChoiceQuestion())
                 }
                 true
             } catch (e: IOException){
@@ -74,7 +74,7 @@ class MultipleChoiceQuestionEntryViewModel @Inject constructor(): ViewModel(){
 
     private suspend fun validateUniqueMultipleChoiceQuestion(uiState: MultipleChoiceQuestionDetails = multipleChoiceQuestionUiState.multipleChoiceQuestionDetails): Boolean {
         return try{
-            !ExamAppApi.retrofitService.getAllMultipleChoiceName().map{it.name}.contains(uiState.question)
+            !retrofitService.getAllMultipleChoiceName().map{it.name}.contains(uiState.question)
         } catch (e: IOException) {
             MultipleChoiceQuestionEntryScreenUiState.Error.errorMessage = "Network error"
             multipleChoiceQuestionScreenUiState = MultipleChoiceQuestionEntryScreenUiState.Error

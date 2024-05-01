@@ -7,7 +7,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hu.bme.aut.android.examapp.api.ExamAppApi
+import hu.bme.aut.android.examapp.api.ExamAppApiService
 import hu.bme.aut.android.examapp.api.dto.TrueFalseQuestionDto
 import hu.bme.aut.android.examapp.ui.ExamDestination
 import kotlinx.coroutines.launch
@@ -22,7 +22,10 @@ sealed interface TrueFalseQuestionDetailsScreenUiState {
 }
 
 @HiltViewModel
-class TrueFalseQuestionDetailsViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : ViewModel() {
+class TrueFalseQuestionDetailsViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
+    val retrofitService: ExamAppApiService
+) : ViewModel() {
 
     val trueFalseQuestionId: String = checkNotNull(savedStateHandle[ExamDestination.TrueFalseQuestionDetailsDestination.trueFalseQuestionIdArg])
 
@@ -36,14 +39,14 @@ class TrueFalseQuestionDetailsViewModel @Inject constructor(savedStateHandle: Sa
         trueFalseDetailsScreenUiState = TrueFalseQuestionDetailsScreenUiState.Loading
         viewModelScope.launch {
             trueFalseDetailsScreenUiState = try{
-                val result = ExamAppApi.retrofitService.getTrueFalse(topicId)
+                val result = retrofitService.getTrueFalse(topicId)
                 uiState = TrueFalseQuestionDetailsUiState(result.toTrueFalseQuestionDetails(
                     topicName =
                         if (result.topic == "null") ""
-                        else ExamAppApi.retrofitService.getTopic(result.topic).topic,
+                        else retrofitService.getTopic(result.topic).topic,
                     pointName =
                         if (result.point == "null") ""
-                        else ExamAppApi.retrofitService.getPoint(result.point).type,
+                        else retrofitService.getPoint(result.point).type,
                 ))
                 TrueFalseQuestionDetailsScreenUiState.Success(result)
             } catch (e: IOException) {
@@ -64,7 +67,7 @@ class TrueFalseQuestionDetailsViewModel @Inject constructor(savedStateHandle: Sa
 
     suspend fun deleteTrueFalseQuestion() {
         try {
-            ExamAppApi.retrofitService.deleteTrueFalse(trueFalseQuestionId)
+            retrofitService.deleteTrueFalse(trueFalseQuestionId)
         } catch (e: IOException) {
             TrueFalseQuestionDetailsScreenUiState.Error.errorMessage = "Network error"
             trueFalseDetailsScreenUiState = TrueFalseQuestionDetailsScreenUiState.Error

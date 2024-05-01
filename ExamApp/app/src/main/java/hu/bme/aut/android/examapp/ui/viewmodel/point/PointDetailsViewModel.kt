@@ -7,7 +7,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hu.bme.aut.android.examapp.api.ExamAppApi
+import hu.bme.aut.android.examapp.api.ExamAppApiService
 import hu.bme.aut.android.examapp.api.dto.PointDto
 import hu.bme.aut.android.examapp.ui.ExamDestination
 import io.ktor.utils.io.errors.IOException
@@ -22,7 +22,10 @@ sealed interface PointDetailsScreenUiState {
 }
 
 @HiltViewModel
-class PointDetailsViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : ViewModel() {
+class PointDetailsViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
+    val retrofitService: ExamAppApiService
+) : ViewModel() {
 
     val pointId: String = checkNotNull(savedStateHandle[ExamDestination.PointDetailsDestination.pointIdArg])
 
@@ -36,7 +39,7 @@ class PointDetailsViewModel @Inject constructor(savedStateHandle: SavedStateHand
         pointDetailsScreenUiState = PointDetailsScreenUiState.Loading
         viewModelScope.launch {
             pointDetailsScreenUiState = try{
-                val result = ExamAppApi.retrofitService.getPoint(pointId)
+                val result = retrofitService.getPoint(pointId)
                 PointDetailsScreenUiState.Success(result)
             } catch (e: IOException) {
                 PointDetailsScreenUiState.Error
@@ -56,7 +59,7 @@ class PointDetailsViewModel @Inject constructor(savedStateHandle: SavedStateHand
     suspend fun deletePoint() {
         try{
             viewModelScope.launch {
-                ExamAppApi.retrofitService.deletePoint(pointId)
+                retrofitService.deletePoint(pointId)
             }
         } catch (e: IOException) {
             PointDetailsScreenUiState.Error.errorMessage = "Network error"

@@ -7,7 +7,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hu.bme.aut.android.examapp.api.ExamAppApi
+import hu.bme.aut.android.examapp.api.ExamAppApiService
 import hu.bme.aut.android.examapp.api.dto.PointDto
 import hu.bme.aut.android.examapp.ui.ExamDestination
 import io.ktor.utils.io.errors.IOException
@@ -22,7 +22,10 @@ sealed interface PointEditScreenUiState {
 }
 
 @HiltViewModel
-class PointEditViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : ViewModel() {
+class PointEditViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
+    val retrofitService: ExamAppApiService
+) : ViewModel() {
 
     var pointUiState by mutableStateOf(PointUiState())
         private set
@@ -41,7 +44,7 @@ class PointEditViewModel @Inject constructor(savedStateHandle: SavedStateHandle)
         pointEditScreenUiState = PointEditScreenUiState.Loading
         viewModelScope.launch {
             pointEditScreenUiState = try{
-                val result = ExamAppApi.retrofitService.getPoint(pointId)
+                val result = retrofitService.getPoint(pointId)
                 pointUiState = result.toPointUiState(true)
                 originalPoint = pointUiState.pointDetails.type
                 PointEditScreenUiState.Success(result)
@@ -64,7 +67,7 @@ class PointEditViewModel @Inject constructor(savedStateHandle: SavedStateHandle)
         return if (validateInput(pointUiState.pointDetails) && validateUniquePoint(pointUiState.pointDetails)) {
             try {
                 viewModelScope.launch {
-                    ExamAppApi.retrofitService.updatePoint(pointUiState.pointDetails.toPoint())
+                    retrofitService.updatePoint(pointUiState.pointDetails.toPoint())
                 }
                 return true
             } catch (e: IOException) {
@@ -103,7 +106,7 @@ class PointEditViewModel @Inject constructor(savedStateHandle: SavedStateHandle)
 
     private suspend fun validateUniquePoint(uiState: PointDetails = pointUiState.pointDetails): Boolean {
         return try {
-            !ExamAppApi.retrofitService.getAllPointName().map { it.name }.contains(uiState.type) || originalPoint == uiState.type
+            !retrofitService.getAllPointName().map { it.name }.contains(uiState.type) || originalPoint == uiState.type
         } catch (e: IOException) {
             PointEditScreenUiState.Error.errorMessage = "Network error"
             pointEditScreenUiState = PointEditScreenUiState.Error

@@ -2,10 +2,11 @@ package hu.bme.aut.android.examapp.data.auth
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
-import hu.bme.aut.android.examapp.api.ExamAppApi
+import hu.bme.aut.android.examapp.api.ExamAppApiService
 import hu.bme.aut.android.examapp.api.dto.UserDto
 import hu.bme.aut.android.examapp.api.dto.UserFireBase
 import hu.bme.aut.android.examapp.data.repositories.inrefaces.UserRepository
+import hu.bme.aut.android.examapp.domain.usecases.AuthenticateUseCase
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -18,7 +19,9 @@ import kotlin.coroutines.suspendCoroutine
 
 class FirebaseAuthService(
     private val firebaseAuth: FirebaseAuth,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val retrofitService: ExamAppApiService,
+    private val authenticateUseCase: AuthenticateUseCase
 ) : AuthService {
     override val currentUserId: String? get() = firebaseAuth.currentUser?.uid
     override val hasUser: Boolean get() = firebaseAuth.currentUser != null
@@ -49,7 +52,7 @@ class FirebaseAuthService(
 
     override suspend fun registerInApi(email: String, password: String) {
         try {
-            val user = ExamAppApi.retrofitService.postUser(
+            val user = retrofitService.postUser(
                 UserDto(
                     name = email,
                     password = password
@@ -82,13 +85,13 @@ class FirebaseAuthService(
             var user : UserDto?
             runBlocking {
                 try{
-                    user = ExamAppApi.retrofitService.getUserByName(email)
+                    user = retrofitService.getUserByName(email)
                 } catch(e: IOException){
                     throw Exception("Network error")
                 } catch(e: HttpException){
                     throw Exception("Server error")
                 }
-                ExamAppApi.authenticate(user!!)
+                authenticateUseCase(user!!)
             }
             if (user != null ){
                 val userInDB = userRepository.getUserByUid(user!!.uuid)
@@ -125,7 +128,7 @@ class FirebaseAuthService(
 
     override suspend fun getCurrentUser(): UserDto? {
         try {
-            return ExamAppApi.retrofitService.getUserByName(firebaseAuth.currentUser?.email!!)
+            return retrofitService.getUserByName(firebaseAuth.currentUser?.email!!)
         } catch(e: IOException){
             throw Exception("Network error")
         } catch(e: HttpException){

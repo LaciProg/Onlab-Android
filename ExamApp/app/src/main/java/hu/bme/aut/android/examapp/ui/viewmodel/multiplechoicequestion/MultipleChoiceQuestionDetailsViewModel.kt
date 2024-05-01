@@ -7,7 +7,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hu.bme.aut.android.examapp.api.ExamAppApi
+import hu.bme.aut.android.examapp.api.ExamAppApiService
 import hu.bme.aut.android.examapp.api.dto.MultipleChoiceQuestionDto
 import hu.bme.aut.android.examapp.ui.ExamDestination
 import kotlinx.coroutines.launch
@@ -22,7 +22,10 @@ sealed interface MultipleChoiceQuestionDetailsScreenUiState {
 }
 
 @HiltViewModel
-class MultipleChoiceQuestionDetailsViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : ViewModel() {
+class MultipleChoiceQuestionDetailsViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
+    val retrofitService: ExamAppApiService
+) : ViewModel() {
 
     val multipleChoiceQuestionId: String = checkNotNull(savedStateHandle[ExamDestination.MultipleChoiceQuestionDetailsDestination.multipleChoiceQuestionIdArg])
     var multipleChoiceDetailsScreenUiState: MultipleChoiceQuestionDetailsScreenUiState by mutableStateOf(
@@ -36,14 +39,14 @@ class MultipleChoiceQuestionDetailsViewModel @Inject constructor(savedStateHandl
         multipleChoiceDetailsScreenUiState = MultipleChoiceQuestionDetailsScreenUiState.Loading
         viewModelScope.launch {
             multipleChoiceDetailsScreenUiState = try{
-                val result = ExamAppApi.retrofitService.getMultipleChoice(topicId)
+                val result = retrofitService.getMultipleChoice(topicId)
                 uiState = MultipleChoiceQuestionDetailsUiState(result.toMultipleChoiceQuestionDetails(
                     topicName =
                     if (result.topic == "null") ""
-                    else ExamAppApi.retrofitService.getTopic(result.topic).topic,
+                    else retrofitService.getTopic(result.topic).topic,
                     pointName =
                     if (result.point == "null") ""
-                    else ExamAppApi.retrofitService.getPoint(result.point).type,
+                    else retrofitService.getPoint(result.point).type,
                 ))
                 MultipleChoiceQuestionDetailsScreenUiState.Success(result)
             } catch (e: IOException) {
@@ -63,7 +66,7 @@ class MultipleChoiceQuestionDetailsViewModel @Inject constructor(savedStateHandl
 
     suspend fun deleteMultipleChoiceQuestion() {
         try{
-            ExamAppApi.retrofitService.deleteMultipleChoice(multipleChoiceQuestionId)
+            retrofitService.deleteMultipleChoice(multipleChoiceQuestionId)
         } catch (e: IOException) {
             MultipleChoiceQuestionDetailsScreenUiState.Error.errorMessage = "Network error"
             multipleChoiceDetailsScreenUiState = MultipleChoiceQuestionDetailsScreenUiState.Error

@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hu.bme.aut.android.examapp.api.ExamAppApi
+import hu.bme.aut.android.examapp.api.ExamAppApiService
 import hu.bme.aut.android.examapp.api.dto.NameDto
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -20,7 +20,9 @@ sealed interface ExamListScreenUiState {
 }
 
 @HiltViewModel
-class ExamListViewModel @Inject constructor(): ViewModel() {
+class ExamListViewModel @Inject constructor(
+    val retrofitService: ExamAppApiService
+): ViewModel() {
 
     var examListScreenUiState: ExamListScreenUiState by mutableStateOf(
         ExamListScreenUiState.Loading)
@@ -31,13 +33,14 @@ class ExamListViewModel @Inject constructor(): ViewModel() {
 
     init {
         getAllExamList()
+
     }
 
     fun getAllExamList(){
         examListScreenUiState = ExamListScreenUiState.Loading
         viewModelScope.launch {
             examListScreenUiState = try{
-                val result = ExamAppApi.retrofitService.getAllExamName()
+                val result = retrofitService.getAllExamName()
                 examListUiState = ExamListUiState(
                     examList = result.map { nameDto ->
                         ExamRowUiState(

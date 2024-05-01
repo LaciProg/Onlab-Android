@@ -5,9 +5,11 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import hu.bme.aut.android.examapp.api.ExamAppApiService
 import hu.bme.aut.android.examapp.data.auth.AuthService
 import hu.bme.aut.android.examapp.data.auth.FirebaseAuthService
 import hu.bme.aut.android.examapp.data.repositories.offline.OfflineUserRepository
+import hu.bme.aut.android.examapp.domain.usecases.AuthenticateUseCase
 import hu.bme.aut.android.examapp.domain.usecases.IsEmailValidUseCase
 import hu.bme.aut.android.examapp.domain.usecases.PasswordsMatchUseCase
 import javax.inject.Singleton
@@ -26,11 +28,19 @@ object LoginUseCaseModule {
 
     @Provides
     @Singleton
+    fun provideAuthenticateUsesCase(): AuthenticateUseCase = AuthenticateUseCase()
+
+    @Provides
+    @Singleton
     fun provideAuthService(
-        repository: OfflineUserRepository
+        repository: OfflineUserRepository,
+        retrofitService: ExamAppApiService,
+        authenticateUseCase: AuthenticateUseCase
     ): AuthService = FirebaseAuthService(
         FirebaseAuth.getInstance(),
-        repository
+        repository,
+        retrofitService,
+        authenticateUseCase
     )
 
     @Provides
@@ -38,10 +48,12 @@ object LoginUseCaseModule {
     fun provideAuthUsesCases(
         passwordsMatchUseCase: PasswordsMatchUseCase,
         isEmailValidUseCase: IsEmailValidUseCase,
-        authService: AuthService
+        authenticateUseCase: AuthenticateUseCase,
+        authService: AuthService,
     ): AuthUseCases = AuthUseCases(
         passwordsMatchUseCase,
         isEmailValidUseCase,
+        authenticateUseCase,
         authService
     )
 
@@ -51,5 +63,6 @@ object LoginUseCaseModule {
 class AuthUseCases(
     val passwordsMatchUseCase: PasswordsMatchUseCase,
     val isEmailValidUseCase: IsEmailValidUseCase,
+    val authenticateUseCase: AuthenticateUseCase,
     val authService: AuthService
 )

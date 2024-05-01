@@ -1,6 +1,10 @@
 package hu.bme.aut.android.examapp.api
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import hu.bme.aut.android.examapp.api.dto.ExamDto
 import hu.bme.aut.android.examapp.api.dto.MultipleChoiceQuestionDto
 import hu.bme.aut.android.examapp.api.dto.NameDto
@@ -24,11 +28,14 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 
 //TODO Firebase analytics
-//TODO Send answers screen
+
+@Module
+@InstallIn(SingletonComponent::class)
 object ExamAppApi {
-    private const val BASE_URL = /*"http://192.168.38.17:46258"*//*"http://10.66.21.253:46258"*/"http://152.66.182.116:46258"
+    private const val BASE_URL = /*"http://192.168.38.17:46258"*/"http://10.66.23.17:46258"/*"http://152.66.182.116:46258"*/
     private var token: String = ""
     private var userDto: UserDto? = null
+
     @OptIn(ExperimentalSerializationApi::class)
     private var retrofit = Retrofit.Builder()
         .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
@@ -42,12 +49,15 @@ object ExamAppApi {
         .baseUrl(BASE_URL)
         .build()
 
-    //TODO token in companion object
-
     private fun retrofitServiceCreator(): ExamAppApiService  =
         retrofit.create(ExamAppApiService::class.java)
 
-    var retrofitService: ExamAppApiService
+    @Provides
+    fun retrofitService(): ExamAppApiService {
+        return retrofitService
+    }
+
+    private var retrofitService: ExamAppApiService
     init{
         retrofitService = retrofitServiceCreator()
     }
@@ -69,6 +79,7 @@ object ExamAppApi {
 
         retrofitService = retrofitServiceCreator()
     }
+
 
     suspend fun authenticate(user: UserDto? = null) {
         userDto = user ?: userDto

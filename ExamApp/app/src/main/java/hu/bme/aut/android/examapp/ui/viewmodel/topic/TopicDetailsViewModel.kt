@@ -7,7 +7,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hu.bme.aut.android.examapp.api.ExamAppApi
+import hu.bme.aut.android.examapp.api.ExamAppApiService
 import hu.bme.aut.android.examapp.api.dto.TopicDto
 import hu.bme.aut.android.examapp.ui.ExamDestination
 import io.ktor.utils.io.errors.IOException
@@ -22,7 +22,10 @@ sealed interface TopicDetailsScreenUiState {
 }
 
 @HiltViewModel
-class TopicDetailsViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : ViewModel() {
+class TopicDetailsViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
+    val retrofitService: ExamAppApiService
+) : ViewModel() {
 
     val topicId: String = checkNotNull(savedStateHandle[ExamDestination.TopicDetailsDestination.topicIdArg])
 
@@ -36,12 +39,12 @@ class TopicDetailsViewModel @Inject constructor(savedStateHandle: SavedStateHand
         topicDetailsScreenUiState = TopicDetailsScreenUiState.Loading
         viewModelScope.launch {
             topicDetailsScreenUiState = try{
-                val result = ExamAppApi.retrofitService.getTopic(topicId)
+                val result = retrofitService.getTopic(topicId)
                 uiState = TopicDetailsUiState(result.toTopicDetails(
                     parentName =
                     if (result.parentTopic == "null") ""
                     else
-                        ExamAppApi.retrofitService.getTopic(result.parentTopic).topic
+                        retrofitService.getTopic(result.parentTopic).topic
                 ))
             TopicDetailsScreenUiState.Success(result)
             } catch (e: IOException) {
@@ -62,7 +65,7 @@ class TopicDetailsViewModel @Inject constructor(savedStateHandle: SavedStateHand
 
     suspend fun deleteTopic() {
         try {
-            ExamAppApi.retrofitService.deleteTopic(topicId)
+            retrofitService.deleteTopic(topicId)
         } catch (e: IOException){
             TopicDetailsScreenUiState.Error.errorMessage = "Network error"
             topicDetailsScreenUiState = TopicDetailsScreenUiState.Error

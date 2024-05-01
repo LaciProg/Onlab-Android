@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hu.bme.aut.android.examapp.api.ExamAppApi
+import hu.bme.aut.android.examapp.api.ExamAppApiService
 import hu.bme.aut.android.examapp.api.dto.ExamDto
 import hu.bme.aut.android.examapp.api.dto.MultipleChoiceQuestionDto
 import hu.bme.aut.android.examapp.api.dto.Question
@@ -24,7 +24,9 @@ sealed interface ExamEntryScreenUiState {
 }
 
 @HiltViewModel
-class ExamEntryViewModel @Inject constructor(): ViewModel(){
+class ExamEntryViewModel @Inject constructor(
+    val retrofitService: ExamAppApiService
+): ViewModel(){
 
     var examUiState by mutableStateOf(ExamUiState())
         private set
@@ -40,7 +42,7 @@ class ExamEntryViewModel @Inject constructor(): ViewModel(){
         return if (validateInput() && validateUniqueExam()) {
             try{
                 viewModelScope.launch {
-                    ExamAppApi.retrofitService.postExam(examUiState.examDetails.toExam())
+                    retrofitService.postExam(examUiState.examDetails.toExam())
                 }
                 true
             } catch (e: IOException){
@@ -66,7 +68,7 @@ class ExamEntryViewModel @Inject constructor(): ViewModel(){
 
     suspend fun getTopicIdByTopic(topic: String): String {
         return try{
-            ExamAppApi.retrofitService.getTopicByTopic(topic)?.uuid ?: ""
+            retrofitService.getTopicByTopic(topic)?.uuid ?: ""
         } catch (e: IOException){
             ExamEntryScreenUiState.Error.errorMessage = "Network error"
             examEntryScreenUiState = ExamEntryScreenUiState.Error
@@ -91,7 +93,7 @@ class ExamEntryViewModel @Inject constructor(): ViewModel(){
 
     private suspend fun validateUniqueExam(uiState: ExamDetails = examUiState.examDetails): Boolean {
         return try{
-            !ExamAppApi.retrofitService.getAllExamName().map{it.name}.contains(uiState.name)
+            !retrofitService.getAllExamName().map{it.name}.contains(uiState.name)
         } catch (e: IOException) {
             ExamEntryScreenUiState.Error.errorMessage = "Network error"
             examEntryScreenUiState = ExamEntryScreenUiState.Error
@@ -141,8 +143,9 @@ suspend fun ExamDto.toExamUiState(
     isEntryValid: Boolean = false,
     topicName: String,
     questionList: String,
+    retrofitService: ExamAppApiService
 ): ExamUiState = ExamUiState(
-    examDetails = this.toExamDetails(topicName, questionList.split("#").map { if(it.toQuestion() != null) it.toQuestion()!! else throw IllegalArgumentException("Invalid question")}),
+    examDetails = this.toExamDetails(topicName, questionList.split("#").map { if(it.toQuestion(retrofitService) != null) it.toQuestion(retrofitService)!! else throw IllegalArgumentException("Invalid question")}),
     isEntryValid = isEntryValid
 )
 
@@ -154,22 +157,22 @@ fun ExamDto.toExamDetails(topicName: String, questionList: List<Question>): Exam
     topicName = topicName
 )
 
-private suspend fun String.toQuestion(
+private suspend fun String.toQuestion( retrofitService: ExamAppApiService
 ): Question? {
     val question = this.split("~")
     val type = question[0].toInt()
     val questionId = question[1]
     return when(type){
-        Type.trueFalseQuestion.ordinal -> toTrueFalseQuestion(questionId)
-        Type.multipleChoiceQuestion.ordinal -> toMultipleChoiceQuestion(questionId)
+        Type.trueFalseQuestion.ordinal -> toTrueFalseQuestion(questionId, retrofitService)
+        Type.multipleChoiceQuestion.ordinal -> toMultipleChoiceQuestion(questionId, retrofitService)
         else -> throw IllegalArgumentException("Invalid type")
     }
 
 }
 
-private suspend fun toTrueFalseQuestion(id: String) : TrueFalseQuestionDto? {
+private suspend fun toTrueFalseQuestion(id: String, retrofitService: ExamAppApiService) : TrueFalseQuestionDto? {
     return try{
-        ExamAppApi.retrofitService.getTrueFalse(id)
+        retrofitService.getTrueFalse(id)
     } catch (e: IOException){
         ExamEntryScreenUiState.Error.errorMessage = "Network error"
         ExamEntryScreenUiState.Error
@@ -186,9 +189,9 @@ private suspend fun toTrueFalseQuestion(id: String) : TrueFalseQuestionDto? {
     }
 }
 
-private suspend fun toMultipleChoiceQuestion(id: String) : MultipleChoiceQuestionDto? {
+private suspend fun toMultipleChoiceQuestion(id: String, retrofitService: ExamAppApiService) : MultipleChoiceQuestionDto? {
     return try{
-        ExamAppApi.retrofitService.getMultipleChoice(id)
+        retrofitService.getMultipleChoice(id)
     } catch (e: IOException){
         ExamEntryScreenUiState.Error.errorMessage = "Network error"
         ExamEntryScreenUiState.Error

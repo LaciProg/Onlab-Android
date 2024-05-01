@@ -7,7 +7,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hu.bme.aut.android.examapp.api.ExamAppApi
+import hu.bme.aut.android.examapp.api.ExamAppApiService
 import hu.bme.aut.android.examapp.api.dto.TopicDto
 import hu.bme.aut.android.examapp.ui.ExamDestination
 import hu.bme.aut.android.examapp.ui.viewmodel.truefalsequestion.TrueFalseQuestionEditScreenUiState
@@ -23,7 +23,10 @@ sealed interface TopicEditScreenUiState {
 }
 
 @HiltViewModel
-class TopicEditViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : ViewModel() {
+class TopicEditViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
+    val retrofitService: ExamAppApiService
+) : ViewModel() {
 
     private lateinit var originalTopic: String
 
@@ -44,12 +47,12 @@ class TopicEditViewModel @Inject constructor(savedStateHandle: SavedStateHandle)
         topicEditScreenUiState = TopicEditScreenUiState.Loading
         viewModelScope.launch {
             topicEditScreenUiState = try{
-                val result = ExamAppApi.retrofitService.getTopic(topicId)
+                val result = retrofitService.getTopic(topicId)
                 topicUiState = result.toTopicUiState(true,
                     parentName =
                     if (result.parentTopic == "null") ""
                     else
-                        ExamAppApi.retrofitService.getTopic(result.parentTopic).topic
+                        retrofitService.getTopic(result.parentTopic).topic
                 )
                 originalTopic = topicUiState.topicDetails.topic
                 TopicEditScreenUiState.Success(result)
@@ -73,7 +76,7 @@ class TopicEditViewModel @Inject constructor(savedStateHandle: SavedStateHandle)
         return if (validateInput(topicUiState.topicDetails) && validateUniqueTopic(topicUiState.topicDetails)) {
             try{
                 viewModelScope.launch {
-                    ExamAppApi.retrofitService.updateTopic(topicUiState.topicDetails.toTopic())
+                    retrofitService.updateTopic(topicUiState.topicDetails.toTopic())
                 }
                 return true
             } catch (e: IOException) {
@@ -111,7 +114,7 @@ class TopicEditViewModel @Inject constructor(savedStateHandle: SavedStateHandle)
 
     private suspend fun validateUniqueTopic(uiState: TopicDetails = topicUiState.topicDetails): Boolean {
         return try {
-            !ExamAppApi.retrofitService.getAllTopicName().map{it.name}.contains(uiState.topic) || originalTopic == uiState.topic
+            !retrofitService.getAllTopicName().map{it.name}.contains(uiState.topic) || originalTopic == uiState.topic
         } catch (e: IOException) {
             TopicEditScreenUiState.Error.errorMessage = "Network error"
             topicEditScreenUiState = TopicEditScreenUiState.Error

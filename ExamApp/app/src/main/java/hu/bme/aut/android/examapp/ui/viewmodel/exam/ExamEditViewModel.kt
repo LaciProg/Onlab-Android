@@ -7,7 +7,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hu.bme.aut.android.examapp.api.ExamAppApi
+import hu.bme.aut.android.examapp.api.ExamAppApiService
 import hu.bme.aut.android.examapp.api.dto.ExamDto
 import hu.bme.aut.android.examapp.ui.ExamDestination
 import kotlinx.coroutines.launch
@@ -22,7 +22,10 @@ sealed interface ExamEditScreenUiState {
 }
 
 @HiltViewModel
-class ExamEditViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : ViewModel() {
+class ExamEditViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
+    val retrofitService: ExamAppApiService
+) : ViewModel() {
 
     private lateinit var originalExam: String
 
@@ -42,12 +45,13 @@ class ExamEditViewModel @Inject constructor(savedStateHandle: SavedStateHandle) 
         examEditScreenUiState = ExamEditScreenUiState.Loading
         viewModelScope.launch {
             examEditScreenUiState =  try{
-                val result = ExamAppApi.retrofitService.getExam(topicId)
+                val result = retrofitService.getExam(topicId)
                 examUiState = result.toExamUiState(isEntryValid = true,
                     topicName =
                     if (result.topicId == "null") ""
-                    else ExamAppApi.retrofitService.getTopic(result.topicId).topic,
+                    else retrofitService.getTopic(result.topicId).topic,
                     questionList = result.questionList,
+                    retrofitService = retrofitService
                 )
                 originalExam = examUiState.examDetails.name
                 ExamEditScreenUiState.Success(result)
@@ -72,7 +76,7 @@ class ExamEditViewModel @Inject constructor(savedStateHandle: SavedStateHandle) 
     suspend fun updateExam() : Boolean{
         return if (validateInput(examUiState.examDetails) && validateUniqueExam(examUiState.examDetails)) {
             try {
-                ExamAppApi.retrofitService.updateExam(examUiState.examDetails.toExam())
+                retrofitService.updateExam(examUiState.examDetails.toExam())
                 true
             } catch (e: IOException) {
                 ExamEditScreenUiState.Error.errorMessage = "Network error"
@@ -109,7 +113,7 @@ class ExamEditViewModel @Inject constructor(savedStateHandle: SavedStateHandle) 
 
     private suspend fun validateUniqueExam(uiState: ExamDetails = examUiState.examDetails): Boolean {
         return try{
-            !ExamAppApi.retrofitService.getAllExamName().map{ it.name }.contains(uiState.name) || originalExam == uiState.name
+            !retrofitService.getAllExamName().map{ it.name }.contains(uiState.name) || originalExam == uiState.name
         } catch (e: IOException) {
             ExamEditScreenUiState.Error.errorMessage = "Network error"
             examEditScreenUiState = ExamEditScreenUiState.Error

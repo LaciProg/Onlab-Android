@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hu.bme.aut.android.examapp.api.ExamAppApi
+import hu.bme.aut.android.examapp.api.ExamAppApiService
 import hu.bme.aut.android.examapp.api.dto.NameDto
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -20,7 +20,7 @@ sealed interface PointListScreenUiState {
 }
 
 @HiltViewModel
-class PointListViewModel @Inject constructor(): ViewModel() {
+class PointListViewModel @Inject constructor(val retrofitService: ExamAppApiService): ViewModel() {
 
     var pointListScreenUiState: PointListScreenUiState by mutableStateOf(PointListScreenUiState.Loading)
     var pointListUiState: PointListUiState by mutableStateOf(PointListUiState())
@@ -32,7 +32,7 @@ class PointListViewModel @Inject constructor(): ViewModel() {
         pointListScreenUiState = PointListScreenUiState.Loading
         viewModelScope.launch {
             pointListScreenUiState = try{
-                val result = ExamAppApi.retrofitService.getAllPointName()
+                val result = retrofitService.getAllPointName()
                 pointListUiState = PointListUiState(
                     pointList = result.map { nameDto ->
                         PointRowUiState(

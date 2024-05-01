@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hu.bme.aut.android.examapp.api.ExamAppApi
+import hu.bme.aut.android.examapp.api.ExamAppApiService
 import hu.bme.aut.android.examapp.api.dto.PointDto
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -20,7 +20,7 @@ sealed interface PointEntryScreenUiState {
 }
 
 @HiltViewModel
-class PointEntryViewModel @Inject constructor(): ViewModel(){
+class PointEntryViewModel @Inject constructor(val retrofitService: ExamAppApiService): ViewModel(){
 
     var pointUiState by mutableStateOf(PointUiState())
         private set
@@ -36,7 +36,7 @@ class PointEntryViewModel @Inject constructor(): ViewModel(){
         return if (validateInput() && validateUniqueTopic()) {
             try{
                 viewModelScope.launch {
-                    ExamAppApi.retrofitService.postPoint(pointUiState.pointDetails.toPoint())
+                    retrofitService.postPoint(pointUiState.pointDetails.toPoint())
                 }
                 true
             } catch (e: IOException){
@@ -69,7 +69,7 @@ class PointEntryViewModel @Inject constructor(): ViewModel(){
 
     private suspend fun validateUniqueTopic(uiState: PointDetails = pointUiState.pointDetails): Boolean {
         return try{
-            !ExamAppApi.retrofitService.getAllPointName().map{it.name}.contains(uiState.type)
+            !retrofitService.getAllPointName().map{it.name}.contains(uiState.type)
         } catch (e: IOException) {
             PointEntryScreenUiState.Error.errorMessage = "Network error"
             pointScreenUiState = PointEntryScreenUiState.Error

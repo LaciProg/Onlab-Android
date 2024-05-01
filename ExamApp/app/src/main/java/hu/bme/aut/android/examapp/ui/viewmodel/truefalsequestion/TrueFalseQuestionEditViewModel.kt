@@ -7,7 +7,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hu.bme.aut.android.examapp.api.ExamAppApi
+import hu.bme.aut.android.examapp.api.ExamAppApiService
 import hu.bme.aut.android.examapp.api.dto.TrueFalseQuestionDto
 import hu.bme.aut.android.examapp.ui.ExamDestination
 import io.ktor.utils.io.errors.IOException
@@ -22,7 +22,10 @@ sealed interface TrueFalseQuestionEditScreenUiState {
 }
 
 @HiltViewModel
-class TrueFalseQuestionEditViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : ViewModel() {
+class TrueFalseQuestionEditViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
+    val retrofitService: ExamAppApiService
+) : ViewModel() {
 
     private lateinit var originalQuestion: String
 
@@ -41,14 +44,14 @@ class TrueFalseQuestionEditViewModel @Inject constructor(savedStateHandle: Saved
         trueFalseEditScreenUiState = TrueFalseQuestionEditScreenUiState.Loading
         viewModelScope.launch {
             trueFalseEditScreenUiState = try{
-                val result = ExamAppApi.retrofitService.getTrueFalse(topicId)
+                val result = retrofitService.getTrueFalse(topicId)
                 trueFalseQuestionUiState = result.toTrueFalseQuestionUiState(isEntryValid = true,
                     topicName =
                         if (result.topic == "null") ""
-                        else ExamAppApi.retrofitService.getTopic(result.topic).topic,
+                        else retrofitService.getTopic(result.topic).topic,
                     pointName =
                         if (result.point == "null") ""
-                        else ExamAppApi.retrofitService.getPoint(result.point).type,
+                        else retrofitService.getPoint(result.point).type,
                     isAnswerChosen = true
                 )
                 originalQuestion = trueFalseQuestionUiState.trueFalseQuestionDetails.question
@@ -72,7 +75,7 @@ class TrueFalseQuestionEditViewModel @Inject constructor(savedStateHandle: Saved
         return if (validateInput(trueFalseQuestionUiState.trueFalseQuestionDetails) && validateUniqueTrueFalseQuestion(trueFalseQuestionUiState.trueFalseQuestionDetails)) {
             try{
                 viewModelScope.launch {
-                    ExamAppApi.retrofitService.updateTrueFalse(trueFalseQuestionUiState.trueFalseQuestionDetails.toTrueFalseQuestion())
+                    retrofitService.updateTrueFalse(trueFalseQuestionUiState.trueFalseQuestionDetails.toTrueFalseQuestion())
                 }
                 return true
             } catch (e: IOException) {
@@ -111,7 +114,7 @@ class TrueFalseQuestionEditViewModel @Inject constructor(savedStateHandle: Saved
 
     private suspend fun validateUniqueTrueFalseQuestion(uiState: TrueFalseQuestionDetails = trueFalseQuestionUiState.trueFalseQuestionDetails): Boolean {
         return try{
-            !ExamAppApi.retrofitService.getAllTrueFalse().map{it.question}.contains(uiState.question) || originalQuestion == uiState.question
+            !retrofitService.getAllTrueFalse().map{it.question}.contains(uiState.question) || originalQuestion == uiState.question
         } catch (e: IOException) {
             TrueFalseQuestionEditScreenUiState.Error.errorMessage = "Network error"
             trueFalseEditScreenUiState = TrueFalseQuestionEditScreenUiState.Error

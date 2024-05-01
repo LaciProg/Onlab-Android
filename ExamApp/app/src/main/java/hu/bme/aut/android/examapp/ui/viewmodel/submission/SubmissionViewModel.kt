@@ -7,7 +7,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hu.bme.aut.android.examapp.api.ExamAppApi
+import hu.bme.aut.android.examapp.api.ExamAppApiService
 import hu.bme.aut.android.examapp.api.dto.ExamDto
 import hu.bme.aut.android.examapp.api.dto.MultipleChoiceQuestionDto
 import hu.bme.aut.android.examapp.api.dto.Question
@@ -36,7 +36,10 @@ sealed interface SubmissionResultScreenUiState {
 }
 
 @HiltViewModel
-class SubmissionViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : ViewModel() {
+class SubmissionViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
+    val retrofitService: ExamAppApiService
+) : ViewModel() {
 
     var submissionScreenUiState: SubmissionScreenUiState by mutableStateOf(SubmissionScreenUiState.Loading)
     var statisticsDialogUiState: SubmissionResultScreenUiState by mutableStateOf(SubmissionResultScreenUiState.Loading)
@@ -57,11 +60,11 @@ class SubmissionViewModel @Inject constructor(savedStateHandle: SavedStateHandle
         submissionScreenUiState = SubmissionScreenUiState.Loading
         viewModelScope.launch {
             submissionScreenUiState = try{
-                val result = ExamAppApi.retrofitService.getExam(topicId)
+                val result = retrofitService.getExam(topicId)
                 uiState = ExamDetailsUiState(result.toExamDetails(
                     topicName =
                     if (result.topicId == "null") ""
-                    else ExamAppApi.retrofitService.getTopic(result.topicId).topic,
+                    else retrofitService.getTopic(result.topicId).topic,
                     questionList = if(result.questionList == "") listOf() else result.questionList.split("#").map { if(it.toQuestion() != null) it.toQuestion()!! else throw IllegalArgumentException("Invalid type")}
                 ))
                 repeat(uiState.examDetails.questionList.size) {
@@ -90,18 +93,19 @@ class SubmissionViewModel @Inject constructor(savedStateHandle: SavedStateHandle
         statisticsDialogUiState = SubmissionResultScreenUiState.Loading
         viewModelScope.launch {
             try {
-                statisticsDto = ExamAppApi.retrofitService.getCorrection(id = examId, answers = answers)
+                statisticsDto = retrofitService.getCorrection(id = examId, answers = answers)
                 statisticsDialogUiState = SubmissionResultScreenUiState.Success(statisticsDto!!)
             } catch (e: IOException) {
                 SubmissionScreenUiState.Error.errorMessage = "Network error"
                 statisticsDialogUiState = SubmissionResultScreenUiState.Error
             } catch (e: HttpException) {
                 when(e.code()){
-                    400 -> SubmissionScreenUiState.Error.errorMessage = "Bad request"
-                    401 -> SubmissionScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
-                    404 -> SubmissionScreenUiState.Error.errorMessage = "Content not found"
-                    500 -> SubmissionScreenUiState.Error.errorMessage = "Server error"
-                    else -> SubmissionScreenUiState.Error
+                    400 -> SubmissionResultScreenUiState.Error.errorMessage = "Bad request"
+                    401 -> SubmissionResultScreenUiState.Error.errorMessage = "Unauthorized try logging in again or open the home screen"
+                    404 -> SubmissionResultScreenUiState.Error.errorMessage = "Content not found"
+                    412 -> SubmissionResultScreenUiState.Error.errorMessage = "Wrong answers format"
+                    500 -> SubmissionResultScreenUiState.Error.errorMessage = "Server error"
+                    else -> SubmissionResultScreenUiState.Error
                 }
                 statisticsDialogUiState = SubmissionResultScreenUiState.Error
             }
@@ -123,7 +127,7 @@ class SubmissionViewModel @Inject constructor(savedStateHandle: SavedStateHandle
 
     private suspend fun toTrueFalseQuestion(id: String) : TrueFalseQuestionDto? {
         return try {
-            ExamAppApi.retrofitService.getTrueFalse(id)
+            retrofitService.getTrueFalse(id)
         } catch (e: IOException) {
             SubmissionScreenUiState.Error.errorMessage = "Network error"
             submissionScreenUiState = SubmissionScreenUiState.Error
@@ -143,7 +147,7 @@ class SubmissionViewModel @Inject constructor(savedStateHandle: SavedStateHandle
 
     private suspend fun toMultipleChoiceQuestion(id: String) : MultipleChoiceQuestionDto? {
         return try {
-            ExamAppApi.retrofitService.getMultipleChoice(id)
+            retrofitService.getMultipleChoice(id)
         } catch (e: IOException) {
             SubmissionScreenUiState.Error.errorMessage = "Network error"
             submissionScreenUiState = SubmissionScreenUiState.Error

@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hu.bme.aut.android.examapp.api.ExamAppApi
+import hu.bme.aut.android.examapp.api.ExamAppApiService
 import hu.bme.aut.android.examapp.api.dto.NameDto
 import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.launch
@@ -20,7 +20,7 @@ sealed interface TopicListScreenUiState {
 }
 
 @HiltViewModel
-class TopicListViewModel @Inject constructor(): ViewModel() {
+class TopicListViewModel @Inject constructor(val retrofitService: ExamAppApiService): ViewModel() {
 
     var topicListScreenUiState: TopicListScreenUiState by mutableStateOf(TopicListScreenUiState.Loading)
     var topicListUiState: TopicListUiState by mutableStateOf(TopicListUiState())
@@ -32,7 +32,7 @@ class TopicListViewModel @Inject constructor(): ViewModel() {
         topicListScreenUiState = TopicListScreenUiState.Loading
         viewModelScope.launch {
             topicListScreenUiState = try{
-                val result = ExamAppApi.retrofitService.getAllTopicName()
+                val result = retrofitService.getAllTopicName()
                 topicListUiState = TopicListUiState(
                     topicList = result.map { nameDto ->
                         TopicRowUiState(

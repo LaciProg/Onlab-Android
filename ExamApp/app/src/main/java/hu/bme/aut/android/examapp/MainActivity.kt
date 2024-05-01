@@ -27,7 +27,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import hu.bme.aut.android.examapp.api.ExamAppApi
 import hu.bme.aut.android.examapp.ui.ExamNavHost
 import hu.bme.aut.android.examapp.ui.theme.ExamAppTheme
 import hu.bme.aut.android.examapp.ui.viewmodel.MainScreenViewModel
@@ -72,7 +71,7 @@ fun MainScreen(
     val context = LocalContext.current
     LaunchedEffect(key1 = true) {
         try{
-            ExamAppApi.authenticate()
+            viewModel.authenticate()
         } catch (e: Exception){
             Toast.makeText(
                 context,

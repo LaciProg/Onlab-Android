@@ -17,6 +17,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +31,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,6 +44,7 @@ import hu.bme.aut.android.examapp.api.dto.StatisticsDto
 import hu.bme.aut.android.examapp.api.dto.TrueFalseQuestionDto
 import hu.bme.aut.android.examapp.ui.theme.Green
 import hu.bme.aut.android.examapp.ui.theme.PaleDogwood
+import hu.bme.aut.android.examapp.ui.theme.Purple40
 import hu.bme.aut.android.examapp.ui.viewmodel.submission.Answers
 import hu.bme.aut.android.examapp.ui.viewmodel.submission.SubmissionResultScreenUiState
 import hu.bme.aut.android.examapp.ui.viewmodel.submission.SubmissionScreenUiState
@@ -131,7 +134,13 @@ fun StatisticDialogContent(
 fun QuestionCard(
     question: Question,
     answers: Answers,
-    index: Int
+    index: Int,
+    containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
+    contentColor: Color = MaterialTheme.colorScheme.onPrimaryContainer,
+    colors: CardColors = CardDefaults.cardColors(
+        containerColor = containerColor,
+        contentColor = contentColor
+    )
 ){
     Card(
         modifier = Modifier
@@ -144,7 +153,8 @@ fun QuestionCard(
             ),
         shape = AlertDialogDefaults.shape,
         colors = CardDefaults.cardColors(
-            containerColor = if(question.typeOrdinal == Type.trueFalseQuestion.ordinal) PaleDogwood else Green
+            containerColor = if(question.typeOrdinal == Type.trueFalseQuestion.ordinal) PaleDogwood else Green,
+            contentColor = Purple40
         )
     ) {
         Row(
