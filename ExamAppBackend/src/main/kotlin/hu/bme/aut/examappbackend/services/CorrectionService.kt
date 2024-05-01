@@ -4,6 +4,8 @@ import enums.Type
 import hu.bme.aut.examappbackend.db.facade.FacadeExposed
 import hu.bme.aut.examappbackend.dto.*
 import kotlinx.coroutines.runBlocking
+import java.util.*
+import javax.naming.directory.InvalidAttributeValueException
 
 class CorrectionService {
 
@@ -44,10 +46,14 @@ class CorrectionService {
         var maxPoint = 0.0
         for((index, question) in questions.withIndex()){
             if(question is TrueFalseQuestionDto){
-                if(question.correctAnswer.toString() == answers[index][0]){
-                    pointsGained += points.find { it.uuid == question.point }?.goodAnswer!!
+                val ans = answers[index][0].lowercase(Locale.getDefault())
+                if(!(ans == "true".lowercase(Locale.getDefault()) || ans == "false".lowercase(Locale.getDefault()))){
+                    throw IllegalArgumentException("Wrong input format")
+                }
+                pointsGained += if(question.correctAnswer.toString() == ans){
+                    points.find { it.uuid == question.point }?.goodAnswer!!
                 } else {
-                    pointsGained += points.find { it.uuid == question.point }?.badAnswer!!
+                    points.find { it.uuid == question.point }?.badAnswer!!
                 }
                 maxPoint += points.find { it.uuid == question.point }?.point!!
             }
@@ -55,12 +61,13 @@ class CorrectionService {
                 val badAnswers: MutableList<String> = mutableListOf()
                 question.answers.forEach { if(!question.correctAnswersList.contains(it)) badAnswers.add(it) }
                 for(answer in answers[index]){
-                    val num = try{
-                        answer.toInt()
+                    var num = -1
+                    try{
+                        num = answer.toInt()
+                        if(num < 0|| num >= question.answers.size ) throw IllegalArgumentException()
                     } catch (e: Exception){
-                        -1
+                        throw IllegalArgumentException("Wrong input format")
                     }
-                    if(num < 0 || num >= question.answers.size) return null
                     if(question.correctAnswersList.contains(question.answers[num])){
                         pointsGained += points.find { it.uuid == question.point }?.goodAnswer!!
                     } else if(badAnswers.contains(question.answers[num])) {

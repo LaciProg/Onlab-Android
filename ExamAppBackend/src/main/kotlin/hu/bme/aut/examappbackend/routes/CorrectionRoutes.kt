@@ -35,8 +35,12 @@ fun Route.correctionRoute(correctionService: CorrectionService){
         val answersList = it.answers.split("-")
         val answers: MutableList<List<String>> = mutableListOf()
         answersList.forEach { answerString -> answers.add(answerString.split(",")) }
-        val result = correctionService.correcting(it.examParent.exam, answers)
-            ?: return@get call.respond(status = HttpStatusCode.BadRequest, message = "")
+        val result = try{
+             correctionService.correcting(it.examParent.exam, answers)
+                ?: return@get call.respond(status = HttpStatusCode.BadRequest, message = "")
+        } catch(e: IllegalArgumentException) {
+            return@get call.respond(status = HttpStatusCode.PreconditionFailed, message = "")
+        }
         call.respond(status = HttpStatusCode.OK, message = result)
     }
 }
