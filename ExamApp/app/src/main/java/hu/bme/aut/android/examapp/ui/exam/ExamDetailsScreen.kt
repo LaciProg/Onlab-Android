@@ -1,5 +1,6 @@
 package hu.bme.aut.android.examapp.ui.exam
 
+import android.os.Bundle
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
@@ -70,11 +71,14 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.logEvent
 import hu.bme.aut.android.examapp.R
 import hu.bme.aut.android.examapp.api.dto.ExamDto
 import hu.bme.aut.android.examapp.api.dto.MultipleChoiceQuestionDto
@@ -206,6 +210,8 @@ private fun SearchBar(
     questions: List<Question>,
     onAddQuestion: (String) -> Unit,
 ) {
+    val context = LocalContext.current
+
     Column(modifier = Modifier.windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))) {
         Spacer(Modifier.windowInsetsTopHeight(WindowInsets.safeDrawing))
         TabRow(
@@ -268,6 +274,17 @@ private fun SearchBar(
         OutlinedButton(
             onClick = {
                 onAddQuestion(question)
+
+                val bundle = Bundle()
+                bundle.putString("add_question", question)
+
+                FirebaseAnalytics.getInstance(context).logEvent(FirebaseAnalytics.Event.SELECT_ITEM){
+                    param(FirebaseAnalytics.Param.ITEM_NAME, question)
+                    param(FirebaseAnalytics.Param.SUCCESS, "true")
+                }
+
+                FirebaseAnalytics.getInstance(context)
+                    .logEvent(FirebaseAnalytics.Event.SELECT_ITEM, bundle)
                 question = ""
             },
             shape = MaterialTheme.shapes.small,

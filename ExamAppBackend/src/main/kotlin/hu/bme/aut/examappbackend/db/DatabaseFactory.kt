@@ -16,7 +16,7 @@ object DatabaseFactory {
 
     fun init() {
         val db = Database.connect(
-            url = System.getenv("DB_URL") ?: "jdbc:postgresql://DB:5432/examapp", /*"jdbc:postgresql://localhost:5432/examapp",*/
+            url = System.getenv("DB_URL") ?: /*"jdbc:postgresql://DB:5432/examapp",*/ "jdbc:postgresql://152.66.211.35:5432/examapp",
             driver = System.getenv("DB_DRIVER") ?: "org.postgresql.Driver",
             user = System.getenv("DB_USER") ?: "examapp",
             password = System.getenv("DB_PASSWORD") ?: "examapp"
@@ -54,8 +54,6 @@ object DatabaseFactory {
         var tf2: TrueFalseQuestionDto? = null
         var mc1: MultipleChoiceQuestionDto? = null
         var mc2: MultipleChoiceQuestionDto? = null
-        var exam1: ExamDto? = null
-        var exam2: ExamDto? = null
         runBlocking {
             if(FacadeExposed.typeDao.getAllType().isEmpty()){
                 type1 = FacadeExposed.typeDao.insertType(
@@ -88,7 +86,7 @@ object DatabaseFactory {
                         badAnswer = 0.0
                     )
                 )
-                val point3 = FacadeExposed.pointDao.insertPoint(
+                FacadeExposed.pointDao.insertPoint(
                     PointDto(
                         type = "IHKiller",
                         point = 4.0,
@@ -113,7 +111,7 @@ object DatabaseFactory {
                 )
             }
             if(FacadeExposed.userDao.getAllUser().isEmpty()){
-                val user1 = FacadeExposed.userDao.insertUser(
+                FacadeExposed.userDao.insertUser(
                     UserDto(
                         name = "user",
                         password = "xdlol"
@@ -167,17 +165,17 @@ object DatabaseFactory {
         }
         runBlocking {
             if(FacadeExposed.examDao.getAllExam().isEmpty()){
-                exam1 = FacadeExposed.examDao.insertExam(
+                FacadeExposed.examDao.insertExam(
                     ExamDto(
                         name = "Elso",
-                        questionList = "${tf1?.typeOrdinal}~${tf1?.uuid}#${tf2?.typeOrdinal}~${tf2?.uuid}#${mc1?.typeOrdinal}~${mc1?.uuid}"/*listOf(tf1, tf2, mc1)*/,
+                        questionList = "${tf1?.typeOrdinal}~${tf1?.uuid}#${tf2?.typeOrdinal}~${tf2?.uuid}#${mc1?.typeOrdinal}~${mc1?.uuid}",
                         topicId = topic1?.uuid!!
                     )
                 )
-                exam2 = FacadeExposed.examDao.insertExam(
+                FacadeExposed.examDao.insertExam(
                     ExamDto(
                         name = "Masodik",
-                        questionList = "${mc2?.typeOrdinal}~${mc2?.uuid}#${mc1?.typeOrdinal}~${mc1?.uuid}#${tf1?.typeOrdinal}~${tf1?.uuid}"/*listOf(mc2, mc1, tf1)*/,
+                        questionList = "${mc2?.typeOrdinal}~${mc2?.uuid}#${mc1?.typeOrdinal}~${mc1?.uuid}#${tf1?.typeOrdinal}~${tf1?.uuid}",
                         topicId = topic2?.uuid!!
                     )
                 )

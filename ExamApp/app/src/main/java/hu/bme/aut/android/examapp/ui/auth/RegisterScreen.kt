@@ -88,7 +88,7 @@ fun RegisterScreen(
             EmailTextField(
                 value = state.email, 
                 label = stringResource(id = R.string.textfield_label_email),
-                onValueChange = { viewModel.onEvent(RegisterUserEvent.EmailChanged(it)) },
+                onValueChange = { viewModel.onEvent(RegisterUserEvent.EmailChanged(it), context) },
                 onDone = {},
                 imeAction = ImeAction.Next,
                 modifier = Modifier.padding(bottom = 10.dp)
@@ -96,23 +96,23 @@ fun RegisterScreen(
             PasswordTextField(
                 value = state.password,
                 label = stringResource(id = R.string.textfield_label_password),
-                onValueChange = { viewModel.onEvent(RegisterUserEvent.PasswordChanged(it)) },
+                onValueChange = { viewModel.onEvent(RegisterUserEvent.PasswordChanged(it), context) },
                 onDone = {},
                 imeAction = ImeAction.Next,
                 modifier = Modifier.padding(bottom = 10.dp),
                 isVisible = state.passwordVisibility,
-                onVisibilityChanged = { viewModel.onEvent(RegisterUserEvent.PasswordVisibilityChanged) }
+                onVisibilityChanged = { viewModel.onEvent(RegisterUserEvent.PasswordVisibilityChanged, context) }
             )
             PasswordTextField(
                 value = state.confirmPassword,
                 label = stringResource(id = R.string.textfield_label_confirm_password),
-                onValueChange = { viewModel.onEvent(RegisterUserEvent.ConfirmPasswordChanged(it)) },
+                onValueChange = { viewModel.onEvent(RegisterUserEvent.ConfirmPasswordChanged(it), context) },
                 onDone = {},
                 modifier = Modifier.padding(bottom = 10.dp),
                 isVisible = state.confirmPasswordVisibility,
-                onVisibilityChanged = { viewModel.onEvent(RegisterUserEvent.ConfirmPasswordVisibilityChanged) }
+                onVisibilityChanged = { viewModel.onEvent(RegisterUserEvent.ConfirmPasswordVisibilityChanged, context) }
             )
-            Button(onClick = { viewModel.onEvent(RegisterUserEvent.SignUp) }) {
+            Button(onClick = { viewModel.onEvent(RegisterUserEvent.SignUp, context) }) {
                 Text(text = stringResource(id = R.string.button_text_sign_up))
             }
         }

@@ -2,7 +2,6 @@ package hu.bme.aut.examappbackend.routes
 
 import hu.bme.aut.examappbackend.db.facade.FacadeExposed
 import hu.bme.aut.examappbackend.dto.MultipleChoiceQuestionDto
-import hu.bme.aut.examappbackend.dto.TrueFalseQuestionDto
 import io.ktor.http.*
 import io.ktor.resources.*
 import io.ktor.server.application.*

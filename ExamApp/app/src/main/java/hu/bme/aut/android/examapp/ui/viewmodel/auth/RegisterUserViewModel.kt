@@ -1,7 +1,10 @@
 package hu.bme.aut.android.examapp.ui.viewmodel.auth
 
+import android.content.Context
+import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.bme.aut.android.examapp.R
 import hu.bme.aut.android.examapp.data.auth.AuthService
@@ -38,7 +41,7 @@ class RegisterUserViewModel @Inject constructor(
     private val _uiEvent = Channel<UiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
 
-    fun onEvent(event: RegisterUserEvent) {
+    fun onEvent(event: RegisterUserEvent, context: Context) {
         when(event) {
             is RegisterUserEvent.EmailChanged -> {
                 val newEmail = event.email.trim()
@@ -59,12 +62,12 @@ class RegisterUserViewModel @Inject constructor(
                 _state.update { it.copy(confirmPasswordVisibility = !state.value.confirmPasswordVisibility) }
             }
             RegisterUserEvent.SignUp -> {
-                onSignUp()
+                onSignUp(context)
             }
         }
     }
 
-    private fun onSignUp() {
+    private fun onSignUp(context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 if (!isEmailValid(email)) {
@@ -80,6 +83,13 @@ class RegisterUserViewModel @Inject constructor(
                         authService.signUp(email, password)
                         authService.registerInApi(email, password)
                         authService.authenticateInApi(email, password)
+
+                        val bundle = Bundle()
+                        bundle.putString("user_sign_up", email)
+
+                        FirebaseAnalytics.getInstance(context)
+                            .logEvent(FirebaseAnalytics.Event.SIGN_UP, bundle)
+
                         _uiEvent.send(UiEvent.Success)
                     }
                 }

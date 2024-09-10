@@ -6,6 +6,7 @@ plugins {
     id("com.google.gms.google-services")
     kotlin("kapt") version "1.9.0"
     id("com.google.dagger.hilt.android")
+    id("com.google.firebase.crashlytics")
 }
 
 
@@ -69,6 +70,7 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("com.google.firebase:firebase-auth:22.3.1")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
+    implementation("com.google.firebase:firebase-crashlytics:18.6.4")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -108,9 +110,9 @@ dependencies {
     implementation(firebaseBom)
     implementation("com.google.firebase:firebase-auth-ktx")
     //implementation("com.google.firebase:firebase-firestore-ktx")
-    //implementation("com.google.firebase:firebase-messaging-ktx")
-    //implementation("com.google.firebase:firebase-crashlytics-ktx")
-    //implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation("com.google.firebase:firebase-messaging-ktx")
+    implementation("com.google.firebase:firebase-crashlytics-ktx")
+    implementation("com.google.firebase:firebase-analytics-ktx")
 
     // Hilt
     val hiltVersion = "2.51.1"

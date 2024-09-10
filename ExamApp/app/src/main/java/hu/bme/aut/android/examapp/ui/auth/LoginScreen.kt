@@ -52,7 +52,7 @@ fun LoginScreen(
 
     LaunchedEffect(key1 = true) {
         try{
-            viewModel.hasUser()
+            viewModel.hasUser(context)
         } catch (e: Exception) {
             scope.launch {
                 snackbarHostState.showSnackbar(
@@ -93,7 +93,7 @@ fun LoginScreen(
             EmailTextFieldWithDropdownUsage(
                 value = state.email,
                 label = stringResource(id = R.string.textfield_label_email),
-                onValueChange = { viewModel.onEvent(LoginUserEvent.EmailChanged(it)) },
+                onValueChange = { viewModel.onEvent(LoginUserEvent.EmailChanged(it), context) },
                 onDone = {},
                 imeAction = ImeAction.Next,
                 modifier = Modifier.padding(bottom = 10.dp),
@@ -102,14 +102,14 @@ fun LoginScreen(
             PasswordTextField(
                 value = state.password,
                 label = stringResource(id = R.string.textfield_label_password),
-                onValueChange = { viewModel.onEvent(LoginUserEvent.PasswordChanged(it)) },
+                onValueChange = { viewModel.onEvent(LoginUserEvent.PasswordChanged(it), context) },
                 onDone = {},
                 modifier = Modifier.padding(bottom = 10.dp),
                 isVisible = state.passwordVisibility,
-                onVisibilityChanged = { viewModel.onEvent(LoginUserEvent.PasswordVisibilityChanged) }
+                onVisibilityChanged = { viewModel.onEvent(LoginUserEvent.PasswordVisibilityChanged, context) }
             )
             Button(
-                onClick = { viewModel.onEvent(LoginUserEvent.SignIn) },
+                onClick = { viewModel.onEvent(LoginUserEvent.SignIn, context) },
                 modifier = Modifier.padding(bottom = 10.dp)
             ) {
                 Text(text = stringResource(id = R.string.button_text_sign_in))

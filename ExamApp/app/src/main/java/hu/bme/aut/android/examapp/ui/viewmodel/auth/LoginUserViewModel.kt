@@ -1,7 +1,10 @@
 package hu.bme.aut.android.examapp.ui.viewmodel.auth
 
+import android.content.Context
+import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.bme.aut.android.examapp.R
 import hu.bme.aut.android.examapp.data.auth.AuthService
@@ -55,7 +58,7 @@ class LoginUserViewModel @Inject constructor(
         private const val TIMEOUT_MILLIS = 5_000L
     }
 
-    fun onEvent(event: LoginUserEvent) {
+    fun onEvent(event: LoginUserEvent, context: Context) {
         when(event) {
             is LoginUserEvent.EmailChanged -> {
                 val newEmail = event.email.trim()
@@ -69,19 +72,26 @@ class LoginUserViewModel @Inject constructor(
                 _state.update { it.copy(passwordVisibility = !state.value.passwordVisibility) }
             }
             LoginUserEvent.SignIn -> {
-                onSignIn()
+                onSignIn(context)
             }
         }
     }
 
-    fun hasUser(){
+    fun hasUser(context: Context){
         viewModelScope.launch {
             if(authService.hasUser){
                 try{
                     val user = authService.getCurrentUser()
+
                     if (user != null) {
-                        authenticateUseCase(user)
-                        _uiEvent.send(UiEvent.Success)
+                        val bundle = Bundle()
+                        bundle.putString("user_login", user.name)
+
+                        FirebaseAnalytics.getInstance(context)
+                            .logEvent(FirebaseAnalytics.Event.LOGIN, bundle)
+
+                            authenticateUseCase(user)
+                            _uiEvent.send(UiEvent.Success)
                     }
                 } catch (e: Exception){
                     _uiEvent.send(UiEvent.Failure(e.toUiText()))
@@ -90,7 +100,7 @@ class LoginUserViewModel @Inject constructor(
         }
     }
 
-    private fun onSignIn() {
+    private fun onSignIn(context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 if (!isEmailValid(email)) {
@@ -105,6 +115,13 @@ class LoginUserViewModel @Inject constructor(
                     } else {
                         authService.authenticate(email,password)
                         authService.authenticateInApi(email,password)
+
+                        val bundle = Bundle()
+                        bundle.putString("user_login", email)
+
+                        FirebaseAnalytics.getInstance(context)
+                            .logEvent(FirebaseAnalytics.Event.LOGIN, bundle)
+
                         _uiEvent.send(UiEvent.Success)
                     }
                 }

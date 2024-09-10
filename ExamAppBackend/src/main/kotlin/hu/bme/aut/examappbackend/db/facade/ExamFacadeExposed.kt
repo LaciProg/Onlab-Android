@@ -14,7 +14,7 @@ class ExamFacadeExposed : ExamFacade{
     private fun resultRowToExam(row: ResultRow) = ExamDto(
         uuid = row[ExamDB.id].toString(),
         name = row[ExamDB.name],
-        questionList = row[ExamDB.questionList] /*row[ExamDB.questionList].split("¤").map { it.toQuestion() }*/,
+        questionList = row[ExamDB.questionList],
         topicId = row[ExamDB.topicId].toString()
     )
 
@@ -117,27 +117,8 @@ class ExamFacadeExposed : ExamFacade{
     override suspend fun updateExam(exam: ExamDto): Boolean = dbQuery {
         ExamDB.update( {ExamDB.id eq UUID.fromString(exam.uuid)} ){
             it[name] = exam.name
-            it[questionList] = exam.questionList//.joinToString("¤") { question -> question?.toQuestionString() ?: "" }
+            it[questionList] = exam.questionList
             it[topicId] = UUID.fromString(exam.topicId)
         } > 0
-    }
-
-    private fun Question.toQuestionString(): String = when(this){
-        is TrueFalseQuestionDto -> "${Type.trueFalseQuestion.name}~${this.uuid}"
-        is MultipleChoiceQuestionDto -> "${Type.multipleChoiceQuestion.name}~${this.uuid}"
-        else -> throw IllegalArgumentException("Invalid type")
-    }
-
-    private fun String.toQuestion(
-    ): Question? {
-        val question = this.split("~")
-        val type = question[0]
-        val questionId = question[1]
-        return when(type){
-            Type.trueFalseQuestion.name ->  runBlocking { FacadeExposed.trueFalseQuestionDao.getTrueFalseQuestionById(questionId) } //FacadeExposed.trueFalseQuestionDao.getTrueFalseQuestionById(questionId)
-            Type.multipleChoiceQuestion.name -> runBlocking { FacadeExposed.multipleChoiceQuestionDao.getMultipleChoiceQuestionById(questionId) }//toMultipleChoiceQuestion(questionId)
-            else -> throw IllegalArgumentException("Invalid type")
-        }
-
     }
 }

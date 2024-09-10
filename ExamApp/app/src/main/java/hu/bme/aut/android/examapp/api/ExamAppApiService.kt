@@ -27,12 +27,10 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 
-//TODO Firebase analytics
-
 @Module
 @InstallIn(SingletonComponent::class)
 object ExamAppApi {
-    private const val BASE_URL = /*"http://192.168.38.17:46258"*/"http://10.66.23.17:46258"/*"http://152.66.182.116:46258"*/
+    private const val BASE_URL = "http://152.66.211.35:46258"/*"http://192.168.38.17:46258"*//*"http://10.66.23.17:46258"*//*"http://152.66.182.116:46258"*/
     private var token: String = ""
     private var userDto: UserDto? = null
 

@@ -5,7 +5,6 @@ import hu.bme.aut.examappbackend.db.facade.FacadeExposed
 import hu.bme.aut.examappbackend.dto.*
 import kotlinx.coroutines.runBlocking
 import java.util.*
-import javax.naming.directory.InvalidAttributeValueException
 
 class CorrectionService {
 
@@ -33,7 +32,7 @@ class CorrectionService {
 
     fun correcting(exam: String, answers: List<List<String>>): StatisticsDto?{
         val questions: MutableList<Question> = mutableListOf()
-        var points: List<PointDto> = mutableListOf()
+        var points: List<PointDto>
         runBlocking {
             val q = getQuestions(exam)
             if(q != null){
