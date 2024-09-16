@@ -2,6 +2,9 @@ package hu.bme.aut.android.examapp.ui.multiplechoicequestion
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -55,6 +58,8 @@ fun MultipleChoiceQuestionEditResultScreen(
                 }
             }
         },
-        modifier = modifier
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+            .fillMaxWidth()
     )
 }

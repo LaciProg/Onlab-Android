@@ -101,7 +101,6 @@ fun MultipleChoiceQuestionEntryBody(
     Column(
         verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_large)),
         modifier = modifier
-            .verticalScroll(rememberScrollState())
             .padding(dimensionResource(id = R.dimen.padding_medium))
     ) {
         MultipleChoiceQuestionInputForm(
@@ -126,8 +125,8 @@ fun MultipleChoiceQuestionInputForm(
     modifier: Modifier = Modifier,
     onValueChange: (MultipleChoiceQuestionDetails) -> Unit = {},
     enabled: Boolean = true,
-    topicListViewModel: TopicListViewModel = hiltViewModel(),//viewModel(factory = AppViewModelProvider.Factory),
-    pointListViewModel: PointListViewModel = hiltViewModel()//viewModel(factory = AppViewModelProvider.Factory)
+    topicListViewModel: TopicListViewModel = hiltViewModel(),
+    pointListViewModel: PointListViewModel = hiltViewModel()
 ) {
     Column(
         modifier = modifier,

@@ -28,18 +28,19 @@ import hu.bme.aut.android.examapp.data.TrueFalseData
 @Composable
 fun ExportedTrueFalseQuestion(number: Int, question: String, point: Double, color: Color = Color.Black)
 {
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = Modifier.width(500.dp).fillMaxWidth()) {
         Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
             Text(text = "$number. $question", color = color)
+            Spacer(modifier = Modifier.padding(end = 16.dp))
             Text(text = "Point: $point\\", modifier = Modifier.padding(end = 50.dp), color = color)
         }
         Spacer(modifier = Modifier.padding(8.dp))
         Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.padding(horizontal = 16.dp)
+            horizontalArrangement = Arrangement.Start,
+            modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth()
         ) {
             Text("True", color = color)
-            Spacer(modifier = Modifier.width(100.dp))
+            Spacer(modifier = Modifier.width(25.dp))
             Text("False", color = color)
         }
     }
