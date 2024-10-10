@@ -62,7 +62,7 @@ class CorrectionService {
                 for(answer in answers[index]){
                     var num = -1
                     try{
-                        num = answer.toInt()
+                        num = answer.first().code - 'A'.code
                         if(num < 0|| num >= question.answers.size ) throw IllegalArgumentException()
                     } catch (e: Exception){
                         throw IllegalArgumentException("Wrong input format")

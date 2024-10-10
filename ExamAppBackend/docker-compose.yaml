@@ -8,6 +8,8 @@ services:
         env_file: .env
         networks:
             - shared
+        ports:
+            -   5432:5432
     api:
         ports:
             -  46258:46258
