@@ -1,5 +1,6 @@
 package hu.bme.aut.android.examapp.ui.viewmodel.submission
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -26,6 +27,7 @@ sealed interface SubmissionScreenUiState {
     data class Success(val examDto: ExamDto) : SubmissionScreenUiState
     data object Error : SubmissionScreenUiState {var errorMessage: String = ""}
     data object Loading : SubmissionScreenUiState
+    data object Camera : SubmissionScreenUiState
 
 }
 
@@ -56,7 +58,8 @@ class SubmissionViewModel @Inject constructor(
     }
 
 
-    fun getExam(topicId: String){
+    fun getExam(topicId: String, gottenAnswers: Answers = this.answers){
+        Log.i("Answers2", answers.answers.toString())
         submissionScreenUiState = SubmissionScreenUiState.Loading
         viewModelScope.launch {
             submissionScreenUiState = try{
@@ -67,9 +70,23 @@ class SubmissionViewModel @Inject constructor(
                     else retrofitService.getTopic(result.topicId).topic,
                     questionList = if(result.questionList == "") listOf() else result.questionList.split("#").map { if(it.toQuestion() != null) it.toQuestion()!! else throw IllegalArgumentException("Invalid type")}
                 ))
-                repeat(uiState.examDetails.questionList.size) {
-                    answers.answers.add("")
+                if(gottenAnswers.answers.isEmpty()) {
+                    repeat(uiState.examDetails.questionList.size) {
+                        Log.i("Answer", gottenAnswers.answers.toString())
+                        answers.answers.add("")
+                    }
                 }
+                Log.i("Answers3", gottenAnswers.answers.toString())
+                Log.i("Answers4", answers.answers.toString())
+                //Log.i("Answers3", gottenAnswers.answers.toString())
+                //if(gottenAnswers.answers.isNotEmpty()) {
+                //    gottenAnswers.answers.forEachIndexed { index, it ->
+                //        Log.i("Answer", it)
+                //        answers.answers[index] = it
+                //    }
+                //}
+
+
                 SubmissionScreenUiState.Success(result)
             } catch (e: IOException) {
                 SubmissionScreenUiState.Error

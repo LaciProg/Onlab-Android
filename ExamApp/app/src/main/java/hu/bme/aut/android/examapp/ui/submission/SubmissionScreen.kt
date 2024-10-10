@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.Button
@@ -60,7 +62,7 @@ fun SubmissionScreen (
         is SubmissionScreenUiState.Loading ->  CircularProgressIndicator(modifier = Modifier.fillMaxSize())
         is SubmissionScreenUiState.Error -> Text(text = SubmissionScreenUiState.Error.errorMessage.ifBlank { "Unexpected error " })
         is SubmissionScreenUiState.Success -> SubmissionScreenContent(viewModel)
-
+        is SubmissionScreenUiState.Camera -> MainCameraScreen()
     }
 
 
@@ -80,7 +82,7 @@ fun SubmissionScreenContent(
     viewModel: SubmissionViewModel
 ){
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -92,7 +94,9 @@ fun SubmissionScreenContent(
             ) {
                 Text(text = "Submission Screen")
                 Text(text = viewModel.uiState.examDetails.name)
-
+                Button(onClick = { viewModel.submissionScreenUiState = SubmissionScreenUiState.Camera }) {
+                    Text(stringResource(R.string.scan))
+                }
             }
         }
         Spacer(modifier = Modifier.height(30.dp))
@@ -104,6 +108,7 @@ fun SubmissionScreenContent(
         Button(onClick = {
             viewModel.statisticsDto = StatisticsDto(0.0,0.0)
             viewModel.statisticsDialogUiState = SubmissionResultScreenUiState.Loading
+            println(viewModel.answers.answers)
             viewModel.submitAnswers(answers = viewModel.answers.answers.joinToString("-"))
         }) {
             Text(stringResource(R.string.submit))
@@ -176,7 +181,7 @@ fun QuestionCard(
                 if(question is MultipleChoiceQuestionDto){
                     for ((answerNumber, answer) in question.answers.withIndex()) {
                         Text(
-                            text = "${answerNumber}. $answer",
+                            text = "${(answerNumber+'A'.code).toChar()}. $answer",
                             modifier = Modifier.width(150.dp)
                         )
                     }
@@ -184,7 +189,7 @@ fun QuestionCard(
             }
             Spacer(modifier = Modifier.width(10.dp))
             var answer by rememberSaveable {
-                mutableStateOf("")
+                mutableStateOf(answers.answers[index])
             }
             OutlinedTextField(
                 value = answer,
@@ -209,7 +214,7 @@ fun QuestionCard(
                 shape = AlertDialogDefaults.shape,
                 keyboardOptions = when (question) {
                     is TrueFalseQuestionDto -> KeyboardOptions(keyboardType = KeyboardType.Text)
-                    is MultipleChoiceQuestionDto -> KeyboardOptions(keyboardType = KeyboardType.Number)
+                    is MultipleChoiceQuestionDto -> KeyboardOptions(keyboardType = KeyboardType.Text)
                 }
             )
         }
