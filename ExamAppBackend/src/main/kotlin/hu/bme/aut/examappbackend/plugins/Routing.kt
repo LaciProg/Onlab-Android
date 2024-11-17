@@ -17,7 +17,7 @@ fun Application.configureRouting(jwtService: JwtService) {
         }
         userRoutes()
 
-        authenticate {
+        //authenticate {
             examRoutes()
             correctionRoute(correctionService)
             multipleChoiceRoutes()
@@ -25,7 +25,7 @@ fun Application.configureRouting(jwtService: JwtService) {
             topicRoutes()
             trueFalseRoutes()
             typeRoutes()
-        }
+        //}
         get("/") {
             call.respondText("Hello World!")
         }
